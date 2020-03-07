@@ -1,0 +1,131 @@
+
+string[3][3] board = NULL
+
+func checkSinglWin(string winner){
+  for i in 3{
+    ver = 0
+    for j in 3{
+      if board[i][j] == winner
+      ver++
+      if ver == 3
+      return true
+    }
+  }
+  
+  for i in 3{
+    ver = 0
+    for j in 3{
+      if board[j][i] == winner
+      ver++
+      if ver == 3
+      return true
+    }
+  }
+  //check diags
+  if winner == board[0][0] &&  winner == board[1][1] &&  winner == board[2][2]
+  return true
+  
+  if winner == board[2][0] &&  winner == board[1][1] &&  winner == board[0][2]
+  return true
+  
+}
+
+func checkWin(){
+  if checkSinglWin("X")
+  return "X"
+  if checkSinglWin("O")
+  return "O"
+}
+
+func makeBoard(){
+  for i in 3{
+    for j in 3{
+      board[i][j] = " "
+    }
+  }
+}
+
+func printBoard(){
+  for i in 3{
+    for j in 3{
+      printn(" "+board[i][j]+" ")
+      if j != 2
+      printn("|", "blue")
+    }
+    print("")
+    if(i != 2)
+    print("------------", "blue")
+  }
+  print("")
+  print("")
+}
+
+func dumbAI(){
+  played = false
+  while !played{
+    x = randInt(0,2)
+    y = randInt(0,2)
+    if board[x][y] == " "{
+      played = true
+      board[x][y] = "O"
+    }
+  }
+}
+
+func bool gameFull(){
+  for i in 3{
+    for j in 3{
+      if board[i][j] == " "
+      return false
+    }
+  }
+  return true
+}
+
+func playerMove(){
+  int x = 0
+  int y = 0
+  valid = false
+  while !valid{
+    x = toInt(input("Enter x: "))-1
+    y = toInt(input("Enter y: "))-1
+    valid = validMove(x, y)
+    if !valid
+    print("Invalid move")
+  }
+  board[x][y] = "X"
+}
+func validMove(x, y){
+  if x >= 3 || y>= 3 || x<0 || y< 0//check bounds
+  return false
+  
+  if board[x][y] == " "//check empty
+  return true
+  return false
+}
+
+func checkDone(){
+  return gameFull() || checkWin() 
+}
+
+func playGame(){
+  done = false
+  while !done{
+    printBoard()
+    playerMove()
+    done = checkDone()
+    if !done{
+      printBoard()
+      dumbAI()
+    }
+  }
+  printBoard()
+  print("The winner is player: "+checkWin())
+}
+
+do{
+   makeBoard()
+   playGame()
+}while(input("Do you want to play again(y/n)") == "y")
+
+

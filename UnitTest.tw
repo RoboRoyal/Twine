@@ -1,0 +1,138 @@
+/*
+File for testing some of the functuality of Twine,
+make sure I don't break anything/it was working in the first place
+*/
+
+int fails = 0
+int succs = 0
+
+func bool match(got, expected, string test){
+if(got!=expected){
+fails++
+print("Failed test: "+test, "red")
+print("Expected "+expected+" but got "+got)
+return false
+}else{
+succs++
+print("Pass "+test, "green")
+return true
+}
+}
+
+func resolver(){
+string str_a = "aAa"
+string str_b = "bBb"
+int int_c = 3
+match(str_a+int_c*str_b, "aAabBbbBbbBb", "Resolver:: str + int * str")
+}//TODO
+
+
+func testTryCatchTrow(){
+test = "nothing"
+try{
+a = 10
+throw "The error is: "+a
+}catch err{
+test = err
+}
+return match(test, "The error is: 10", "Try/Catch Throw")
+}
+
+func fileIO(){
+string me = "first"
+file = "testFile.txt"
+write(file,me)
+you = read(file)
+if you!=me{
+print("Failed on first(FILE IO)")
+return false}
+next="\nsecond"
+write(file,next,true)
+you = read(file)
+return match(you, me+next, "File IO")
+}
+
+func listTest(){
+a = {1,2.3,"four and five", {6,7,8}}
+match(1,a[0], "List int")
+match(2.3, a[1], "List double")
+match("four and five", a[2], "List string")
+match({6,7,8}, a[3], "List list")
+int[][3] b = {{0,1,2}, {1,2,3}}
+match(2, b[1][1], "Int[][3]")
+}
+func paramTest(){}
+func opsTest(){}
+func simpleMath(){
+a = 3
+b = 2
+b++
+match(a,b,"SimpleOPs::Increment++")
+c = 99
+//++c
+//match(c,100,"SimpleOPs::++Incramnet")
+c--
+match(c, 98, "SimpleOPs::Decrement--")
+b*=2
+match(6,b,"SimpleOPs::*=")
+a+=5
+match(8,a,"SimpleOPs::+=")
+a/=2
+match(4,a,"SimpleOPs::/=")
+b-=10
+match(-4,b,"SimpleOPs::-=")
+}
+//twineLibBasic
+
+
+
+func ANYTest(){
+a = 1.0
+b = -2.0
+c = "Test"
+d = "*"
+e = 3
+match(a++, 2.0, "ANY::++")
+a *= 5
+match(a, 10.0, "ANY::*=")
+match(c+d, "Test*", "ANY::string addition")
+match(d*e, "***" , "ANY::string multiplication")
+match(e*b, -6.0, "ANY::int * double")
+match(b*e, -6.0, "ANY::double * int")
+match(a%e, 1.0, "ANY::double % int")
+}
+
+func userIOTest(){
+printn("hello ")//no new line
+print("world")
+user = input("was hello world on one line and this on a new line?: (yes/no) ")
+return match(user, "yes", "User IO Test")
+}
+
+/*main*/
+func mainTest(){
+
+testTryCatchTrow()
+fileIO()
+listTest()
+paramTest()
+opsTest()
+//userIOTest()
+simpleMath()
+ANYTest()
+resolver()
+
+
+print("All tests done, "+succs+" succsseded, " + fails + " failed("+(100*succs/(succs+fails))+"%)")
+
+}
+
+mainTest()
+//I dont think this is a good way to lay out code, just put main in its own function for testing
+
+func assertTrue(bool value){
+if(!value){
+print("Error in assert True", "red")
+}
+}
+
