@@ -1,0 +1,50 @@
+
+
+//all about them objects
+
+class doNothing{
+const string str = "i am extended"
+func doNothing(){
+print("I am super constructor")
+}
+}
+
+class myClass extends doNothing{
+      string name = "taco-Time"
+      int secret = 6
+      
+      
+      func myClass(){
+      name = "new name"
+      }
+
+      func do_a_thing(int a = 4, string b = "B"){
+      	   print("My name is: "+name)
+	   return a*b*secret
+      }
+
+}
+
+
+myClass me = myClass()
+myClass you = myClass()
+
+
+print(me.toString())//auto generated toString() function
+print(you == me)//auto generated == and != functions
+
+you.name = "who are you"//member access
+
+print(you == me)//no longer the same
+
+classVar = myClass()// __ANY__ type vars can hold objects
+
+
+print("this: "+classVar.do_a_thing(2, "C"))
+int i = classVar.do_a_thing(2, "string")//__ANY__ type vars can still be used with member functions
+
+
+print("return  value was: "+i)
+
+print(randInt(3,99))//rand int
+print(randStr(10))//randstring

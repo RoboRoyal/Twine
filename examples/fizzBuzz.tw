@@ -1,0 +1,19 @@
+
+//Classic example fo FizzBuzz
+//Printe Fizz if i is divisible by 3
+//Prints Buzz if i is divisible by 5
+//Prints the current number otherwise
+
+for i in 1:20
+    fizzBuzz(i)
+
+
+func fizzBuzz(i){
+	if i%3 == 0
+	   printn("Fizz")
+	if i%5 == 0
+	   printn("Buzz")
+	if i%3 != 0 and i%5 != 0
+	   printn(i)
+	printn(", ")
+}

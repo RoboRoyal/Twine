@@ -1,0 +1,37 @@
+
+
+class alive{
+int age
+string name
+
+}
+
+class person extends alive{
+
+const int lifespand = 60
+
+func person(a, n){
+age = a
+name = n
+}
+
+func getOlder(){
+age++
+if age > 60{
+die()
+return false
+}
+return true
+}
+
+func die(){
+print(name+" has died")
+}
+
+}
+
+person ben = person(55, "ben")
+
+while ben.getOlder(){
+print("One year has passed")
+}

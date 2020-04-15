@@ -1,0 +1,51 @@
+
+//you can import regular .cpp and .h files
+//the files will be parsed to extract classes and functions (this currently fails on complicated files)
+#import examples/cpp_file.cpp 
+
+
+//you can include files right from the internet
+//files will be downloaded with wget into the downloadedImports directory
+//imported files will be automatically run in place
+#import https://raw.githubusercontent.com/RoboRoyal/notReal/master/tad.tw
+
+//importing bool isGreater(int num) from internet
+#import https://raw.githubusercontent.com/RoboRoyal/notReal/master/check.cpp
+
+
+cppFunc(number = 99, str = "hello cpp")//cpp functions can be called the same way as any other function
+
+
+isBigger = isGreater(6)//return values also work for cpp functions
+
+
+for i in "this is a string"{//looping through a string works
+if i != " "//no () or {} are required for if statments
+printn(i)//printn means dont print a newline after the statent
+}
+print()//print new line
+
+for i in 5:10{//loop from 5 to 15
+printn(i)
+}
+print()
+
+print("i am colorfull", "red", "yellow")//forground and background color can be set when printing
+
+
+
+
+//to access arguments passed to the program, use:
+print(args)
+print(args[0])
+
+
+//static sized, multi dimentional arrays arrays
+//int[3][2] foo = {{1,2},{3,4},{5,6}}
+int[][3] foo = {{0,1,2}, {1,2,3}}
+print(foo)
+
+//dynamic-varried sized array
+bar = {1,2.34, "five", {6,"seven and 8", {9}}}
+print(bar)
+

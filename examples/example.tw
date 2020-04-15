@@ -1,0 +1,45 @@
+
+
+//line comment
+
+/*multi-line
+block comment*/
+
+globe = 99//This is a global varriable, accessable from anywhere
+
+bar()//can call a function before it is defined
+
+//functions can be declaired with func kew word
+func bar(int num = 99){//parameters can have a defualt value
+print("This is an integer: "+num+" and the global value "+globe)//automatic type formatting
+return 42//return type is automatically determined
+}
+
+
+func double foo(a=1, double b=2.3, c= "hello"){//type of parameters can by dynamic
+thing = a+b+c
+return thing//will be converted into a double as that is the specified return type
+}
+
+
+string me = foo(b="happy")+"aBcD"//parameters can by specified by name, types will be automatically converted(in this case a double to string)
+
+print("String: "+me)//show what me is origonally
+print("String *2: "+(me*2))//strings can be mulitplied ("Abc"*2 = "AbcAbc")
+
+print("String -3: "+(me-3))//string can be subtracted from to remove trailing charecters
+
+globe = "hello world"//dynamic type change of globe value
+bar("this is a string")//more dynamic type changing
+
+
+
+int[] intList = {1,2,99,2} //dynamic sized list
+var[2][2] square = {{1,true,},{"string",4.4}}//fixed sized array, dynamic type
+//var other = {8,{42,"str"}, false, {true,{false, "happy days"}}} //array with muliple types and sized sub arrays
+
+print(intList)//arrays and lists can be automatically converted to string
+print(square)
+//print(other)
+
+

@@ -1,0 +1,8 @@
+
+int[] numbers = 100[2:]//get a list of number from 2 to 100
+
+
+while numbers.size(){//loop until there are no number left
+print(numbers[0])//print first number
+numbers = numbers[1::numbers[0]]//remove first number and all multiples of it
+}
