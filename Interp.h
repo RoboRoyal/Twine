@@ -29,10 +29,9 @@ public:
 };
 
 const string versionNumber = "null";
-bool implicitPrint;
+bool implicitPrint = false;
 
 vector<string> stackTrace;
-//__ANY__ stackTrace;
 
 int Interp();//Take flags?
 void printWelcome();
@@ -63,7 +62,7 @@ __ANY__ interpAtom(atom * a);
 __ANY__ applyOP(__ANY__ left, const string& OP ,__ANY__ right);
 __ANY__ applyOP(__ANY__ left, const string& OP);
 __ANY__ applyOP(const string& OP, __ANY__ right);
-__ANY__ interpDot(__ANY__ left, atom* right);
+__ANY__ interpDot(__ANY__& left, atom* right);
 
 void cleanUp(prog * Prog);
 void analizeProg(prog * Prog);

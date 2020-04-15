@@ -421,7 +421,6 @@ __ANY__ interpFunkCall(funkCall * fc){
     print(me);
     //return me;
   }else if(fc->funkName == "help"){
-    //cout<<"help"<<endl;
     interpHelp(interpExpression(fc->parameters.at(0)).toString());
     return 0;
   }else if(fc->funkName == "exit"){
@@ -686,7 +685,7 @@ string interpDotOnString(string left, atom * right){
   warn("Invalid call "+call+" on type string");
   return "";
 }
-__ANY__ interpDot(__ANY__ left, atom * right){//this is a temp function until ther interpreter gets proper object support
+__ANY__ interpDot(__ANY__& left, atom * right){//this is a temp function until ther interpreter gets proper object support
   //__ANY__ left = interpAtom(leftAtom);
   string call = right->fCall->funkName;
   if(call == "at"){

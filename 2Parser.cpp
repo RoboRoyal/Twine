@@ -379,6 +379,7 @@ void addNotEquals(object * obj){
 }
 void addString(object * obj){
   Funk * F = new Funk;
+  F->constant = true;
   F->returnType = var("string");
   F->name = "toString";
   parseNode * p = new parseNode;

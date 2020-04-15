@@ -220,7 +220,7 @@ bool TransProg(){
   return true;
 }
 void TransClass(object * N){
-  debugT("TransClass");
+  debugT("TransClass()");
   out+="class "+N->name;
   if(N->isBranch){
     out+=": public runnable<"+((branch*)N)->type+">";
@@ -248,7 +248,17 @@ void TransClass(object * N){
   }
   //add type() for class
   out += "string type(const "+N->name+" NoN){\n\treturn \""+N->name+"\";}\n";
-  debugT("TransClass");
+  TransToString(N);
+  debugT("TransClass() dene");
+}
+void TransToString(object * N){
+  debugT("TransToString()");
+  out += "string toString(const ";
+  out += N->name+"&";
+  out += " data){\n";
+  out += "return data.toString();\n";
+  out += "}\n";
+  debugT("TransToString() done");
 }
 void TransClassVar(var * N, string object){
   debugT("TransClassVar()");
@@ -337,6 +347,8 @@ void TransFunkKW(Funk * N, bool regFunk, bool includeStartingValue){
   }
 
   out+=")";
+  if(N->constant)
+    out += "const";
   debugT("TransFunkKW() done");
 }
 

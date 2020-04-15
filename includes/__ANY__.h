@@ -119,6 +119,16 @@ public:
     }
     ptr = tmp;
   }
+
+  template<typename T, int size> __ANY__(const array<T, size>& data){
+    type = VECTOR;
+    vector<__ANY__> * tmp = new vector<__ANY__>();
+    for(int i = 0; i < size; i++){
+      //tmp->emplace_back(__ANY__(data[i]));
+      tmp->push_back(__ANY__(data[i]));
+    }
+    ptr = tmp;
+  }
   
   //template class for any other data type
   template <typename T>
@@ -462,6 +472,7 @@ public:
     }
   };
   string toString()const{
+    //cout<<"__ANY__ toString()"<<endl;
     if(type == INT){//int
       return(to_string((long long) i));
     }else if(type == DOUBLE){

@@ -55,6 +55,7 @@ bool TransBlockComment(parseNode * N);
 bool tempStart();
 void tempEnd();
 void TransClass(object * N);
+void TransToString(object * N);
 
 const string varListDef(var * v);
 const string resolveVarType(var * v);

@@ -457,11 +457,16 @@ const nameSpace nameSpaces[] = {
 				 },				
 };
 
+//a.insert(b,c) -> a.insert(a.begin()+b,c)
+
 bool valipOP(const string& nameSpace, const string& OP){//TODO
   for(int i = 0; i< sizeof(nameSpaces)/sizeof(nameSpaces[0]); i++){
     if(nameSpace == nameSpaces[i].name){
       if(nameSpaces[i].validOPs.size() == 0)
 	return true;      
+      for(int j = 0; j<nameSpaces[i].validOPs.size();j++)
+	if(nameSpaces[i].validOPs[j] == OP)
+	  return true;
     }
   }
   return false;

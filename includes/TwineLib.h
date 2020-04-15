@@ -228,6 +228,9 @@ string toString(const double pol, int decmalCount = -1){//TODO
   return tmp;
 }
 
+/*template<class T> string toString(const T& data){
+  return data.toString();
+  }*/
 //end casts
 
 double max(const __ANY__ &x){
