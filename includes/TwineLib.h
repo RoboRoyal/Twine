@@ -201,7 +201,6 @@ int toDouble(__ANY__ a,int base = 10){//TODO base change
 }
 double toDouble(const bool& b, int base = 10){return b;}
 
-string toString(const __ANY__& a){return a.toString();}
 
 string toString(const int& num){return to_string(num);}
 
@@ -227,7 +226,19 @@ string toString(const double pol, int decmalCount = -1){//TODO
   }
   return tmp;
 }
+template<typename T, size_t N> string toString(const array<T, N>& arr, long start = 0, const long end = -1){//repeated code in print
+  string ret = "{";
+  for(;start < N && (end == -1 || start <= end);){
+    ret += toString(arr[start]);
+    start++;
+    if(start < N && (end == -1 || start <= end))
+      ret += ',';
+  }
+  ret += '}';
+  return ret;
+}//missing vector
 
+string toString(const __ANY__& a){return a.toString();}
 /*template<class T> string toString(const T& data){
   return data.toString();
   }*/

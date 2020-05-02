@@ -12,18 +12,18 @@
 #include "Lexer.h"
 #include "2Parser.h"
 
-void parseCppFile(string name);
-vector<TokenData>* getTokenisedFile(string fileName);
+void parseCppFile(const string& name);
+vector<TokenData>* getTokenisedFile(const string& fileName);
 void parseCppTop();
 bool allow(const string& text);
 var * parseCppParameterVar();
 Funk * parseCppFunction();
-void parseCppFile(string pathToFile);
+void parseCppFile(const string& pathToFile);
 object * parseCppClass();
 bool checkIfFunc();
 
 
-vector<TokenData>* getTokenisedFile(string fileName){
+vector<TokenData>* getTokenisedFile(const string& fileName){
   //set lexer to right settings
   //dont save comments/whitespaces, yes scrub, 
   string importFileText = "";
@@ -127,7 +127,7 @@ Funk* parseCppFunction(){
   return cppFunk;;
 }
 
-void parseCppFile(string pathToFile){
+void parseCppFile(const string& pathToFile){
   vector<TokenData>* tokens = getTokenisedFile(pathToFile);
   if(tokens == NULL || tokens->size() < 3)
     return;

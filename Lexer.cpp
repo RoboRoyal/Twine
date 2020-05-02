@@ -20,12 +20,19 @@ inline CharClassifier::Type CharClassifier::get(char C){
 bool Lexer(string * data, vector<TokenData>* tokens){
   if(data->size() == 0) return false;//error if there is nothing
 
+  
+  //int a = tokens->capacity();
+  //int b = ((data->size()/6)+2);
+  
   if(!tokens->capacity())
     tokens->reserve((data->size()/6)+2);
   
-  if(lex(data, tokens))
+  if(lex(data, tokens)){  
+    //cout<<"Data: "<<a<<" "<<b<<" "<<tokens->size()<<endl;
+    //exit(99);
     return true;
-
+  }
+  
   return false;
 }
 
@@ -166,9 +173,8 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
 		break;
 	      }
 	    }//end for(x)
-	  }
-	}//hope you like closing braces ;)
-	//as a note ther use to be a lot more
+	  }//if(lastCharClass == CharClassifier::OPERATOR)
+	}//else
 	tok += C;
 	tokens->emplace_back(tok, line, charPos-tok.length(), TokenData::OPERATOR);//operators
 	tok = "";
@@ -268,7 +274,7 @@ void addLitteral(TokenData i, vector<TokenData>* tokens){//should take refrence 
 	report("Setting value to: "+i.tokenText,0);
       }else{
 	//return false;
-	throw 99;
+	exit(5);
       }
     }
   }else if(isReserved(i.tokenText)){//checks reserved words

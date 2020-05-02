@@ -195,6 +195,7 @@ struct functions{
   string returnType;
   string params;
   string help;
+  string alias;
   string toString()const{
     string ret = name+"("+params+")";
     short len = ret.length();
@@ -438,8 +439,8 @@ const nameSpace nameSpaces[] = {
 				  {},//no static methods
 				  {
 				   //list of dynamic methods
-				   {"append", "void", "* data","Adds new element to the end of the list"},
-				   {"appendFront", "void", "* data", "Adds new element to the front of the list"},
+				   {"append", "void", "* data","Adds new element to the end of the list", "push_back"},
+				   {"appendFront", "void", "* data", "Adds new element to the front of the list", "push_front"},
 				   {"at", "*", "int position", "Returns dat at the givien position"},
 				   {"resize", "void", "int size", "Makes the list a certain size"},
 				   {"insert", "void", "int position, * data", "Inserts the given element at the given position"},

@@ -1,7 +1,12 @@
+
+/*
+Main file for handling command line inputs
+Handls calls to lexer, parser, and trans
+*/
+
 /*
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-
 */
 #include "utils/Twine_Utils.h"
 #include "Lexer.cpp"

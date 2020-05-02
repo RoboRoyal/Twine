@@ -318,9 +318,12 @@ void addDefualtConstructor(object * obj){
   obj->memberFunks.push_back(F);
 }
 void addEquals(object * obj){//used to auto generate == operator in a class
+  
   Funk * F = new Funk;
+  F->constant = true;
   F->returnType = var("bool");
   F->name = "operator==";
+
   var a = var();
   a.type = obj->name;
   a.constant = true;
@@ -340,14 +343,19 @@ void addEquals(object * obj){//used to auto generate == operator in a class
   p->data += "return true;";
   F->funkBlock->Lines.push_back(p);
   obj->memberFunks.push_back(F);
+  
   Funk * G = new Funk;
-  var b = var();
+  G->constant = true;
   G->returnType = var("bool");
   G->name = "operator==";
+  
+  var b = var();
   b.type = "__ANY__";
   b.constant = true;
+  b.reference = true;
   b.name = ("a");
   G->parameters.push_back(b);
+  
   parseNode * l = new parseNode;
   l->type = "C++";
   l->data = "if(typeid(*this).name() == a.type && (*("+obj->name+"*) a.ptr) == (*this)) return true; return false;";
@@ -355,15 +363,19 @@ void addEquals(object * obj){//used to auto generate == operator in a class
   obj->memberFunks.push_back(G);
 }
 void addNotEquals(object * obj){
+
   Funk * F = new Funk;
+  F->constant = true;
   F->returnType = var("bool");
   F->name = "operator!=";
+  
   var a = var();
   a.type = obj->name;
   a.constant = true;
   a.reference = true;
   a.name = "ot";
   F->parameters.push_back(a);
+  
   parseNode * p = new parseNode;
   p->type = "C++";
   if(obj->extends != "Object" && !obj->isBranch)
@@ -377,11 +389,14 @@ void addNotEquals(object * obj){
   F->funkBlock->Lines.push_back(p);
   obj->memberFunks.push_back(F);
 }
+
 void addString(object * obj){
+  
   Funk * F = new Funk;
   F->constant = true;
   F->returnType = var("string");
   F->name = "toString";
+  
   parseNode * p = new parseNode;
   p->type = "C++";
   p->data = "string out = string(\""+obj->name+"\")+\" @\"+to_string((long long) this)+'\\n';\n";
@@ -408,6 +423,7 @@ void addString(object * obj){
 }
 
 void addStaticString(object * obj){
+  
   Funk * F = new Funk;
   F->STATIC = true;
   F->returnType = var("string");
@@ -1572,6 +1588,7 @@ Funk * functionsToFunk(functions func){//TODO leaks mem unless ptr is saved
   }
   return tmp;
 }
+
 object * nameSpaceToObject(nameSpace n){
   object * obj = new object;
   obj->name = n.name;

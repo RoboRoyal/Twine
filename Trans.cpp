@@ -347,8 +347,11 @@ void TransFunkKW(Funk * N, bool regFunk, bool includeStartingValue){
   }
 
   out+=")";
-  if(N->constant)
+
+  if(N->constant){
     out += "const";
+  }
+  
   debugT("TransFunkKW() done");
 }
 

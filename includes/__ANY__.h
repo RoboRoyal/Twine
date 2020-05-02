@@ -33,8 +33,8 @@ public:
   __ANY__ runObjFunkHelper(const string& funcName, va_list& args );
   __ANY__ getObjVar(const __ANY__& obj, const string varName);
   __ANY__ getObjVar(const string varName){ return getObjVar(*this, varName);}
-  union{void * ptr;bool b;int64_t i; double d;};//TODO should honestly have doubles as non-pointer
-  //union{void * ptr;bool b;int32_t i; double d};//like this
+  union{void * ptr;bool b;int64_t i; double d;};
+
   string type;
   /*
     _I = int64_t
@@ -697,17 +697,17 @@ public:
 	  tmp->erase(i, ((string*)a.ptr)->length());
 	b.ptr=tmp;
       }else if(a.type == INT || a.type == DOUBLE|| a.type == BOOL){//remove last # of chars from this
+	//TODO error check
+#ifndef TWINE_QUIET
+	long tmp = a.toNum();
+	if(tmp > (*(string*)this->ptr).length())
+	  throw invalid_argument("Can not subtract "+to_string(tmp)+" chars from string of length "+to_string((*(string*)this->ptr).length()));
+#endif //TWINE_QUIET
 	b.type = STRING;
-	//string * tmp = new string(*(string*)this->data);
 	b.ptr = new string((*(string*)this->ptr).substr(0,(*(string*)this->ptr).length()-a.toNum()));//TODO
-	//b.data=tmp;
-	/*}else if(a.type == BOOL){
-	b.type = STRING;
-	*/
-        //remove last char from this
       }else{
 #ifndef TWINE_QUIET
-	throw(invalid_argument("Trying to subtract invalid type: "+a.type+" from type string"));
+	throw invalid_argument("Trying to subtract invalid type: "+a.type+" from type string");
 #endif //TWINE_QUIET
       }
     }else if(this->type == INT || this->type == DOUBLE){
