@@ -306,6 +306,7 @@ struct nameSpace{
   }
 };
 
+const string baseNameSym = "$";
 
 const nameSpace nameSpaces[] = {
 				{"string", "Any combination of numbers, symbols, and letters of any length",
@@ -440,10 +441,11 @@ const nameSpace nameSpaces[] = {
 				  {
 				   //list of dynamic methods
 				   {"append", "void", "* data","Adds new element to the end of the list", "push_back"},
-				   {"appendFront", "void", "* data", "Adds new element to the front of the list", "push_front"},
+				   //{"appendFront", "void", "* data", "Adds new element to the front of the list", "push_front"},
+				   {"begin", "int", "void", "Pointer to start of list"},
 				   {"at", "*", "int position", "Returns dat at the givien position"},
 				   {"resize", "void", "int size", "Makes the list a certain size"},
-				   {"insert", "void", "int position, * data", "Inserts the given element at the given position"},
+				   {"insert", "void", "int position+$.begin()+, * data", "Inserts the given element at the given position"},
 				   {"clear", "void", "void", "Removes all elements in list"},
 				   {"size", "int", "void", "Returns how many elements are in the list"},
 				  },

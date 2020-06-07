@@ -636,7 +636,6 @@ void parseFunkKW(Funk* F){//TODO lint checks happen twice here
     F->closed = true;
   //get and set name
   if(accept(TokenData::IDENT)){//function name
-    //cout<<"accepting name: "<<lastSym->tokenText<<endl;
     F->name = lastSym->tokenText;
     if(peek() != "(" && accept(TokenData::OPERATOR))
       F->name += lastSym->tokenText;
@@ -660,19 +659,6 @@ void parseFunkKW(Funk* F){//TODO lint checks happen twice here
 
   while(!accept(")")){
     if(!(accept(",") ^ needComma)){
-      /*
-      var a = var();
-      if(accept("const"))
-	a.constant = true;
-      if(acceptType()){
-	a.type = lastSym->tokenText;//TODO acceptType vs valueType?
-      }else{
-	a.type = "__ANY__";
-	if(lint && currentLineOn) checkTypeAllow(a.name);//check for currentLineOn so it only prints lint msg durring normal parsing, not durring pre-scan
-      }
-      expect(TokenData::IDENT);//should be name of var
-      a.name = lastSym->tokenText;
-      */
       var a = parseVar();
       if(accept(".")){// && accept(".") && accept(".")){//poor way of doing it
 	expect("."); expect(".");
@@ -1580,12 +1566,17 @@ Funk * functionsToFunk(functions func){//TODO leaks mem unless ptr is saved
     if(split(singleParam.at(1),"=").size() == 2){
       newVar->name = split(singleParam.at(1), "=").at(0);
       newVar->startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
+    }else if(split(singleParam.at(1),baseNameSym).size() == 2){
+      newVar->name = split(singleParam.at(1), "=").at(0);
+      newVar->startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
     }else{
       newVar->name = singleParam.at(1);
     }
     tmp->parameters.push_back(*newVar);
     delete newVar;
   }
+  if(func.alias.length())
+    tmp->alias = func.alias;
   return tmp;
 }
 
@@ -1898,6 +1889,11 @@ void parseFunkCallParameters(funkCall * fc, Funk * F){
   //if(fc->isVer &&
   if(F->dynamicParamType != "" && F->parameters.size() == currentParam)
     fc->parameters.push_back(intToExp3(0));
+
+  //set alias to real name
+  if(F->alias != ""){
+    fc->funkName = F->alias;
+  }
   debug("parseFunkCallParameters() done");
 }
 

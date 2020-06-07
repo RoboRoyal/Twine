@@ -4,6 +4,7 @@
 bool Trans(){//, vector<Funk> * ProgPtr){
   report("Trans compiling...",0);
   out = "";//all methods write output to out, which gets writen to output file
+  out.reserve(10*(Prog->totalComplexity()) + 800);//TODO
   tempStart();//makes new file/clear existing file, then writes out template
   TransForwardDeclair();
   if(!TransProg()){
@@ -12,7 +13,7 @@ bool Trans(){//, vector<Funk> * ProgPtr){
   }
   tempEnd();
   //write();
-  report("Trans compiling done",0);
+  report("Trans compiling done", 0);
   return true;
 }
 bool TransRunner(){//TODO extends
@@ -87,7 +88,7 @@ void TransThing(){
 }
 
 bool tempStart(){//sets configuration and gets template file
-  string tmp = "/*TWINE_VERSION = "+TWINE_VERSION+"*/";
+  string tmp = "/*TWINE_VERSION = "+TWINE_VERSION+"*/\n";
   for(int i = 0; i < sizeof(compileFlags)/sizeof(compileFlags[0]);i++){
     if(compileFlags[i].enabled){
       tmp+= "#define "+compileFlags[i].name+'\n';
@@ -98,7 +99,7 @@ bool tempStart(){//sets configuration and gets template file
   tmp+="#define TWINE_SAFE\n";
   tmp+="#include \""+INSTALL_PATH+"includes/CONFIG."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";//I know im using .h.gch...
   tmp+="#include \""+INSTALL_PATH+"includes/EXTERN."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
-  //tmp+="#define int int32_t\n";//i think it should be int64_t as that is what ANY use4s as defualt
+  //tmp+="#define int int32_t\n";//i think it should be int64_t as that is what ANY uses as defualt
   tmp+="#include \""+INSTALL_PATH+"includes/__ANY__."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   tmp+="#include \""+INSTALL_PATH+"includes/TwineLib."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   tmp+="#include \""+INSTALL_PATH+"includes/Channel."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
@@ -961,6 +962,7 @@ const string resolveVarType(var * v){
 void write(){
   //appendFile(outFileName.c_str(),&out);
   appendFile(cppFileName.c_str(),&out);
+  report("Writing "+to_string(out.length())+" chars", 0);
   out = "";
 }
 void debugT(const string& s){

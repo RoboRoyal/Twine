@@ -21,15 +21,10 @@ bool Lexer(string * data, vector<TokenData>* tokens){
   if(data->size() == 0) return false;//error if there is nothing
 
   
-  //int a = tokens->capacity();
-  //int b = ((data->size()/6)+2);
-  
   if(!tokens->capacity())
     tokens->reserve((data->size()/6)+2);
   
   if(lex(data, tokens)){  
-    //cout<<"Data: "<<a<<" "<<b<<" "<<tokens->size()<<endl;
-    //exit(99);
     return true;
   }
   

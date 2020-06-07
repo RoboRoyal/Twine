@@ -92,6 +92,7 @@ class var{
   bool atomic;//aka safe
   bool ptr;
   bool isList;
+  bool isBegin;
   string name;
   expression3 * startingValue;
   expression2 * startingValue2;
@@ -299,7 +300,8 @@ public:
 class Funk{
 public:
   string name;
-  //string returnType;
+  string alias;
+
   var returnType;
   vector<var> parameters;
   
