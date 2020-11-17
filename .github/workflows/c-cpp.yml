@@ -16,7 +16,7 @@ jobs:
     - name: make
       run: make
     - name: first
-      run: make first
+      run: make prog
     - name: test
       run: make test
 
