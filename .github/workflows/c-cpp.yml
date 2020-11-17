@@ -15,7 +15,8 @@ jobs:
     - uses: actions/checkout@v2
     - name: make
       run: make
-    - name: test
-      run: make test
     - name: first
       run: make first
+    - name: test
+      run: make test
+
