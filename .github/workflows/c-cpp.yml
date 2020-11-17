@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: enable
-      run: chmod twine +x
     - name: make
       run: make
+    - name: enable
+      run: chmod twine +x
     - name: first
       run: make prog
     - name: test
