@@ -351,6 +351,16 @@ template<typename T, size_t N> void print(const array<T, N>& arr, const string& 
   cout<<"}"<<endl;
 }
 
+void print(const __ANY__& data, const string& text_color = "", const string& background_color = ""){
+  static bool canColor = canOutputColor();
+  const string __tmp__ = data.toString();
+  if(!canColor){
+    cout<<__tmp__<<'\n';
+  }else{
+    cout<<"\033["<<getForgroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<__tmp__<<"\033[0m\n";
+  }
+}
+
 template<typename T> void print(const T& data, const string& text_color = "", const string& background_color = ""){
   static bool canColor = canOutputColor();//TODO can make this one var for both functions?
   if(!canColor){
@@ -390,10 +400,6 @@ void print(const char a[]){
 }
 void printn(const char a[]){
   cout<<a;
-}
-void print(const __ANY__& a){
-  //cout<<"print called: "<<a.type<<" "<<a.toString()<<endl;
-  cout<<a.toString()<<'\n';
 }
 void printn(const __ANY__& a){
   cout<<a.toString();
@@ -482,5 +488,10 @@ string read(const string fileName){
   return text;
 }
 ;
+
+template<typename T> 
+void insert(vector<T>& in, const long pos, const T& thing){
+  in.insert(in.begin()+pos, thing);
+}
 
 #endif//TWINELIB_BASIC

@@ -24,22 +24,23 @@ class returnExit : public exception{//used for exit();
 public:
   int exitCode = 0;
   string what(){
-    return "Exit exception";// with status: "+to_string((long long) exitCode);
+    return "Exit exception with status: "+to_string((long long) exitCode);
   }
 };
 
 const string versionNumber = "null";
 bool implicitPrint = false;
+//__ANY__ lastEval = __ANY__();//maybe i will imp?
 
 vector<string> stackTrace;
 
-int Interp();//Take flags?
+int Interp(const string& = "");//Take flags?
 void printWelcome();
 
 string getInput();
 int checkFlags(const string& line);
 void initialVarSetUp();
-int executeInterp(string data);
+int executeInterp(const string& data, const bool runMain = true);
 
 bool interpProg(prog * prog);
 __ANY__ interpFunk(Funk * f);
@@ -60,8 +61,8 @@ __ANY__ interpExpression(expression3 * exp);
 __ANY__ interpAtom(atom * a);
 
 __ANY__ applyOP(__ANY__ left, const string& OP ,__ANY__ right);
-__ANY__ applyOP(__ANY__ left, const string& OP);
-__ANY__ applyOP(const string& OP, __ANY__ right);
+__ANY__ applyOP(__ANY__ left, const string& OP, const string& name = "");
+__ANY__ applyOP(const string& OP, __ANY__ right, const string& name = "");
 __ANY__ interpDot(__ANY__& left, atom* right);
 
 void cleanUp(prog * Prog);

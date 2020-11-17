@@ -233,6 +233,7 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
   }
   if(EXP->helper != targetType && targetType != "" || targetType != "*")
     applyCast(EXP, targetType);
+  //delete expIn;
   debug("resolveExpressionHelper("+EXP->helper+") done");
   return EXP;
 }

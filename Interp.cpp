@@ -5,7 +5,7 @@
 scope parseVars;// = scope();//something, init
 interpMe vars;
 
-int Interp(){
+int Interp(const string& in){
   int exitStatus = 0;
   interpMode = true;
   printWelcome();//these lines could go in setup() or init()
@@ -19,11 +19,19 @@ int Interp(){
   stackTrace = vector<string>();
   stackTrace.push_back("userMain");
   bool cont = true;
+  bool didIn = false;
   do{
     indent = 0;
     implicitPrint = false;
     if(reportingLevel < 1){cout<<"peeking now"<<endl;vars.peekScope(); analizeProg(Prog);}
-    string data = getInput();
+    string data;
+    if(in != "" && !didIn){
+      data = in; 
+      didIn = true;
+    }else{
+      data = getInput();
+    }
+    
     int flagStatus = checkFlags(data);//checks flags like exit and help; returns 1 if exit, 2 if help/about, 0 if no flag
     if(flagStatus == 1)
       //return 0;
@@ -42,10 +50,10 @@ int Interp(){
   report("Exited with code: "+to_string((long long) exitStatus), 0);
   return exitStatus;
 }
-int executeInterp(string data){//Make string ptr
+int executeInterp(const string& data, const bool runMain){
   vector<TokenData> tokens;
   if(!Lexer(&data,&tokens)){
-    cout<<"Unable to lex"<<endl;//print error msg
+    error("Unable to lex");
     return false;
   }
   if(reportingLevel < 0){
@@ -62,7 +70,7 @@ int executeInterp(string data){//Make string ptr
     cleanUp(Prog);
     return false;
   }
-
+  
   try{
     interpProg(Prog);
   }catch(returnExit e){//exits interpreter
@@ -70,11 +78,13 @@ int executeInterp(string data){//Make string ptr
   }catch(returnExcep& e){//return value
     print(e.data);
   }catch(exception& e){//TODO this doesnt print the proper error msg
-    cout<<"Error interpreting: "<<e.what()<<endl;
+    error(string("Exception in interpretation: ")+e.what());
   }
   cleanUp(Prog); //we want to run, then delete Main;  keep all other functions
   return false;
 }
+
+//Clears main function
 void cleanUp(prog * Prog){
   report("Cleaning up",-2);
   for(int i = 0; i<Prog->functions.size();i++){
@@ -83,13 +93,20 @@ void cleanUp(prog * Prog){
       for(auto messyPtr : Prog->functions.at(i)->funkBlock->Lines){
 	delete messyPtr;
       }
-      Prog->functions.at(i)->funkBlock->Lines.clear();
-      //delete Prog->functions.at(i)->funkBlock;
-      //Prog->functions.at(i)->funkBlock = new Block();
+      //Prog->functions.at(i)->funkBlock->Lines.clear();
+      Prog->functions.at(i)->funkBlock->Lines = vector<parseNode*>();
+      
+      /*delete Prog->functions.at(i);
+      Funk * newMain = new Funk();
+      newMain->name = "__userMain__";
+      Prog->functions.insert(Prog->functions.begin(), newMain);
+      */
+      break;
     }
   }
   report("All clean", -2);
 }
+
 int checkFlags(const string& data){//or check for exit(), 0= no flags, 1=exit, 2 = other flag(dont execute but dont exit)
   if(data == string("exit\n\n")){
     return 1;
@@ -140,9 +157,6 @@ bool interpProg(prog * Prog){//since it parsed already, it should run okay
   try{
     //Execute main
     interpBlock((*Prog->functions.begin())->funkBlock, false);//TODO what about interpUserFunkCall to main?
-    
-    //funkCall fc = funkCall();
-    //interpUserFunkCall((*Prog->functions.begin()), &fc);
     
   }catch(returnExit e){
     debug("interpProg(EXIT) done");
@@ -211,7 +225,7 @@ void interpBlock(Block * b, bool pushScope){
 }
 
 void interpLine(parseNode * N){
-  debug("interpLine()");
+  debug("interpLine("+N->type+")");
   if(N->type == "WHILE"){
     interpWHILE((WHILE *)N->theThing);
   }else if(N->type == "FOR2"){
@@ -222,12 +236,10 @@ void interpLine(parseNode * N){
     interpVarAss((varAssign *)N->theThing);
   }else if(N->type == "funkCall"){
     interpFunkCall((funkCall *)N->theThing);
-  }else if(N->type == "exp3"){//TODO
-    if(implicitPrint)
-      print(interpExpression((expression3 *)N->theThing));
-  }else if(N->type == "exp2"){//TODO
-    if(implicitPrint)
-      print(interpExpression((expression2 *)N->theThing));
+  }else if(N->type == "exp3"){
+    interpExpression((expression3 *)N->theThing);
+  }else if(N->type == "exp2"){
+    interpExpression((expression2 *)N->theThing);
   }else if(N->type == "ret"){
     returnExcep ret = returnExcep();
     ret.data = interpExpression((expression3 *)(N->theThing));
@@ -436,7 +448,10 @@ __ANY__ interpFunkCall(funkCall * fc){
   return __ANY__(0);
 }
 
-__ANY__ interpExpression(expression3 * exp){
+//x=90
+//print(x)
+//print(x) --this segfualt, size is wrong, exp must get messed up(deconstruc?)
+__ANY__ interpExpression(expression3 * exp){//doesnt do ++ or --
   debug("interpExpression(3) with size: "+to_string(exp->bigAtoms->size())+".  ");
    //if length =1 return
    if(exp->bigAtoms->size() == 1)
@@ -444,7 +459,12 @@ __ANY__ interpExpression(expression3 * exp){
    //if length =2 return apply OP
    if(exp->bigAtoms->size() == 2){
      if(exp->bigAtoms->front()->type == bigAtom::ATOM){
-       return applyOP(interpAtom(exp->bigAtoms->front()->a),exp->bigAtoms->at(1)->op);
+       atom * tmp = exp->bigAtoms->front()->a;
+       /*error(tmp->type);
+       if(tmp->type == "var")
+       error("yes");*/
+       return applyOP(interpAtom(tmp),exp->bigAtoms->at(1)->op);
+		      
      }else{
        return applyOP(exp->bigAtoms->front()->op,interpAtom(exp->bigAtoms->at(1)->a));
      }
@@ -539,6 +559,7 @@ __ANY__ interpExpression(expression2 * exp){
 }
 
 __ANY__ interpExpression(expression * exp){
+  error("How did this happen?");
   __ANY__ a = interpAtom(exp->atoms[0]);
   for(int i = 1;i<exp->atoms.size();i++){
     a = applyOP(a,exp->OPs[i-1],interpAtom(exp->atoms[i]));
@@ -546,21 +567,24 @@ __ANY__ interpExpression(expression * exp){
   return a;
 }
 __ANY__ interpAtom(atom * a){
-  debug("interpAtom("+a->type+")--");
+  debug("interpAtom("+a->type+"~"+to_string(a->stringLit)+")--");
   if(a->type == "lit"){//TODO will print strings with same name as var as var vale: a = 99, print("a") prints 99, not a
     string name = *(a->literalValue);
-    //cout<<"A"<<endl;
-    __ANY__ c = vars.getVar(name);//assume its a var
-    //cout<<"B"<<endl;
-    if(c != __ANY__("DNE")){//if the value if found, return it
-      //cout<<"C"<<endl;
-      return c;
+    if(a->stringLit){
+      return name;
+    }else{
+      __ANY__ c = vars.getVar(name);
+      if(c != __ANY__("DNE")){//if the value if found, return it
+	return c;
+      }
+      //ERROR, how?
+      //throw invalid_argument("Var "+name+" not found!~~");
+      a->helper.type = "num";
     }
-    //cout<<"D"<<endl;
+
     if(a->helper.type == "num" || a->helper.type == ""){//if it is supposed to be a number, try to turn it into one
-      //cout<<"E"<<endl;
+
       try{return __ANY__(stoi(name));}catch(invalid_argument e){}//try int
-      //cout<<"E_1"<<endl;
       try{return __ANY__(stod(name));}catch(invalid_argument e){}//try double
 
       if(name == "true")
@@ -583,24 +607,30 @@ __ANY__ interpAtom(atom * a){
   }
   return false;
 }
-__ANY__ applyOP(const string& OP, __ANY__ right){
+__ANY__ applyOP(const string& OP, __ANY__ right, const string& varName){//TODO make it do ++ and --
   if(OP == "++"){
-    return right++;
+    right++;
   }else if(OP == "--"){
-    return right--;
+    right--;
   }else{
     error("Unsupported op: "+OP);
   }
-  return __ANY__(0);
+  if(varName != "")
+    if(vars.setVar(varName, right))
+      error("seting new var whne should be(applyOP right; "+OP+")");
+  return right;
 }
-__ANY__ applyOP(__ANY__ left, const string& OP){
+__ANY__ applyOP(__ANY__ left, const string& OP, const string& varName){
   if(OP == "++"){
-    return ++left;
+    ++left;
   }else if(OP == "--"){
-    return --left;
+    --left;
   }else{
     error("Unsupported op: "+OP);
   }
+  if(varName != "")
+    if(vars.setVar(varName, left))
+      error("seting new var whne should be(applyOP left; "+OP+")");
   return __ANY__(0);
 }
 __ANY__ applyOP(__ANY__ left, const string& OP, __ANY__ right){
@@ -657,7 +687,7 @@ __ANY__ applyCast(__ANY__ data, const string& cast){
 void interpTry(tryCatch * TC){
   try{
     interpBlock(TC->tryBlock);
-  }catch(returnExit e){//ignor exits and returns, only catch other exceptions
+ }catch(returnExit e){//ignor exits and returns, only catch other exceptions
     throw e;
   }catch(returnExcep e){
     throw e;

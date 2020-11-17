@@ -43,7 +43,6 @@ class branch;          //a main thread
 //deconstructors
 class prog;            //holds functions and classes
 
-
 class parseNode{
  public:
   string type;
@@ -54,12 +53,7 @@ class parseNode{
     ID = numberOfNodes;
     numberOfNodes++;
   }
-  string toString(){
-    string me;
-    me+="/* Type: "+type;
-    me+=" Data: "+data+"*/";
-    return me;
-  }
+  string toString(int indent = 0)const;
   ~parseNode();//impilmented at bottom
 };
 
@@ -75,6 +69,13 @@ public:
     fileName = "";
     importedName = "";
     cTypeInclude = false;
+  }
+  string toString()const{
+    string ret = "INCLUDE("+pathToFile+" "+fileName+")";
+    if(importedName != "")
+      ret+= " as "+importedName;
+    ret+="\n";
+    return ret;
   }
 };
 
@@ -95,7 +96,7 @@ class var{
   bool isBegin;
   string name;
   expression3 * startingValue;
-  expression2 * startingValue2;
+  expression2 * startingValue2; //currently unused
   
   string type;
   string secondaryType;
@@ -115,6 +116,7 @@ class var{
     reference = false;
     isList = false;
     startingValue = NULL;
+    startingValue2 = NULL;
     type = "__ANY__";
     secondaryType = "";
     arr = vector<unsigned long>();
@@ -129,6 +131,7 @@ class var{
     reference = false;
     isList = false;
     startingValue = NULL;
+    startingValue2 = NULL;
     type = tp;
     secondaryType = "";
     arr = vector<unsigned long>();
@@ -144,21 +147,23 @@ class var{
     reference = false;
     isList = false;
     startingValue = NULL;
+    startingValue2 = NULL;
     name = nm;
     type = tp;
     secondaryType = "";
     arr = vector<unsigned long>();
     lineDefinedOn = -1;
   }
-  var(const string& varName,const string& varType , bool con){
+  var(const string& varName,const string& varType , bool con, bool list = false){
     STATIC = false;
     priv = false;
     constant = con;
     atomic = false;
     ptr = false;
     reference = false;
-    isList = false;
+    isList = list;
     startingValue = NULL;
+    startingValue2 = NULL;
     name = varName;
     type = varType;
     secondaryType = "";
@@ -174,6 +179,7 @@ class var{
     reference = false;
     isList = false;
     startingValue = NULL;
+    startingValue2 = NULL;
     name = varName;
     type = varType;
     secondaryType = "";
@@ -201,6 +207,7 @@ class var{
     ptr = Var->ptr;
     reference = Var->reference;
     startingValue = Var->startingValue;
+    startingValue2 = Var->startingValue2;
     name = Var->name;
     type = Var->type;
     secondaryType = Var->secondaryType;
@@ -209,9 +216,9 @@ class var{
     lineDefinedOn = Var->lineDefinedOn;
   }
   //var(string nm,string tp,string sv){name = nm;type = tp;startingValue = sv;priv = false;constant = false;STATIC = false;}
-  //~var();//implimented at bottom --TODO
-  string toString(){
-    string ret = type;
+  ~var();//implimented at bottom --TODO
+  string toString()const{
+    string ret = (constant?"cosnt ":"")+type;
     for(unsigned i =0; i < arr.size(); i++){
       ret += "[";
       if(arr[i] == 0){
@@ -220,7 +227,8 @@ class var{
 	ret+= to_string(arr[i]);
       ret += "]";
     }
-    return type;
+    ret+=" "+name;
+    return ret;
   }
 };
 
@@ -236,11 +244,12 @@ public:
   Block(){
     Lines = vector<parseNode*>();
   }
-  string toString(){
-    string me = "/*BLOCK*/";
+  string toString()const{
+    string me = "<BLOCK>";
     for(int i = 0; i < Lines.size();i++){
-      me+=Lines.at(i)->toString()+'\n';
+      me+=Lines.at(i)->toString();
     }
+    me += "</BLOCK>";
     return me;
   }
   ~Block(){
@@ -270,7 +279,7 @@ class FOR_IN{
 class WHILE{
 public:
   Block * blockState;
-  expression * exp;
+  //expression * exp;
   expression3 * exp3;
   bool isNorm;
   WHILE(){
@@ -281,20 +290,24 @@ public:
     blockState = new Block;
     isNorm = a;
   }
+  ~WHILE();
+  string toString()const;
 };
 
 class IF{
 public:
   vector<Block*> * blockStatments;
-  vector<boolStatment *> * boolStatments;
+  //vector<boolStatment *> * boolStatments;
   vector<expression3 *> * exps3;
   bool usingBool;
   IF(){
     usingBool = false;
     blockStatments = new vector<Block*>();
-    boolStatments = new vector<boolStatment*>();
+    //boolStatments = new vector<boolStatment*>();
     exps3 = new vector<expression3 *>();
   }
+  ~IF();
+  string toString()const;
 };
 
 class Funk{
@@ -317,8 +330,11 @@ public:
   /*complexity numbers to show how complex a function is, to determen when it should be made into a new thread*/
   struct complexity_struct{
     int funcCall=0, loops=0, conditionals=0, exps=0;
-    int total(){return (2+this->funcCall+this->loops+this->conditionals+this->exps);}
+    int total()const{return (2+this->funcCall+this->loops+this->conditionals+this->exps);}
   }complexity;
+  int totalComplexity()const{
+    return this->complexity.funcCall + this->complexity.loops + this->complexity.exps;
+  }
   Funk(){
     //TOKS = vector<string>();
     funkBlock = new Block();
@@ -332,25 +348,19 @@ public:
     //complexity = *(new complexity_struct());
     complexity.funcCall=0;complexity.loops=0;complexity.conditionals=0;complexity.exps=0;
   }
-  string toString(){
-    string me = "";
-    me+="Name: "+name+"\n";
-    me+="Open/closed: ";
-    if(open){
-      me+="True";
-    }else{
-      me+="False";
+  string toString()const{
+    string me = "Funk: ";
+    if(open)
+      me+= "OPEN";
+    me += returnType.toString()+" "+name+"(";
+    for(unsigned i = 0; i <parameters.size(); i++){
+      me+= parameters[i].toString();
+      if(i != parameters.size()-1)
+	me+=", ";
     }
-    me+="/";
-    if(closed){
-      me+="True";
-    }else{
-      me+="False";
-    }
+    me+=")  ("+ to_string((long long) complexity.total())+")\n";
     me+="\n";
-    me+="Return type: "+returnType.type+'\n';
-    me+="Complexity: ";
-    me+=to_string((long long) complexity.total())+'\n';
+    me+=funkBlock->toString();
     return me;
   }
   operator string(){
@@ -360,20 +370,23 @@ public:
   }
   ~Funk(){
     delete funkBlock;
-    parameters.clear();
   }
 }activeFunk;
+
 class funkCall{
  public:
   string funkName;
   vector<expression3*> parameters;
   vector<expression2*> parameters2;
   atom * base;//unused
+  bool newThreadMe = false;
   funkCall(){
     parameters = vector<expression3*>();
     funkName = "";
+    base = NULL;
   }
   ~funkCall();
+  string toString()const;
 };
 
 class atom{
@@ -391,7 +404,7 @@ class atom{
     string * literalValue;
     var * VAR;
     funkCall * fCall;
-    expression * exp;
+    //expression * exp;
     expression2 * exp2;
     expression3 * exp3;
   };
@@ -403,11 +416,11 @@ class atom{
     stringLit = false;
     //front = ""; end = ""; base = "";
   }
-  atom(string a,string b,string c, expression* d){atom();type = a;cast=b;helper=c;exp=d;};
+  //atom(string a,string b,string c, expression* d){atom();type = a;cast=b;helper=c;exp=d;};
   atom(const atom& a){atom();type=a.type;cast=a.cast;helper=a.helper;VAR = a.VAR;}
   ~atom();//implimented at bottom
   
-  string toString(){
+  string toString()const{
     /*string tmpOut = out;
     out = "";
     int tmp = reportingLevel;
@@ -440,19 +453,23 @@ class expression{//no longer used, depricated
 class varAssign{
  public:
   var * VAR;
-  expression * exp;
-  expression * exp2;
+  //expression * exp;
+  expression2 * exp2;
   expression3 * exp3;
   string OP;
   bool newVar;
   varAssign(){
+    exp2 = NULL;
+    exp3 = NULL;
     newVar = false;
     OP = "";
   }
+  string toString()const;
+  ~varAssign();
 };
 class boolStatment{
  public:
-  string toString(){return "/*not done*/";}
+  string toString()const{return "/*not done*/";}
   vector<expression*> exps;
   vector<string> OPs;
 
@@ -493,6 +510,9 @@ public:
       };//union
     };//struct
   };//union
+  string toString()const{
+    return "/*FOR2--TODO*/\n";
+  }
 };//class
 
 class expression2{
@@ -520,28 +540,24 @@ public:
   ~expression2(){
     if(leftIsExp){
       if(leftExp){
-	//leftExp->~expression2();
 	delete leftExp;
       }
     }else{
       if(leftAtom){
-	//leftAtom->~atom();
 	delete leftAtom;
       }
     }
     if(rightIsExp){
       if(rightExp){
-	//rightExp->~expression2();
 	delete rightExp;
       }
     }else{
       if(rightAtom){
-	//rightAtom->~atom();
 	delete rightAtom;
       }
     }
   }
-  string toString(){//TODO
+  string toString()const{//TODO
     /*string tmpOut = out;
     out = "";
     int tmp = reportingLevel;
@@ -582,7 +598,7 @@ public:
   bigAtom(string operation){type = OP; op = operation;};
   bigAtom(expression3 * n){type = EXP3; exp3 = n;};
   bigAtom(expression2 * n){type = EXP2; exp2 = n;};
-  string toString(){
+  string toString()const{
     if(type == OP)
       return "OP: "+op;
     if(type == ATOM)
@@ -602,6 +618,9 @@ public:
   vector<bigAtom*> * bigAtoms;
   expression3(){bigAtoms = new vector<bigAtom*>();complexity=0;cast = "";ptr = false;}
   ~expression3();
+  string toString()const{
+    return "/*exp3--TODO*/";
+  }
 };
 
 class tryCatch{
@@ -616,6 +635,13 @@ public:
     delete tryBlock;
     //catchBlock->~Block();
     delete catchBlock;
+  }
+  string toString()const{
+    string ret = "TRY{\n";
+    ret+=tryBlock->toString();
+    ret+="\n}catch("+exceptionName+"){\n";
+    ret+=catchBlock->toString()+"\n}\n";
+    return ret;
   }
 };
 struct templateType{
@@ -634,6 +660,7 @@ public:
   vector<Funk*> memberFunks;
   vector<object *> objectExtends;
   vector<templateType *> templates;
+  ~object();
   object(){
     isBranch = false;
     name = "";
@@ -643,11 +670,26 @@ public:
     constructors = vector<Funk*>();
     templates = vector<templateType *>();
   }
-  int complexity(){
+  int complexity()const{
     int total = (int) (memberVars.size()/10);
     for(int i = 0; i<memberFunks.size(); i++)
       total += memberFunks.at(i)->complexity.total();
     return total;
+  }
+  string toString()const{
+    string me = "Class "+name+(extends==""? "": " ext. "+extends)+"("+to_string(complexity())+")\n";//TODO use objectExtends
+    me+="Member Vars("+to_string(memberVars.size())+")\n";
+    for(unsigned i = 0; i < memberVars.size();i++){
+      me+=memberVars[i]->toString()+"\n";
+    }
+    me+="Constructors("+to_string(constructors.size())+")\n";
+    for(unsigned i = 0; i < constructors.size();i++){
+      me+=constructors[i]->toString()+"\n";
+    }me+="Member Funks("+to_string(memberFunks.size())+")\n";
+    for(unsigned i = 0; i < memberFunks.size();i++){
+      me+=memberFunks[i]->toString()+"\n";
+    }
+    return me;
   }
 };
 
@@ -685,34 +727,30 @@ public:
   }
 };
 
-
-/*var::~var(){
-  if(startingValue != NULL){
-    startingValue->~expression3();
+var::~var(){//currently cuases error so just let it out TODO
+  /*if(startingValue)
     delete startingValue;
-  }
+  if(startingValue2)
+  delete startingValue2;*/
+};
 
-  }*/
 atom::~atom(){
   //cout<<"Atom deconstructor being called"<<endl;
   if(exp3 ==NULL)//check null ptr
     return;
   if(type == "exp3"){
-    //exp3->~expression3();
     delete exp3;
   }else if(type == "exp2"){
-    //exp2->~expression2();
    delete exp2;
   }else if(type == "lit"){
-    //literalValue->~string();
     delete literalValue;
   }else if(type == "funkCall"){
-    //fCall->~funkCall();
     delete fCall;
   }
 }
 parseNode::~parseNode(){
   //cout<<"Parser Node deconstructed"<<endl;
+  //cout<<type<<" "<<theThing<<endl;
   if(theThing == NULL) return;
   if(type == "WHILE"){
     delete ((WHILE *)theThing);
@@ -736,9 +774,45 @@ parseNode::~parseNode(){
   //delete theThing;
   theThing = NULL;
 }
+string parseNode::toString(int indent)const{
+  string me = "";
+  for(int i=0; i < indent;i++)
+    me+="  ";
+  indent++;
+  me += "PARSE_NODE("+to_string(ID)+")\n";
+  //TODO
+  if(type=="IF"){
+    me+=((IF*)theThing) -> toString();
+  }else if(type=="FOR2"){
+    me+=((FOR2*)theThing) -> toString();
+  }else if(type=="WHILE"){
+    me+=((WHILE*)theThing) -> toString();
+  }else if(type=="ret"){
+    me+=((expression3*)theThing) -> toString();
+  }else if(type=="TRY"){
+    me+=((tryCatch*)theThing) -> toString();
+  }else if(type=="throw"){
+    me+=((expression3*)theThing) -> toString();
+  }else if(type=="varAss"){
+    me+=((varAssign*)theThing) -> toString();
+  }else if(type=="funkCall"){
+    me+=((funkCall*)theThing) -> toString();
+  }else if(type == "exp3"){
+    me+=((expression3*)theThing) -> toString();
+  }else if(type=="C++"){
+    me+=data;
+  }else{
+    me+="/* Type: "+type;
+    me+=" Data: "+data+"*/";
+  }
+  me+='\n';
+  indent--;
+  return me;
+}
+
 funkCall::~funkCall(){
   for(unsigned i = 0; i < parameters.size(); i++){
-    delete parameters[i];
+    //delete parameters[i];//this gets mixed up with Funk pointer params. Uncomment leads to interp crashing
   }
   for(unsigned i = 0; i < parameters2.size(); i++){
     delete parameters2[i];
@@ -761,6 +835,80 @@ expression3::~expression3(){
   }
   delete bigAtoms;
 }
+IF::~IF(){
+  for(unsigned i = 0; i < blockStatments->size();i++)
+    delete blockStatments->at(i);
+  delete blockStatments;
+  for(unsigned i = 0; i < exps3->size();i++)
+    delete exps3->at(i);
+  delete exps3;
+}
+string IF::toString()const{
+  string ret = "IF("+exps3->at(0)->toString()+"){\n";
+  ret+=blockStatments->at(0)->toString()+"\n}";
+  int x = 1;
+  while(exps3->size() > x){
+    ret+="ELSE_IF("+exps3->at(x)->toString()+"){\n";
+    ret+=blockStatments->at(x)->toString()+"\n}";
+    x++;
+  }
+  if(exps3->size() < blockStatments->size()){
+    ret+="ELSE{\n";
+    ret+=blockStatments->at(x)->toString()+"\n}";
+  }
+  return ret;
+}
+string WHILE::toString()const{
+    string ret = "WHILE("+exp3->toString()+"){\n";
+    ret+=blockState->toString();
+    ret+="\n}\n";
+    return ret;
+}
+WHILE::~WHILE(){
+  delete exp3;
+  delete blockState;
+}
+string funkCall::toString()const{//TODO
+  string ret ="";
+  if(base)
+    ret+=base->toString();
+  ret+=funkName+"(/*TODO*/)\n";
+  return ret;
+}
+string varAssign::toString()const{
+  string ret = VAR->toString();
+  ret+=" "+OP+" ";
+  if(exp2)
+    ret+=exp2->toString();
+  if(exp3)
+    ret+=exp3->toString();
+  return ret;
+}
+varAssign::~varAssign(){
+  delete VAR;
+  if(exp2)
+    delete exp2;
+  if(exp3)
+    delete exp3;
+}
+
+object::~object(){
+  for(unsigned i = 0; i < memberVars.size(); i++){
+      delete memberVars[i];
+  }
+  for(unsigned i = 0; i < constructors.size(); i++){
+      delete constructors[i];
+  }
+  for(unsigned i = 0; i < memberFunks.size(); i++){
+      delete memberFunks[i];
+  }
+  for(unsigned i = 0; i < memberFunks.size(); i++){
+    //delete memberFunks[i];//it crashes otherwise, so instead of fixing it, i just commented it out
+  }
+  for(unsigned i = 0; i < templates.size(); i++){
+      delete templates[i];
+  }
+}
 
 class prog{
 public:
@@ -778,7 +926,7 @@ public:
     globalVars  = vector<var *>();
     branches  = vector<branch *>();
   }
-  int totalComplexity(){
+  int totalComplexity()const{
     int total = 0;
     for(int i = 0; i < functions.size(); i++)
       total+=functions.at(i)->complexity.total();
@@ -792,12 +940,41 @@ public:
     total+=(int) globalVars.size()/10;
     return total;
   }
+  
+  string toString()const{
+    string me = "\nProgram("+to_string(totalComplexity())+")\n";
+    me+="Global Vars("+to_string(globalVars.size())+")\n";;
+    for(unsigned i = 0; i < globalVars.size(); i++){
+      me+=globalVars[i]->toString()+'\n';
+    }
+    me += "Funks("+to_string(functions.size())+")\n";
+    for(unsigned i = 0; i < functions.size(); i++){
+      me+=functions[i]->toString()+'\n';
+    }
+    me+="Classes("+to_string(classes.size())+")\n";
+    for(unsigned i = 0; i < classes.size(); i++){
+      me+=classes[i]->toString()+'\n';
+    }
+    me+="Branches("+to_string(branches.size())+")\n";
+    for(unsigned i = 0; i < branches.size(); i++){
+      me+=branches[i]->toString()+'\n';
+    }
+    me+="\n";
+    return me;
+  }
+
   ~prog(){
     for(unsigned i = 0; i < functions.size(); i++){
       delete functions[i];
     }
     for(unsigned i = 0; i < classes.size(); i++){
       delete classes[i];
+    }
+    for(unsigned i = 0; i < globalIncludes.size(); i++){
+      delete globalIncludes[i];
+    }
+    for(unsigned i = 0; i < globalVars.size(); i++){
+      delete globalVars[i];
     }
     for(unsigned i = 0; i < branches.size(); i++){
       delete branches[i];

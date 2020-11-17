@@ -12,21 +12,6 @@
 
 #include "parserNodes.h"
 
-class SingleVAR{//TODO change to var from parserNode.h
- public:
-  string varName;
-  string varType;
-  bool constant;
-  SingleVAR(){
-    varName = "";
-    varType = "";
-  }
-  SingleVAR(string name, string type, bool con){
-    varName = name;
-    varType = type;
-    constant = con;
-  }
-};
 class scope{
  public:
   bool newVarScope;
@@ -120,6 +105,20 @@ bool isLocal(const string& name){
   }
   return false;
 }
+bool isList(const string& varName){
+  for(vector<var>::iterator i = currentVars->varsInScope.begin(); i != currentVars->varsInScope.end(); i++){//checks global vars
+    if(i->name == varName) return i->isList;
+  }
+  for(vector<scope *>::reverse_iterator i = localVars->rbegin(); i != localVars->rend(); i++)//checks local vars
+    for(vector<var>::iterator j = ((scope *)*i)->varsInScope.begin(); j != ((scope *)*i)->varsInScope.end(); j++)
+      if(j->name == varName)
+        return j->isList;
+
+  for(vector<var>::iterator i = globalVars->varsInScope.begin(); i != globalVars->varsInScope.end(); i++){//checks global vars
+    if(i->name == varName) return i->isList;
+  }
+  return false;
+}
 vector<unsigned long> getArr(const string& varName){
   for(vector<var>::iterator i = currentVars->varsInScope.begin(); i != currentVars->varsInScope.end(); i++){//checks global vars
     if(i->name == varName) return i->arr;
@@ -149,16 +148,16 @@ var getVar(const string& varName){
   }
   return var("DNE", "DNE");
 }
-void setVar(const string& name, const string& type = "__ANY__", bool global = false, bool constant = false){
-  report("Setting var: "+name+" with type: "+type+" Global: "+to_string(global),-2);
+void setVar(const string& name, const string& type = "__ANY__", bool global = false, const bool constant = false, const bool isList = false){
+  report("Setting var (complex): "+name+" with type: "+type+" Global: "+(global?"True":"False"),-2);
   if(global){
-    globalVars->varsInScope.push_back(var(name,type,constant));
+    globalVars->varsInScope.push_back(var(name, type, constant, isList));
   }else{
-    currentVars->varsInScope.push_back(var(name,type,constant));
+    currentVars->varsInScope.push_back(var(name, type, constant, isList));
   }
 }
 void setVar(const var& v, bool global = false){
-  report("Setting var: "+v.name+" with type: "+v.type+" Global: "+to_string(global),-2);
+  report("Setting var: "+v.name+" with type: "+v.type+" Global: "+(global?"True":"False"),-2);
   if(global){
     globalVars->varsInScope.push_back(v);
   }else{
@@ -180,34 +179,6 @@ bool removeVar(const string& varName){
     }*/
   return false;
 }
-
-//---------------------------------------------
-/*void setVar(const var& Var, bool global = false){
-  if(global){
-    globalVars->varsInScope.push_back(Var);
-  }else{
-    currentVars->varsInScope.push_back(Var);
-  }
-}
-var * getVar(const string& name){
-  for(vector<var>::iterator i = currentVars->varsInScope.begin(); i != currentVars->varsInScope.end(); i++){//checks global vars
-    if(i->name == name) return &(*i);
-  }
-  for(vector<scope *>::reverse_iterator i = localVars->rbegin(); i != localVars->rend(); i++){//checks local vars
-    for(int j = 0; j < ((scope *)*i)->varsInScope.size(); j++){
-      if((*i)->varsInScope.at(j).name == name) return &(*i);
-    }
-  }
-  for(vector<var>::iterator i = globalVars->varsInScope.begin(); i != globalVars->varsInScope.end(); i++){//checks global vars
-    if(i->name == name) return &(*i);
-  }
-  return NULL;
-}
-string getSecondType(const string& name){
-  if(getVar(name)->secondaryType != "")
-    return getVar(name)->secondaryType;
-  return "DNE";
-  }*/
 
 //--------------------------------------------
 

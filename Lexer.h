@@ -30,7 +30,7 @@ bool scrub(vector<TokenData>* tokens);
 void addLitteral(TokenData i, vector<TokenData>* tokens);
 bool isReserved(const string& text);
 bool isValidNum(const string& text);
-bool Lexer(string* data, vector<TokenData>* tokens);
+bool Lexer(const string* data, vector<TokenData>* tokens);
 void checkControleLine(const string& line, int lineNumber, vector<TokenData>* tokens);
 //Import functions//
 void parseImport(const string& name, vector<TokenData>* tokens);

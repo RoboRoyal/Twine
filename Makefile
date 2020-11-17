@@ -1,5 +1,6 @@
-#Main make file for Twine project
-#-Wall -g 
+# Main make file for Twine project
+#-Wall -g
+#-fpermissive
 CPPFLAGS = -pthread -march=native -fmerge-all-constants -g -rdynamic
 CXX = g++
 
@@ -7,6 +8,7 @@ FIRST = "first.tw"		#main tester file
 SECOND = "second.tw"		#other testing file
 TEST = "UnitTest.tw"		#unit tests for testing full functionality of program
 BENCHMARK = "Bencmark1.tw"	#testing the speed of parsing and efficiency of ouput code
+INTERP_TEST = "Interp_test.tw"
 INSTALL =TWINE_INSTALL_BUILD
 CLANG =TWINE_USING_CLANG
 
@@ -62,7 +64,7 @@ run:    twine
 
 #Runs interpreter
 interp: twine
-	./twine -interp
+	./twine -interp -rl 3
 
 #Runs linter on defualt file
 lint:   twine
@@ -72,7 +74,6 @@ clang: CXX=clang
 clang: twine
 
 #Things for install
-
 install: CPPFLAGS +=-O3 -w 
 install: twineInstall
 
@@ -95,7 +96,10 @@ format: twine
 
 #Unit tests
 test:   twine
-	./twine $(TEST)
+	./twine $(TEST) IGNORE_ALL_WARNING
+
+inttest:  twine
+	./twine $(INTERP_TEST_) -rl 2 -interp
 
 #Test speed of comiler/output code
 bench:  twine
@@ -121,6 +125,9 @@ val2:	twine
 
 vali:	twine
 	valgrind --leak-check=yes --track-origins=yes ./twine
+
+valti:	twine
+	valgrind --leak-check=no --track-origins=no ./twine
 
 #valgrind --leak-check=yes ./twine
 

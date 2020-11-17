@@ -23,7 +23,7 @@ private:
   const static string INT;
   const static string DOUBLE;
   const static string VECTOR;
-  
+  //char to string needed in + //TODO
 
 public:
   //__ANY__ runObjFunk(const __ANY__& obj, const string funkName, ...);
@@ -51,7 +51,7 @@ public:
   */
   //TODO
   //all throws should be in TWINE_QUIET
-  const static int32_t ZERO = 0;
+  const static int64_t ZERO = 0;
   
   ~__ANY__(){
 #ifdef TWINE_DEBUG
@@ -82,10 +82,9 @@ public:
   __ANY__(string tp, int in){type = tp;i = in;}
   __ANY__(int in){type = INT;i = in;}
   __ANY__(const string &s){type = STRING;ptr = new string(s);}
-  //__ANY__(const string s){type = STRING;ptr = new string(s);}
   __ANY__(const double dIn){type = DOUBLE;d = dIn;}
-  //__ANY__(const double dIn){type = DOUBLE;ptr=new double(dIn);}
   __ANY__(const char c[]){type = STRING;ptr = new string(c);}
+  __ANY__(const char c){type = STRING;const char tmp[1] = {c};ptr = new string(tmp);}
   __ANY__(const bool bin){type = BOOL;b = bin;}
   __ANY__(const long in){type = INT; i = in;}
   __ANY__(const long long in){
@@ -507,7 +506,7 @@ public:
       return out;
     }else{//TODO ast to type of object, then call toString() on it
       return type+"@"+to_string((long long) ptr);//TODO idk
-      //return *(string *)(this->runObjFunk("toString()").ptr);
+      //return *(string *)(this->runObjFunk("toString").ptr);
     }
   };
   /*
@@ -950,23 +949,27 @@ public:
     }
     return b;
   }
+
+
   __ANY__ operator%(const __ANY__& a)const{
     __ANY__ b;
     if(this->type == INT){
+      
       //TODO throw error if string/vec if not enabled
       if(a.type == INT||a.type == BOOL){
 	b.type = INT;
-	b.i=(this->i)%(int)a.toNum();
+	//b.i=(this->i)%(int)a.toNum();
+	b.i = fmod(this->i, a.toNum());
       }else{
 	b.type = DOUBLE;
-	//b.ptr=new double(this->i%(int)a.toNum());
-	b.d = this->i % (int)a.toNum();
+	//b.d = this->i % (int)a.toNum();
+	b.d = fmod(this->i, a.toNum());
       }
     }else if(this->type == DOUBLE){
       //TODO throw error if string/vec if not enabled
       b.type = DOUBLE;
-      //b.ptr=new double(this->i%(int)a.toNum());
-      b.d = this->i%(int)a.toNum();
+      //b.d = this->i%(int)a.toNum();
+      b.d = fmod(this->d, a.toNum());
     }else if(this->type == STRING){
       //TODO throw error if string/vec if not enabled
       string tmp2 = "";

@@ -24,6 +24,10 @@ string str_a = "aAa"
 string str_b = "bBb"
 int int_c = 3
 match(str_a+int_c*str_b, "aAabBbbBbbBb", "Resolver:: str + int * str")
+int cast_i = str_a
+match(cast_i, 3, "Implicit cast:: String to int")
+string cast_s = int_c
+match(cast_s, "3", "Implicit cast:: Int to String")
 }//TODO
 
 
@@ -35,7 +39,12 @@ throw "The error is: "+a
 }catch err{
 test = err
 }
-return match(test, "The error is: 10", "Try/Catch Throw")
+match(test, "The error is: 10", "Try/Catch Throw")
+try{
+throw("function throw")
+}catch thing{
+match(thing, "function throw", "Try/Catch function")
+}
 }
 
 func fileIO(){
@@ -49,7 +58,7 @@ return false}
 next="\nsecond"
 write(file,next,true)
 you = read(file)
-return match(you, me+next, "File IO")
+match(you, me+next, "File IO")
 }
 
 func listTest(){
@@ -106,7 +115,7 @@ func userIOTest(){
 printn("hello ")//no new line
 print("world")
 user = input("was hello world on one line and this on a new line?: (yes/no) ")
-return match(user, "yes", "User IO Test")
+match(user, "yes", "User IO Test")
 }
 
 /*main*/

@@ -213,6 +213,7 @@ const functions builtInFunctions[] = {//TODO finish and organize
 				      {"getenv", "string", "string varName", "Gets the value of the passed in enviromental variable from the system"},
 				      {"getStack()", "__ANY__", "void", "Returns list of the names of the functions on the stack"},//TODO replace with string[]
 				      {"input","string","string msg=\"\"","Gets input from the user. Can pass a string to pass to the user first"},
+				      {"insert", "void", "* list, int pos, * data", "Ineserts data into list and give position"},
 				      {"len","int","__ANY__ target","Returns the length of a list passed, otherwise returns 1"},
 				      {"list","__ANY__","__ANY__ item=0","Converts what is passed to a list"},
 				      {"min","__ANY__","__ANY__ target","Returns the minimum of all values passed(passed as list)"},
@@ -445,7 +446,8 @@ const nameSpace nameSpaces[] = {
 				   {"begin", "int", "void", "Pointer to start of list"},
 				   {"at", "*", "int position", "Returns dat at the givien position"},
 				   {"resize", "void", "int size", "Makes the list a certain size"},
-				   {"insert", "void", "int position+$.begin()+, * data", "Inserts the given element at the given position"},
+				   //{"insert", "void", "int position+$.begin()+, * data", "Inserts the given element at the given position"},
+				   {"insert", "void", "int position,  * data", "Inserts the given element at the given position"},
 				   {"clear", "void", "void", "Removes all elements in list"},
 				   {"size", "int", "void", "Returns how many elements are in the list"},
 				  },
@@ -494,16 +496,6 @@ bool validVarName(const string& name){
     return false;
   return true;
 }
-
-
 ;
-
-/*
-Native C++ code
-FOR2
-INIT funks
-return * to things in 2Parse instead of pass
-All of the Interp
- */
 
 #endif/*OPERATORS_H_*/

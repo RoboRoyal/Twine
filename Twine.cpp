@@ -28,6 +28,7 @@ string argsForProg = "";      //args that are passed on to the user executing po
 
 bool benchmarkTime = false;   //time how long each process takes
 bool doneOtherThings = false; //says if the user has done something other than compile a prog
+bool start_interp = false;    //start interpreter after everything
 
 void help(string what = "");                                           //prints help info
 void about();                                                          //unused
@@ -192,7 +193,7 @@ bool compile(const string& fileInName, const string& fileOutName){
     report("failed to compile in C++: "+to_string((long long) compileStatus),4);
     return false;
   }else{
-    report("Succsess compiling",0);
+    report("Success compiling",0);
     if(removeCPPFileAfter)
       int doll = system((string("rm ")+fileInName).c_str());
     return true;
@@ -205,7 +206,7 @@ bool execute(const string& name){
   try{
     report(command,0);
     if(!(returnStatus = system(command.c_str()))){
-      report("Executing succsessful! (exit code: "+to_string(returnStatus)+')',0);
+      report("Executing successful! (exit code: "+to_string(returnStatus)+')',0);
       return true;
     }else{
       report("ERROR while executing code: "+to_string(WEXITSTATUS(returnStatus)),4);
@@ -524,7 +525,6 @@ void about(){
 
 void freeProg(){
   high_resolution_clock::time_point start = high_resolution_clock::now();
-
   delete Prog;
 
   for(unsigned i = 0; i < TwineFunks.size(); i++){

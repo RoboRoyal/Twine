@@ -125,6 +125,7 @@ bool accept(string sym);
 bool accept(TokenData::Type sym);
 bool expect(string sym, bool allowForce = true);
 bool expect(TokenData::Type sym, bool allowForce = true);
+bool shouldThread(const Funk* i_am_a_funkky_pointer);
 
 void nextSym();
 

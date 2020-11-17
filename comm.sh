@@ -120,13 +120,12 @@ touch /bin/twine
 if [[ "$DEFUALT_INSTALL" == "YES" ]]; then
     echo "#!/bin/bash
 
-#luancher for twine
-
+#Luancher for twine
 $INSTALL_PATH/src/twine \$@" > /bin/twine
 else
     echo "#!/bin/bash
 
-#luancher for twine
+#Alt-luancher for twine
 $INSTALL_PATH/src/twine -INSTALL_PATH $INSTALL_PATH/src/ \$@" > /bin/twine
 fi
 
@@ -178,7 +177,8 @@ if [ type twine >/dev/null 2>&1 ]; then
 	echo "You can also check out 'man twine' and 'twine -help' for help with running twine"
 	echo "Thanks for trying out twine, all feedback is greatly appreciated"
 else
-	echo "An unknow error has occured"
+    echo "An unknow error has occured"
+    echo "Try running uncomm.sh and then try reinstalling again with defualt options"
 fi
 #------------------------------------------
 

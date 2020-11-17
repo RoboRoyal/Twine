@@ -17,9 +17,8 @@ inline CharClassifier::Type CharClassifier::get(char C){
 }
 
 /*This is the function called to lex. It calls the main tokeniser and the lexer if appropriate*/ 
-bool Lexer(string * data, vector<TokenData>* tokens){
+bool Lexer(const string * data, vector<TokenData>* tokens){
   if(data->size() == 0) return false;//error if there is nothing
-
   
   if(!tokens->capacity())
     tokens->reserve((data->size()/6)+2);
@@ -37,7 +36,7 @@ bool Lexer(string * data, vector<TokenData>* tokens){
  *Parameters: string * data              : The data to be tokenized 
  *            vector<TokenData>* tokens  : Where to push the tokens to
  *
- *Returns bool : Wheter the tokenization ran without issue
+ *Returns bool : Wheter the tokenization was succsessfull 
  */
 bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(checking indents for {,}, new lines, etc..
 
@@ -217,7 +216,7 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
   tokens->emplace_back("EOF", line, charPos, TokenData::FILE_END);
   tokens->emplace_back("EOF", line, charPos, TokenData::FILE_END);
   //TODO free memory
-  report("Succsess Lexing file",0);
+  report("Success Lexing file",0);
   return true;
 }
 
@@ -255,7 +254,9 @@ bool scrub(vector<TokenData>* tokens){
   return true;
 }
 
+//pushes litteral onto the vector with some extra checks
 void addLitteral(TokenData i, vector<TokenData>* tokens){//should take refrence to TokenData or take info about it
+  //check if litteral is a number
   if(isNum(i.tokenText.at(0)) || (i.tokenText.at(0) == '.' && isNum(i.tokenText.at(1)))){//where isValidNumber shoud be called
     if(isValidNum(i.tokenText)){
       i.tokenType = TokenData::NUM;
@@ -286,6 +287,7 @@ void addLitteral(TokenData i, vector<TokenData>* tokens){//should take refrence 
   tokens->push_back(i);//would like to use emplace
 }
 
+//checks if a number is properly formatted
 bool isValidNum(const string& text){//currently only checks if the number has two or more '.'
   bool dot = false;
   char C;
@@ -304,7 +306,6 @@ bool isValidNum(const string& text){//currently only checks if the number has tw
   //check if number is valid
   //for some reason regex isnt working
   return true;
-
 }
 
 //checks if a word is reserved as defined in Operators.h
@@ -315,7 +316,7 @@ bool isReserved(const string& text){
   return false;
 }
 
-//sets up the classifications of all chars  
+//sets up the classifications of all chars
 void CharClassifier::init(){
   TypeNames[0] = "WHITESPACE";
   TypeNames[1] = "LINE_BREAK";
@@ -371,15 +372,15 @@ void clearLexertokens(vector<TokenData>* tokens){
   tokens->clear();
   //delete tokens;
 }
-//--------------------------------Import functions-------------------------------------//
 
+//--------------------------------Import functions-------------------------------------//
 
 inline bool fileExists(const string& name) {//https://stackoverflow.com/questions/12774207/fastest-way-to-check-if-a-file-exist-using-standard-c-c11-c
   struct stat buffer;
   return stat(name.c_str(), &buffer) == 0;
 }
 
-void checkControleLine(const string& line, int lineNumber, vector<TokenData>* tokens){
+void checkControleLine(const string& line, const int lineNumber, vector<TokenData>* tokens){
   report("Line command: "+line, -2);
   auto arr = split(line, " ");
   if(arr.size() < 2){
@@ -461,7 +462,7 @@ void parseImport(const string& name, vector<TokenData>* tokens){
 }
 
 
-bool download(const string& URL){//TODO add other options then wget (curl, windows options, maybe jsut use a socket?
+bool download(const string& URL){//TODO add other options then wget (curl, windows options, maybe jsut use a socket?)
   report("Attempting to download file...", -2);
   string command = "cd "+pathToDownloadedImports+" && wget -q --https-only "+URL;//+" && cd ..";//TODO fix directory pathing
   if(int compileStatus = system(command.c_str())){

@@ -153,33 +153,37 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
       checkProg(Prog);
       finalLint();
     }
+    if(reportingLevel < -1)
+      cout<<Prog->toString();
     if(varsPassedIn == NULL)//delete vars if we made them
       cleanScopes();
     
     if(numberOfScopes()>1 && !errors)
       throw invalid_argument("Logic error, still scopes left");
-    report("Succsess parsing file",0);
+    report("Success parsing file",0);
     return true;
   }
 
 /*scans the file and looks for all defined functions and classes*/
+//This could be done away with by using a smarter parser, catagorizing calls,
+//then parsing them after the funcition gets defined
 bool preScan(){
   debug("prescan()");
   while(!accept(TokenData::FILE_END)){//loop throught whole file
     if(accept("func")){//find all functions
 
-      Funk * dummy = new Funk();
-      parseFunkKW(dummy);//get name/returntype/parameters
+      Funk * skell = new Funk();
+      parseFunkKW(skell);//get name/returntype/parameters
       
-      if(getFunk(dummy->name) != NULL){
+      if(getFunk(skell->name) != NULL){
 	if(getFlag("FUNCTION_REDEFINITION") || interpMode){
-	  removeFunk(dummy->name);
-	  warn("Redefinition of function '"+dummy->name+"'");
+	  removeFunk(skell->name);
+	  warn("Redefinition of function '"+skell->name+"'");
 	}else
-	  error("Redefinition of function '"+dummy->name+"'", true);
+	  error("Redefinition of function '"+skell->name+"'", true);
       }
       
-      Prog->functions.push_back(dummy);
+      Prog->functions.push_back(skell);
       
     }else if(accept("class")){//TODO object?
       object * obj = new object;
@@ -190,6 +194,7 @@ bool preScan(){
       if(getClass(obj->name) != NULL && !getFlag("CLASS_REDEFINITIONS")){
 	error("Redefinition of class "+obj->name, true);
 	//TODO delete old implimentation
+	removeClass(obj->name);
       }
       //add it to Prog
       Prog->classes.push_back(obj);
@@ -589,7 +594,7 @@ void parseTop(){
     }
   }
   checkReturn(Prog->functions.at(0));//check return of main
-  try{ debug("pareTop() done");}catch(const exception& e){cout<<"  pareTop() done(err on line)"<<endl;}
+  try{ debug("pareTop() done");}catch(const exception& e){cout<<"  pareTop() done(err on line)"<<endl;}//this fixes a bug that shouldnt exist
 }
 
 void parseFunk(Funk* F, bool doKW){
@@ -611,8 +616,11 @@ void parseFunk(Funk* F, bool doKW){
   parseBlock(F->funkBlock, true);
   checkReturn(F);//TODO only do if not constructor
   
-  if(lint)
+  if(lint){
     checkFunk(F, F->name != F->returnType.type);
+    //TODO check trailing blanks
+    newLineAfterFunk(*F);
+  }
   if(doKW){
     pullScope();
   }
@@ -882,6 +890,8 @@ expression3 * parseExpression(const string targetType, const vector<unsigned lon
       EXP->bigAtoms->push_back(nAtom);
       
       if(isAssignment(lastSym->tokenText)){//if we just assigned something, ie =, +=, etc
+	//if(assignBefore)
+	//error("Can only have one assignment per expression", true);//unused
 	assignBefore = true;//no more assignments allowed
 	bigAtom * aAtom = new bigAtom();
 	aAtom->exp3 = parseExpression(targetType, arr, false);
@@ -907,7 +917,7 @@ expression3 * parseExpression(const string targetType, const vector<unsigned lon
     expAtom->a = expHolder;
     for(auto i: *(EXP->bigAtoms)){//delete OPs, cant deleate Atoms, they are being used in exp2
       if(i->type == bigAtom::big_type::OP) delete i;
-      }
+    }
     EXP->bigAtoms->clear();
     EXP->bigAtoms->push_back(expAtom);
   }
@@ -1074,7 +1084,7 @@ bool parseAtom(atom * a, string base, bool baseStatic){
       }
       a->stringLit = true;
     }else{
-      error("Unkown type: "+sym->tokenText +" with type: "+TokenData::getTokenTypeName(sym->tokenType), false);//TODO can cuase infinite loop
+      error("Unkown type: "+sym->tokenText +" with type: "+TokenData::getTokenTypeName(sym->tokenType), false);//TODO can cuase infinite loop if true?
       a->type = "__ANY__";
       a->helper = var("__ANY__");
     }
@@ -1128,9 +1138,8 @@ void parseBlock(Block* b,bool pushBackVarScope){
     //TODO better way of checking for class types?
     if((sym+1)->tokenText != "." && acceptType()){//TODO i feel like this is not the best way to do this
       PN->type = "varAss";
-      varAssign * tmp = new varAssign();
-      PN->theThing = tmp;
-      parseVarAssign(tmp, false, lastSym -> tokenText);
+      PN->theThing = new varAssign();
+      parseVarAssign((varAssign*)PN->theThing, false, lastSym -> tokenText);
       //}else if(accept(TokenData::IDENT)){
     }else if(peek(TokenData::IDENT) && (sym+1)->tokenText != "."){
       accept(TokenData::IDENT);
@@ -1398,10 +1407,10 @@ void parseIdent(parseNode * pn){//TODO add support for x++
 	checkTypeAllow(varName);
 	checkVarName(varName);
       }
-      me->exp3 = parseExpression("__ANY__");
+      me->exp3 = parseExpression("__ANY__", {}, false);
     }else{
       tVar->type = "";
-      me->exp3 = parseExpression(getVar(varName));
+      me->exp3 = parseExpression(getVar(varName), false);
 
       }
      me->VAR = tVar;
@@ -1519,7 +1528,7 @@ void parseVarAssign(varAssign * va, bool constant, const string varType){
   if(accept("NULL")){
     va->exp3 = NULL;
   }else{
-    va->exp3 = parseExpression(*tVar);
+    va->exp3 = parseExpression(*tVar, false);
   }
 
   //add var to scope
@@ -1528,7 +1537,6 @@ void parseVarAssign(varAssign * va, bool constant, const string varType){
   va->VAR = tVar;
   debug("parseVarAssign() done");
 }
-
 
 var * getMemberVar(const string& className, const string& varName, bool STATIC_BASE){
   object * tmp = getClass(className);
@@ -1561,19 +1569,18 @@ Funk * functionsToFunk(functions func){//TODO leaks mem unless ptr is saved
   vector<string> params = split(func.params,",");
   for(int x = 0;x<params.size();x++){
     vector<string> singleParam = split(params.at(x), " ");
-    var * newVar = new var();//TODO fix to make this cleaner, not new/delete
-    newVar->type = singleParam.at(0);
+    var newVar = var();//TODO fix to make this cleaner, not new/delete
+    newVar.type = singleParam.at(0);
     if(split(singleParam.at(1),"=").size() == 2){
-      newVar->name = split(singleParam.at(1), "=").at(0);
-      newVar->startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
+      newVar.name = split(singleParam.at(1), "=").at(0);
+      newVar.startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
     }else if(split(singleParam.at(1),baseNameSym).size() == 2){
-      newVar->name = split(singleParam.at(1), "=").at(0);
-      newVar->startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
+      newVar.name = split(singleParam.at(1), "=").at(0);
+      newVar.startingValue = stringToExp(split(singleParam.at(1),"=").at(1));
     }else{
-      newVar->name = singleParam.at(1);
+      newVar.name = singleParam.at(1);
     }
-    tmp->parameters.push_back(*newVar);
-    delete newVar;
+    tmp->parameters.emplace_back(newVar);
   }
   if(func.alias.length())
     tmp->alias = func.alias;
@@ -1995,6 +2002,13 @@ bool accept(string s){
   }
   return false;
 }
+bool shouldThread(const Funk* i_am_a_funkky_pointer){
+  if(i_am_a_funkky_pointer->open || (i_am_a_funkky_pointer->totalComplexity() >= threadComplexityThreshold &&
+				     i_am_a_funkky_pointer->totalComplexity() >= minthreadComplexityThreshold && !i_am_a_funkky_pointer->closed)){
+    return true;
+  }  
+  return false;
+}
 bool peek(TokenData::Type s){
   if(sym->tokenType == s){
     return true;
@@ -2068,7 +2082,7 @@ void forceSkip(){
 
 void error(const string& msg, bool passable){
   //currentLine.push_back(*sym);
-  string line = "";
+  string line = "";//sometimes thie repeats the last word twice
   for(int i = 0; i<currentLine.size();i++){//TODO add color
     line+=currentLine.at(i).tokenText;//+" ";//TODO only add " " if not saving white spaces
     if(!SAVE_WHITESPACE)
@@ -2088,17 +2102,26 @@ void error(const string& msg, bool passable){
   errorMsg += "\n";
   
   if(!interpMode)
-    errorMsg += "File: '" + currentParsingFile+"'";
+    errorMsg += "'"+ currentParsingFile+"' ";
     
-  errorMsg += " Line: "+to_string((unsigned) sym->line)+":"+to_string((unsigned) sym->charPos)+": "+msg + '\n';
-  errorMsg += line;
+  errorMsg += to_string((unsigned) sym->line)+":"+to_string((unsigned) sym->charPos)+": "+msg;
+  errorMsg += line + '\n';
   if(!passable){
     throw invalid_argument(errorMsg);
   }else{
     report(errorMsg, 4);
   }
+  if(getFlag("EXIT_ON_ERROR"))//should just use a dict for these flags
+    exit(1);
 }
 void warn(const string& msg){//TODO make look a bit nicer
+  if(getFlag("IGNORE_ALL_WARNING")){
+    return;
+  }
+  if(getFlag("WARNINGS_ARE_ERRORS")){
+    error(msg);
+    return;
+  }
   string warningMsg;
   if(string(getenv("TERM")) == string("xterm")){
     warningMsg = "\033[35mWARNING\033[0m";//purple warning msg
@@ -2109,7 +2132,10 @@ void warn(const string& msg){//TODO make look a bit nicer
     warningMsg += " in function "+currentFunk->name;
   if(currentClass != NULL)
     warningMsg += " in class "+currentClass->name;
-  warningMsg += "\n'" + currentParsingFile +"' "+to_string((long long) sym->line)+":"+to_string((long long) sym->charPos)+": "+msg + '\n';
+  warningMsg += "\n";
+  if(!interpMode)
+    warningMsg += "'" + currentParsingFile +"' ";
+  warningMsg += to_string((long long) sym->line)+":"+to_string((long long) sym->charPos)+": "+msg + '\n';
   report(warningMsg, 2);
 }
 

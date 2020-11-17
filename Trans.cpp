@@ -765,18 +765,18 @@ bool TransBoolState(boolStatment * N){//TODO get rid of
 bool TransIF(IF * N){
   debugT("TransIF()");
   out+="if(";
-  if(N->usingBool){
-    TransBoolState(N->boolStatments->front());
-  }else{
-    TransExp(N->exps3->front());
-  }
+  //if(N->usingBool){
+  //  TransBoolState(N->boolStatments->front());
+  //}else{
+  TransExp(N->exps3->front());
+  //}
   out+="){\n";
   TransBlock(N->blockStatments->front());
   out+="}";
   if(N->blockStatments->size() == 1) return true;
   out+='\n';
   int x = 0;
-  if(N->usingBool){
+  /*if(N->usingBool){
     for(vector<boolStatment *>::iterator i = N->boolStatments->begin()+1;i != N->boolStatments->end();i++){
       out+="else if(";
       TransBoolState(*i);
@@ -785,17 +785,17 @@ bool TransIF(IF * N){
       TransBlock(N->blockStatments->at(x));
       out+="}";
     }
-  }else{
-    for(vector<expression3 *>::iterator i = N->exps3->begin()+1;i != N->exps3->end();i++){
-      out+="else if(";
-      TransExp(*i);
-      out+="){\n";
-      x++;
-      TransBlock(N->blockStatments->at(x));
-      out+="}";
-    }
+    }else{*/
+  for(vector<expression3 *>::iterator i = N->exps3->begin()+1;i != N->exps3->end();i++){
+    out+="else if(";
+    TransExp(*i);
+    out+="){\n";
+    x++;
+    TransBlock(N->blockStatments->at(x));
+    out+="}";
   }
-  if(N->blockStatments->size() == N->boolStatments->size()){out+="/*end IF*/ \n"; return true;}
+  //}
+  //if(N->blockStatments->size() == N->boolStatments->size()){out+="/*end IF*/ \n"; return true;}
   out+="else{\n";
   TransBlock(N->blockStatments->back());
   out+="}/*end of IF*/";

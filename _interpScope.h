@@ -39,6 +39,12 @@ class interpSingleVAR{//or could just use var from parserNode
     varType = gType;
   }
 };
+
+
+__ANY__ DNE = __ANY__("DNE");
+__ANY__ CURRENT_TIME_MS_INTERP = __ANY__(2.718);
+
+
 class interpScope{
  public:
   bool newVarScope;
@@ -116,7 +122,7 @@ public:
     //cout<<"Pulled: "<<numOfNewVarScopes<<endl;
     return numOfNewVarScopes;
   }
-  __ANY__ getVar(string varName){//TODO should return ptr value, NULL if not found
+  __ANY__& getVar(string varName){//TODO should return ptr value, NULL if not found
 
     /*cout<<"Trying to get var: "<<varName<<endl;
     if(!currentVars->varsInScope.size())
@@ -141,16 +147,19 @@ public:
       if(i->varName == varName) return i->data;
     }
     //cout<<"check 5"<<endl;
-    if(varName == "CURRENT_TIME_MS")
-      return (double)chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-    return "DNE";
+    if(varName == "CURRENT_TIME_MS"){
+      CURRENT_TIME_MS_INTERP =  (double)chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
+      return CURRENT_TIME_MS_INTERP;
+    }
+    DNE = "DNE";
+    return DNE;
   }
   
   //returns if new var was made
   bool setVar(const string name, __ANY__ data, bool global = false, string type = "__ANY__"){//TODO search if var exists first, and replace if it does
     report("Call to setVar: "+name+" with type "+type, -2);
 
-    if(!global){
+    //    if(!global){
       for(vector<interpSingleVAR>::iterator i = currentVars->varsInScope.begin(); i != currentVars->varsInScope.end(); i++){//checks global vars
 	if(i->varName == name){
 	  i->data = data;
@@ -167,7 +176,7 @@ public:
 	  }
 	}
       }
-    }else{
+      //}else{
       for(vector<interpSingleVAR>::iterator i = globalVars->varsInScope.begin(); i != globalVars->varsInScope.end(); i++){//checks global vars
 	if(i->varName == name){
 	  i->data = data;
@@ -175,7 +184,7 @@ public:
 	  return false;
 	}
       }
-    }
+      //}
     //else if not found, make a new one
     report("New var being added", -2);
     if(global){

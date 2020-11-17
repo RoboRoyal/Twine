@@ -14,8 +14,8 @@
 using namespace std;
 
 //Global Flags
-string TWINE_VERSION = "0.1";
-unsigned TWINE_VERSION_INT = 2;//is the exit stauts when asking for integer version
+const string TWINE_VERSION = "0.1";
+const unsigned TWINE_VERSION_INT = 2;//is the exit stauts when asking for integer version
 string INSTALL_PATH = "/etc/twine/src/";
 int reportingLevel = 2;//what data should be reported to user: -2 = debug, 0=info, 2 = warnings, 4 = errors
 bool FORCE = false;//attempt fo fix mistakes and force to run
@@ -27,7 +27,7 @@ string pathToFile = "";//used to get includes to file
 string mainFileName;
 string executableFileName;
 
-string pathToDownloadedImports = "downloadedImport/";
+const string pathToDownloadedImports = "downloadedImport/";
 
 //Lexer Flags --probably should move into a list to be accessed by getFlag
 bool SAVE_LINE_COMMENTS = false;
@@ -54,12 +54,19 @@ const string warningIgnore = "-Wnarrowing -Wno-return-type";
 
 string compileOptions = "";
 const string specialOptions = "-fmerge-all-constants -g -rdynamic -fno-signed-zeros -fno-keep-static-consts -pthread -march=native -funsafe-math-optimizations -fpermissive";//fun and safe math? sign me up!
-const string specialOptions_clang = "-fmerge-all-constants -rdynamic -fno-signed-zeros -funsafe-math-optimizations -march=native -pthread";
+const string specialOptions_clang = "-fmerge-all-constants -rdynamic -fno-signed-zeros -funsafe-math-optimizations -march=native -pthread -fpermissive";
 const string ignor_warning = "-w";
 const string ignor_warning_clang = "-Weverything";
 string runParams = "";
 
+
+//2Parse flags
+const unsigned minthreadComplexityThreshold = 12;
+unsigned threadComplexityThreshold = 0;
+
 //Twine compiler flags
+
+
 struct flagOptions{
   string name;
   bool * enabled;
@@ -104,6 +111,7 @@ Flag compileFlags[] = {
 		       {"CLASS_REDEFINITIONS", false,"Allows redefinitions of classes"},//redef or addition?
 		       {"FUNCTION_REDEFINITION", true,"Allows redefinition of fucntions"},
 		       {"WARNINGS_ARE_ERRORS", false, "Turns all warnings into errors"},
+		       {"IGNORE_ALL_WARNING", false, "Ignores all warnings thrown"},
 		       {"EXIT_ON_ERROR", false, "Exits parsing on first error"},
 		       {"TRY_TRANS", false, "Try to output a .cpp file even if there were some error"},
 		       {"TRY_COMPILE", false, "Try to compile in C++ even if there were some error"}, //not implimented
@@ -194,32 +202,33 @@ struct lintFlag{
     return ret+"Enabled: "+(enabled?"True":"False")+"\tValue is sent to: "+to_string(number);
   }
 };
-  
+
 lintFlag linterFlags[] = {//alternitivly, dont need a bool, just set int to 0 if disabled. Or could use bool as warning/error enable
 			  //TODO make the names better-more consistant
-			  {"VAR_MAX_LENGTH", true, 20, "Maximum length of varriables allowed"},//
-			  {"VAR_MIN_LENGTH", true, 3, "Minimum length of varriables allowed"},//
-			  {"PROPER_VAR_NAMES", true, 3, "Checks if name is in proper format (1:a_b vs 2:a_B vs 3:aB)"},//
-			  {"VAR_TYPE_DEFINED", false, 1, "Makes all vars must have type"},//
 			  {"CAPITALISE_CONSTANTS", true, 1, "Checks if all constants are in all caps"},//
-			  {"LINE_MAX_LENGTH", true, 90, "Maximum length of a single line"},//
+			  {"EXCESS_NEW_LINE", true, 3, "Checks for excesive consecutive new lines"},//
 			  {"EXCESS_PARENTHESES", true, 1, "Checks for un-neccisarry usage of ( )"},//
-			  {"IMPLICIT_CONVERTIONS", true, 1, "Checks for implicit convertions, such as int x = string"},//?
-			  {"NUM_TO_STRING", true, 1, "Checks for convertions from numbers(int/double/bools) to strings (string s = 123)"},
-			  {"STRING_TO_NUM", true, 1, "Checks for convertions from string to numbers(int/double/bools)"},
+			  {"EXPRESSION_MAX_COMPLEXITY", true, 20, "The max complexity of any single expression"},//
+			  {"EXPRESSION_MAX_LENGTH", true, 30, "The max number of atoms+OPs a single exprtession can have"},//
+			  {"FUNCTION_COMPLEXITY", true, 200, "Maximum complexity of a function"},//
 			  {"FUNCTION_NAME_MAX_LENGTH", true, 30, "Maximum length of function names allowed"},//
 			  {"FUNCTION_NAME_MIN_LENGTH", true, 3, "Minimum length of fuction names allowed"},//
 			  {"FUNCTION_NAME_PROPER", true, 3, "Checks if the name of a function is in the proper format (1:a_b vs 2:a_B vs 3:aB)"},//
+			  {"IMPLICIT_CONVERTIONS", true, 1, "Checks for implicit convertions, such as int x = string"},//?
+			  {"LINE_MAX_LENGTH", true, 90, "Maximum length of a single line"},//
+			  {"LINE_AFTER_FUNK", true, 1, "Requires a new line after the end of a function"},//
 			  {"MISSING_RETURN_STATMENTS", false, 1, "Checks if functions without void return has a return statment"},//
-			  {"FUNCTION_COMPLEXITY", true, 200, "Maximum complexity of a function"},//
-			  {"EXCESS_NEW_LINE", true, 3, "Checks for excesive consecutive new lines"},//
-			  {"EXPRESSION_MAX_COMPLEXITY", true, 20, "The max complexity of any single expression"},//
-			  {"EXPRESSION_MAX_LENGTH", true, 30, "The max number of atoms+OPs a single exprtession can have"},//
+			  {"NUM_TO_STRING", true, 1, "Checks for convertions from numbers(int/double/bools) to strings (string s = 123)"},
 			  {"NUMBER_OF_COMMENTS", true, 8, "How many lines of code you should have per comment"},//
 			  {"NEW_LINE_FOR_BLOCK", true, 1, "Requires a new line at the start of a block({block})"},//
 			  {"NO_SIMILAR_NAMES", false, 1, "Does not allow vars/functions/classes of similar names to avoid confution"},//
 			  {"NO_EMPTY_BLOCKS", false, 1, "Checks for empty blocks"},//
+			  {"PROPER_VAR_NAMES", true, 3, "Checks if name is in proper format (1:a_b vs 2:a_B vs 3:aB)"},//
+			  {"STRING_TO_NUM", true, 1, "Checks for convertions from string to numbers(int/double/bools)"},
 			  {"SHOW_COMPLEXITIES", false, 1, "Shows breakdown of complexities of every function/class"},//
+			  {"VAR_MAX_LENGTH", true, 20, "Maximum length of varriables allowed"},//
+			  {"VAR_MIN_LENGTH", true, 3, "Minimum length of varriables allowed"},//
+			  {"VAR_TYPE_DEFINED", false, 1, "Makes all vars must have type"},//
 			  
 			  {"NO_MISSING_RETURNS", true, 1, "Requires every non-void function to have a return statment as the last line"},
 			  {"NEW_LINE_AFTER_BLOCK", true, 1, "Requires a new line after }"},
