@@ -1,0 +1,93 @@
+
+const int secretNumber = 11
+print("I am greeeeen text!", "green")
+print("The args are: "+args.toString())
+print("The args are of type: "+args.getType())
+print("e^2 = "+pow(2))
+class thing{
+func toString(){
+return "yes i worked"
+}
+func bool operator==(thing x){print("Cehcking if ==")return true}
+}
+
+class person extends thing{
+string name
+int age
+const int lifeSpand = 20
+static int numOfPeople = 600
+
+func person(string N, int a){
+numOfPeople++
+name = N
+age = a
+}
+
+func bool getOlder(){
+//throw("dead")
+//fualt()
+age=age+dum()
+print("Happy "+age+" birthday "+name+"!", "blue", "yellow")
+
+if age>lifeSpand{
+print(name+" has died", "red")
+name = "dead "+name
+die()
+return false
+}
+return true
+}
+
+func void die(){
+print("Burry "+name+" in the ground")
+}
+
+func int static number(){
+return numOfPeople
+}
+func int dum(){
+return 1
+}
+}
+
+
+
+person me = person("Merry", 10)
+person you = person("Ben", 15)
+
+you.getOlder()
+
+live(me)
+live(you)
+person ben = person("Ben", 18)
+person aBen = person("Ben", 18)
+
+bool same = ben == aBen
+
+print("Are they the same person? " + same)
+same = ben != aBen
+print("Are they not the same person? " + same)
+print("How about you and me? Same:"+(me==you)+" Diff: "+(you!=me))
+print(you.toString())
+//print("I am "+(me.toString()))
+//print("Number of ppl: "+person.number())
+Cpp_code"cout<<(person::number())<<endl;"
+
+func void live(person p){
+print(me)
+while p.getOlder(){
+print("one year has passed")
+}
+}
+
+
+//i want to write to file too
+
+write("FIRSTs_TEST_FILE.txt", "look its all \n working \" end stuff")
+
+var test = person("test name", 19)
+print(test)
+print(test.name)
+print(test.age)
+print(test.age.getType())
+print(type(ben))
