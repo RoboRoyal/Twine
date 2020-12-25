@@ -141,14 +141,14 @@ const singleOP Operators[] = {
 			      //{":", 5, false, false, false, true, false},//cotton candy
 };
 
-singleOP getOP(string OPName){
+singleOP getOP(const string OPName){
   for(int i  = 0;i<sizeof Operators/sizeof Operators[0];i++){
     if(Operators[i].OP == OPName)
       return Operators[i];
   }
   if(OPName == "::")
     return getOP(".");
-  throw runtime_error("Looking for OP that doesn exist: "+OPName);
+  throw runtime_error("[getOP] Looking for OP that doesn exist: "+OPName);
 };
 struct symbol{//aka helpable object
   string name;

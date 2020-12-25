@@ -12,6 +12,8 @@
 
 #include "parserNodes.h"
 
+
+//TODO use MAP instead
 class scope{
  public:
   bool newVarScope;

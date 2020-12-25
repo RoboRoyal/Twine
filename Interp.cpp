@@ -22,7 +22,7 @@ int Interp(const string& in){
   bool didIn = false;
   do{
     indent = 0;
-    implicitPrint = false;
+    //implicitPrint = false;
     if(reportingLevel < 1){cout<<"peeking now"<<endl;vars.peekScope(); analizeProg(Prog);}
     string data;
     if(in != "" && !didIn){
@@ -226,6 +226,7 @@ void interpBlock(Block * b, bool pushScope){
 
 void interpLine(parseNode * N){
   debug("interpLine("+N->type+")");
+  usedAssign = true;
   if(N->type == "WHILE"){
     interpWHILE((WHILE *)N->theThing);
   }else if(N->type == "FOR2"){
@@ -237,8 +238,10 @@ void interpLine(parseNode * N){
   }else if(N->type == "funkCall"){
     interpFunkCall((funkCall *)N->theThing);
   }else if(N->type == "exp3"){
+    usedAssign = false;
     interpExpression((expression3 *)N->theThing);
   }else if(N->type == "exp2"){
+    usedAssign = false;
     interpExpression((expression2 *)N->theThing);
   }else if(N->type == "ret"){
     returnExcep ret = returnExcep();
@@ -310,6 +313,7 @@ void interpIF(IF * f){
 }
 void interpVarAss(varAssign * va){
   debug("interpVarAss()");
+  usedAssign = true;
   //va has type, name, and exp(it actually has two, not sure why)
   if(va->OP == "="){
     //cout<<"New var?: "<<va->newVar<<endl;
@@ -508,7 +512,16 @@ __ANY__ interpExpression(expression3 * exp){//doesnt do ++ or --
    //debug("interpExpression(3) done");
 }
 
-__ANY__ interpExpression(expression2 * exp){
+
+__ANY__ interpExpression(const expression2 * exp){
+  //usedAssign = false;
+  __ANY__ tmp = interpExpressionHelper(exp);
+  cout<<usedAssign <<" "<<implicitPrint<<endl;
+  if(!usedAssign && implicitPrint)
+    print(tmp);
+  return tmp;
+}
+__ANY__ interpExpressionHelper(const expression2 * exp){
   debug("interpExpression(2)");
   /*if(exp->right != NULL){
     return applyOP(interpAtom(exp->left),exp->OP,interpAtom(exp->right));

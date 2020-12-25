@@ -29,7 +29,8 @@ public:
 };
 
 const string versionNumber = "null";
-bool implicitPrint = false;
+bool implicitPrint = true;
+bool usedAssign = false;
 //__ANY__ lastEval = __ANY__();//maybe i will imp?
 
 vector<string> stackTrace;
@@ -55,7 +56,8 @@ void interpVarAss(varAssign * va);
 __ANY__ interpFunkCall(funkCall * fc);
 __ANY__ interpUserFunkCall(Funk * f, funkCall * fc);
 
-__ANY__ interpExpression(expression2 * exp);
+__ANY__ interpExpression(const expression2 * exp);
+__ANY__ interpExpressionHelper(const expression2 * exp);
 __ANY__ interpExpression(expression * exp);
 __ANY__ interpExpression(expression3 * exp);
 __ANY__ interpAtom(atom * a);

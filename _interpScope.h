@@ -10,6 +10,8 @@
 #ifndef INTERP_SCOPE_H_
 #define INTERP_SCOPE_H_
 
+#include <chrono>
+
 //includes
 class interpSingleVAR{//or could just use var from parserNode
  public:
@@ -122,16 +124,9 @@ public:
     //cout<<"Pulled: "<<numOfNewVarScopes<<endl;
     return numOfNewVarScopes;
   }
-  __ANY__& getVar(string varName){//TODO should return ptr value, NULL if not found
-
-    /*cout<<"Trying to get var: "<<varName<<endl;
-    if(!currentVars->varsInScope.size())
-      cout<<"Trying to get var when there are no scopes1"<<endl;
-    if(!localVars->size())
-      cout<<"Trying to get var when there are no scopes2"<<endl;
-    if(!globalVars->varsInScope.size())
-      cout<<"Trying to get var when there are no scopes3"<<endl;
-    cout<<"check 2"<<endl;*/
+  __ANY__& getVar(const string& varName){//TODO should return ptr value, NULL if not found
+    if(varName == "CURRENT_TIME_MS")//Im ugly and im proud //TODO
+      setVar("CURRENT_TIME_MS", (double)chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count());
     
     for(vector<interpSingleVAR>::iterator i = currentVars->varsInScope.begin(); i != currentVars->varsInScope.end(); i++){//checks global vars
       if(i->varName == varName) return i->data;
