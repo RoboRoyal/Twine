@@ -103,6 +103,7 @@ Flag compileFlags[] = {
 		       {"TWINE_TYPE_SAFE", false,"Enables stricked type checking(disables WIERD_CONVERTIONS, WIERD_ASSINGMENTS, TWINE_QUITE, WIERD_TYPE_CHECKS"},
 		       {"SAVE_LINE_COMMENTS",false,"Saves single line comments from origonal file and puts them into the output(C++) file"},//TODO impliment these two
 		       {"SAVE_BLOCK_COMMENTS",false,"Saves block comments from origonal file and puts them into the output(C++) file"},
+		       {"TWINE_SAFE", true, "Adds safty measures to seg fault conditions"},
 		       
 		       //should be these in a different list?
 		       //these are used internal to the lex-parse-trans process

@@ -217,7 +217,7 @@ bool preScan(){
       
     }else if(accept("import")){//handle imports
       if(interpMode) error("Can not import non-twine files when in interpreting mode");
-      accept(TokenData::OTHER) || expect(TokenData::OTHER); 
+      accept(TokenData::IMPORT) || expect(TokenData::IMPORT); 
       parseCppFile(lastSym->tokenText);
     }else if(accept(TokenData::FILE_CHANGE)){//track current file to make error messages better
       currentParsingFile = lastSym->tokenText;
@@ -1159,10 +1159,11 @@ void parseBlock(Block* b,bool pushBackVarScope){
       }
     }else if(accept(TokenData::FILE_CHANGE)){
       currentParsingFile = lastSym->tokenText;
-    }else if(accept("import")){
-      //must be C++ file
-      expect(TokenData::OTHER);
-      //parseCppFile(lastSym->tokenText);
+      
+    }else if(accept("import")){//ignore these here
+      expect(TokenData::IMPORT);//currently parses all imported files in preScan()
+      PN->type = "IMPORT";
+      PN->data = lastSym->tokenText;
     }else{
       //try to parse exp
       PN->type = "exp3";
@@ -2104,7 +2105,7 @@ void error(const string& msg, bool passable){
   if(!interpMode)
     errorMsg += "'"+ currentParsingFile+"' ";
     
-  errorMsg += to_string((unsigned) sym->line)+":"+to_string((unsigned) sym->charPos)+": "+msg;
+  errorMsg += to_string((unsigned) sym->line)+":"+to_string((unsigned) sym->charPos)+": "+msg+'\n';
   errorMsg += line + '\n';
   if(!passable){
     throw invalid_argument(errorMsg);
@@ -2135,7 +2136,9 @@ void warn(const string& msg){//TODO make look a bit nicer
   warningMsg += "\n";
   if(!interpMode)
     warningMsg += "'" + currentParsingFile +"' ";
-  warningMsg += to_string((long long) sym->line)+":"+to_string((long long) sym->charPos)+": "+msg + '\n';
+
+  //use lastSym to avoid reporting next line when being called from resolver
+  warningMsg += to_string((long long) lastSym->line)+":"+to_string((long long) sym->charPos)+": "+msg + '\n';
   report(warningMsg, 2);
 }
 

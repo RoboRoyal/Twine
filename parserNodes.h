@@ -43,6 +43,7 @@ class branch;          //a main thread
 //deconstructors
 class prog;            //holds functions and classes
 
+
 class parseNode{
  public:
   string type;
@@ -910,6 +911,7 @@ object::~object(){
   }
 }
 
+extern vector<Funk *>TwineFunks;
 class prog{
 public:
   vector<Funk *> functions;
@@ -960,6 +962,13 @@ public:
       me+=branches[i]->toString()+'\n';
     }
     me+="\n";
+    bool show_twine_f = true;
+    if(show_twine_f){
+      me += "Twine Funks("+to_string(TwineFunks.size())+")\n";
+      for(unsigned i = 0; i < TwineFunks.size(); i++){
+	me+=TwineFunks[i]->toString()+'\n';
+      }
+    }
     return me;
   }
 

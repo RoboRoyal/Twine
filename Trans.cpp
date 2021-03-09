@@ -94,9 +94,9 @@ bool tempStart(){//sets configuration and gets template file
       tmp+= "#define "+compileFlags[i].name+'\n';
     }
   }
-  //if(FORCE) tmp += "#define TWINE_FORCE\n";//TODO these guys switches
+  tmp += "#define __TWINE__VERSION__ "+to_string(TWINE_VERSION_INT)+'\n';
+
   //TODO includes
-  tmp+="#define TWINE_SAFE\n";
   tmp+="#include \""+INSTALL_PATH+"includes/CONFIG."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";//I know im using .h.gch...
   tmp+="#include \""+INSTALL_PATH+"includes/EXTERN."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   //tmp+="#define int int32_t\n";//i think it should be int64_t as that is what ANY uses as defualt
@@ -441,6 +441,8 @@ bool TransLine(parseNode * N){
     out+=");";
   }else if(N->type == "EMPTY"){
     //Do nothing
+  }else if(N->type == "IMPORT"){
+    out += "//IMPORT: "+N->data;
   }else{
     out+="/*IDK: ";
     out+=to_string(N->ID);

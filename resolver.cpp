@@ -9,7 +9,8 @@ void applyCast(atom * a, string targetType);*/
 
 int recused = 0;
 
-
+/*USed to tell if a var type is an object
+  Object does not need ot be user created*/
 bool isObj(const string& name){
   if(convertedType(name) == "num")
     return false;
@@ -18,16 +19,29 @@ bool isObj(const string& name){
   return true;
 }
 
-void checkCast(const string& from, const string& targetType){
+/*Checks warning/eror if a cast 'from' to 'targetType' is allowed.*/
+bool checkCast(const string& from, const string& targetType, bool output = true){
   if(targetType == "string" && convertedType(from) == "num" && from != "bool"){
     if(getLintFlag("NUM_TO_STRING") == 1){
-      warn("Cast from "+from+"(number) to string");
+      if(output) warn("Cast from number("+from+") to string");
     }else if(getLintFlag("NUM_TO_STRING") == 2){
-      error("Cast from "+from+"(number) to string", true);
+      if(output) error("Cast from number("+from+") to string", true);
+      return false;
     }
-  }//lint?
+  }else if(convertedType(targetType) == "num" && from == "string"){
+    if(getLintFlag("STRING_TO_NUM") == 1){
+      if(output) warn("Cast from string to number");
+    }else if(getLintFlag("STRING_TO_NUM") == 2){
+      if(output) error("Cast from string to number", true);
+      return false;
+    }
+  }else if(!builtInType(from) && from != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
+    warn("Implicit cast from type '"+from+"' to type "+targetType);
+  //lint?
+  return true;
 }
-string resolveTypeOfDots(expression3 * exp){//should return var
+
+string resolveTypeOfDots(const expression3 * exp){//should return var
   return exp->bigAtoms->at(0)->a->helper.type;
 }
 
@@ -52,8 +66,9 @@ void applyCast(expression2 * EXP, string targetType){
     debug("applyCast(EXP) done");
     return;
   }
+  checkCast(EXP->helper, targetType);
   if(targetType == "string" && convertedType(EXP->helper) == "num"){//TODO bool should be different
-    checkCast(EXP->helper,"string");
+    //checkCast(EXP->helper,"string");
     EXP->cast = "num to string";
   }else if(targetType == "string" && EXP->helper == "__ANY__"){
     EXP->cast = "string";
@@ -61,15 +76,16 @@ void applyCast(expression2 * EXP, string targetType){
     EXP->cast = "toString";
   }else if(convertedType(targetType) == "num" && EXP->helper == "string"){
     EXP->cast = "string to num";
+    
     //TODO cast warning/check allow
-    if(getLintFlag("STRING_TO_NUM") == 1){
+    /* if(getLintFlag("STRING_TO_NUM") == 1){
       warn("Cast from string to number");
     }else if(getLintFlag("STRING_TO_NUM") == 2){
       error("Cast from string to number", true);
-    }
+      }*/
   }else{
-    if(!builtInType(EXP->helper) && EXP->helper != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
-      warn("Implicit cast from type '"+EXP->helper+"' to type "+targetType);
+    //if(!builtInType(EXP->helper) && EXP->helper != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
+    //  warn("Implicit cast from type '"+EXP->helper+"' to type "+targetType);
     EXP->cast = convertedType(targetType);
   }
   //cout<<"applyCast() set cast to: "<<EXP->cast<<endl;
@@ -238,10 +254,11 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
   return EXP;
 }
 
+//Turns exp3 an atom has into an exp2
 void resolveAtom(atom * a){
   debug("resolveAtom()--");
   if(a->type == "exp3"){
-    cout<<"Got exp3 here"<<endl;
+    //cout<<"Got exp3 here"<<endl;
     expression3 * tmp = a->exp3;
     a->type = "exp2";
     a->exp2 = resolveExpression2(a->exp3, "*");

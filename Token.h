@@ -36,6 +36,7 @@ public:
 	    FILE_CHANGE, //change what file were parsing
 	    CONTROLE_LINE,
 	    DELIMITER,//; and ,
+	    IMPORT,
   };
   string tokenText;
   unsigned line, charPos;
@@ -76,6 +77,8 @@ public:
       return "FILE_CHANGE";
     case(DELIMITER):
       return "DELIMITER";
+    case(IMPORT):
+      return "IMPORT";
     default:
       return "BAD_TYPE";
     }

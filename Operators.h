@@ -427,14 +427,14 @@ const nameSpace nameSpaces[] = {
 				  {"sync", "void", "void", "Waits for thread to end"},
                                  },
 				 
-                                 {//list of constants
+                                 {},//list of constants
+                                 {},//static vars
+                                 {
 				  {"__run__", "bool", "If the thread/branch is currently set to run again after this cycle"},
 				  {"__pause__", "bool", "If the thread/branch is currently set to pause at the beggining of the next cycle"},
 				  {"__finish__", "bool", "If the thread has finished execution"},
 				  {"__succsess__", "bool", "If the thread executed successfully"},
-				 },
-                                 {},//static vars
-                                 {},//dynamic vars
+				 },//dynamic vars
                                  {},//OPS
 				},
 				 {"list", "Hold multiple of one type of object",

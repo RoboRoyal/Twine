@@ -68,11 +68,11 @@ int main(int argc, char *argv[]){
     __finish__();
   }catch(const exception& e){
 #ifndef TWINE_QUIET
-    //try{throw e;}catch(const exception& e){cout<<"FAILED: "<<e.what()<<endl;}
     cout<<"FAILED: "<<e.what()<<endl;
 #endif //TWINE_QUIET
     returnStat = -2;
   }
+  //delete params;
   return  returnStat;
 }
 #define MAX_T 8

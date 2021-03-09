@@ -25,11 +25,20 @@ using namespace std;
   return newVec;
   }*/
 
+double fmod_t(const double base, const double mod){
+  double a,b;
+  a = modf(base/mod, &b);
+  return base - ((int)b * mod);
+}
+
 template<typename T>
 vector<T> sub(const vector<T>& vec, const int start, const int end){
-  if(start < 0 || start < end || end > vec.length()){
-    throw invalid_argument("Range error");
-  }
+  if(start < 0)
+    throw invalid_argument("Start indice must be > 0");
+  if(start < end)
+    throw invalid_argument("Start indice(" + to_string(start)+ ") must be less than end indice(" + to_string(end) + ")");
+  if(end > vec.length())
+    throw invalid_argument("End indice(" + to_string(end) + ") must be less then vector length(" + to_String(vec.length()));
   vector<T> newVec( vec.begin() + start, vec.begin() + end);
   return newVec;
 }
@@ -492,6 +501,13 @@ string read(const string fileName){
 template<typename T> 
 void insert(vector<T>& in, const long pos, const T& thing){
   in.insert(in.begin()+pos, thing);
+}
+
+
+//template<typename T>
+double mod(const double a, const double b){
+  const int div = a / b;
+  return a - (div * b);
 }
 
 #endif//TWINELIB_BASIC

@@ -958,8 +958,8 @@ public:
       //TODO throw error if string/vec if not enabled
       if(a.type == INT||a.type == BOOL){
 	b.type = INT;
-	//b.i=(this->i)%(int)a.toNum();
-	b.i = fmod(this->i, a.toNum());
+	b.i=(this->i)%(int)a.toNum();
+	//b.i = fmod(this->i, a.toNum());
       }else{
 	b.type = DOUBLE;
 	//b.d = this->i % (int)a.toNum();

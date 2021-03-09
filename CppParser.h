@@ -21,38 +21,53 @@ Funk * parseCppFunction();
 void parseCppFile(const string& pathToFile);
 object * parseCppClass();
 bool checkIfFunc();
+void matchLessSym();
 
+
+//parse var
+//parse type
 
 vector<TokenData>* getTokenisedFile(const string& fileName){
   //set lexer to right settings
   //dont save comments/whitespaces, yes scrub, 
-  string importFileText = "";
+  /*string importFileText = "";
   if(!readFile(fileName.c_str(),&importFileText)){
     report("Error reading file: "+pathToFile,4);
     exit(21);
-  }
+    }*/
+  string importFileText = "";
+  bool read = readFile(fileName.c_str(), &importFileText);
   vector<TokenData>* tokens = new vector<TokenData>;
-  if(!Lexer(&importFileText,tokens)){//I know my lexer isn't C++ compatable, but its all i have on hand
+  if(!read)
+    return tokens;
+  if(!Lexer(&importFileText, tokens)){//I know my lexer isn't C++ compatable, but its all i have on hand
     report("Lexer failed, terminating program", 4);
     exit(20);      //cant exit gracfully
   }else{
     return tokens; 
   }
-  return NULL;
+  return NULL;//should never get here but if we do make sure we crash
 }
 
 void parseCppTop(){
   while(!accept(TokenData::FILE_END)){
+    bool changed = false;
     allow(";");
     if(peek("class")){
+      changed = true;
       object * tmp = parseCppClass();
       if(tmp)
 	TwineObjects.push_back(tmp);
     }else{
       Funk * tmp = parseCppFunction();
-      if(tmp)
+      if(tmp){
+	debug("Adding funk "+tmp->name+" ");
 	TwineFunks.push_back(tmp);
+	changed = true;
+      }
     }
+    if(!changed)//prevent inf loops
+      nextSym();
   }
 }
 
@@ -77,11 +92,11 @@ var * parseCppParameterVar(){
   accept(TokenData::IDENT);
   a->name = lastSym->tokenText;
   if(accept("=")){
-  //doesnt need to be anything as long as startingValue != NULL (could just set it to 1?
+  //doesnt need to be anything as long as startingValue != NULL (could just set it to 1?)
   //need to find end of expression, but i dont want to actually parse a Cpp Expression
   //this could be done by looking for a comma, or an end ) of a ;
-    a->startingValue = new expression3();
-    parseExpression();
+    //expression3 * tmp = new expression3(); 
+    a->startingValue =     parseExpression();//TODO
   }
   if(a->name == "" || a->type == "" || a->name == a->type){
     report("Invalid C parameter found: "+a->name+" with type: "+a->type, -2);
@@ -193,5 +208,29 @@ bool checkIfFunc(){
   sym = origonal;
   lastSym = origonalLast;
   return ret;
+}
+
+void matchLessSym(){
+  unsigned sharkCount = 1;
+  while(!sharkCount){
+    nextSym();//cant have 2+ < in a row
+    sharkCount += accept("<");
+    nextSym();//cant have <>
+    while(accept(">"))//can have multiple >> in a row
+      sharkCount -= 1;
+  }
+}
+
+void parseType(){//func or var
+  var tmp = var();
+  if(accept("const")) tmp.constant = true;
+  nextSym();
+  tmp.type = lastSym->tokenText;
+  if(accept("<"))
+     matchLessSym();
+  if(accept("*")) tmp.ptr = true;
+  nextSym();
+  tmp.name = lastSym->tokenText;
+  if(accept("&")) tmp.reference = true;
 }
 

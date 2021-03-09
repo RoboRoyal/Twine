@@ -44,7 +44,8 @@ if hash g++ 2>/dev/null; then
 	#do nothing, its the defualt
 elif hash clang 2>/dev/null; then
 	#using clang
-	USING_GCC=false
+    USING_GCC=false
+    echo "Using clang for compiling/execution"
 else
     echo "A C++ compiler is neccesary for installation"
     echo -n "Would you like to install g++ now?(y/n) "
@@ -170,6 +171,7 @@ if [ -f ".gitignore" ]; then
 fi
 #-------------------------------
 
+
 #-----test if install was successful--------
 if [ type twine >/dev/null 2>&1 ]; then
 	echo "Twine has been installed. If you wish to uninstall twine at any time, simply run sudo ./unComm.sh"
@@ -178,7 +180,7 @@ if [ type twine >/dev/null 2>&1 ]; then
 	echo "Thanks for trying out twine, all feedback is greatly appreciated"
 else
     echo "An unknow error has occured"
-    echo "Try running uncomm.sh and then try reinstalling again with defualt options"
+    echo "Try running uncomm.sh [sudo ./uncomm.sh] to uninstall and then try reinstalling again with defualt options"
 fi
 #------------------------------------------
 

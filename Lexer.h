@@ -33,7 +33,7 @@ bool isValidNum(const string& text);
 bool Lexer(const string* data, vector<TokenData>* tokens);
 void checkControleLine(const string& line, int lineNumber, vector<TokenData>* tokens);
 //Import functions//
-void parseImport(const string& name, vector<TokenData>* tokens);
+void parseImport(const string& name, vector<TokenData>* tokens, unsigned lineNumber);
 bool download(const string& URL);
 
 
@@ -41,7 +41,7 @@ class CharClassifier{
 public:
   void init();
   enum Type{//not sure how many of these are actually used
-	    WHITESPACE,//0,               not generally used
+	    WHITESPACE,//0,               used durring linting, not durring general parsing
 	    LINE_BREAK,//1,               ; not generally used
 	    LETTER,//2,                   abcs...ABCs...
 	    DIGIT,//3,                    123...

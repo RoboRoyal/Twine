@@ -384,7 +384,7 @@ void checkControleLine(const string& line, const int lineNumber, vector<TokenDat
   report("Line command: "+line, -2);
   auto arr = split(line, " ");
   if(arr.size() < 2){
-    report("WARNING:Unrecognised command: "+line, 2);
+    report("WARNING:Unrecognised command(1): "+line, 2);
     tokens->push_back(TokenData(line, lineNumber, line.length(), TokenData::LINE_COMMENT));
     return;
   }
@@ -395,14 +395,14 @@ void checkControleLine(const string& line, const int lineNumber, vector<TokenDat
   if(arr[0] == "FILE"){
     tokens->push_back(TokenData(data, lineNumber, data.length(), TokenData::FILE_CHANGE));
   }else if(arr[0] == "import"){
-    parseImport(data, tokens);
+    parseImport(data, tokens, lineNumber);
   }else{
     report("WARNING:Unrecognised command line: "+line, 2);
     tokens->push_back(TokenData(line, lineNumber, line.length(), TokenData::LINE_COMMENT));//if its nothing else, just comment it out, or could error
   }
 }
 
-void parseImport(const string& name, vector<TokenData>* tokens){
+void parseImport(const string& name, vector<TokenData>* tokens, unsigned lineNumber){
   string pathToFile;
   bool isCpp;
   report("Trying to import file: "+name, -2);
@@ -441,8 +441,8 @@ void parseImport(const string& name, vector<TokenData>* tokens){
   if(isCpp){
     //TODO
     /*I think i need to make a rough C++ parser to find functions+parameters, would be done in 2Parse.cpp*/
-    tokens->push_back(TokenData("import", -1, 6, TokenData::OTHER));
-    tokens->push_back(TokenData(pathToFile, -1, pathToFile.length(), TokenData::OTHER));
+    tokens->push_back(TokenData("import", lineNumber, 6, TokenData::IMPORT));
+    tokens->push_back(TokenData(pathToFile, lineNumber, pathToFile.length(), TokenData::IMPORT));
     //exit(14);
   }else{
     string importFileText = string("#FILE ")+name.substr(name.find_last_of("/")+1);
