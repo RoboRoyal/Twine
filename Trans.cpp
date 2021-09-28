@@ -102,8 +102,8 @@ bool tempStart(){//sets configuration and gets template file
   //tmp+="#define int int32_t\n";//i think it should be int64_t as that is what ANY uses as defualt
   tmp+="#include \""+INSTALL_PATH+"includes/__ANY__."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   tmp+="#include \""+INSTALL_PATH+"includes/TwineLib."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
-  tmp+="#include \""+INSTALL_PATH+"includes/Channel."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
-  tmp+="#include \""+INSTALL_PATH+"includes/runnable."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
+  //tmp+="#include \""+INSTALL_PATH+"includes/Channel."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
+  //tmp+="#include \""+INSTALL_PATH+"includes/runnable."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   tmp+="#include \""+INSTALL_PATH+"includes/TypeInfoLib."+((usingPreCompiledHeaders) ? "h.gch" : "h")+"\"\n";
   tmp+="#include \""+INSTALL_PATH+"includes/error."+((usingPreCompiledHeaders) ? "hpp.gch" : "hpp")+"\"\n";
   readFile((INSTALL_PATH + "temp1.cpp").c_str(),&tmp);

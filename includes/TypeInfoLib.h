@@ -7,7 +7,7 @@
 #include <typeinfo> //typeid
 
 #include "__ANY__.h"
-#include "Channel.h"
+//#include "Channel.h"
 
 //look into std::type_info
 

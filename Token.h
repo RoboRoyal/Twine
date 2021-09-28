@@ -29,12 +29,10 @@ public:
 	    BLOCK_COMMENT,
 	    NUM,
 	    RESERVED,
-	    OTHER,//dont think its used?
-	    FILE_END,
+	    END_OF_FILE,
 	    FORCE_ADDED,
 	    BAD_TYPE,
 	    FILE_CHANGE, //change what file were parsing
-	    CONTROLE_LINE,
 	    DELIMITER,//; and ,
 	    IMPORT,
   };
@@ -71,7 +69,7 @@ public:
       return "LINE_COMMENT";
     case(BLOCK_COMMENT):
       return "BLOCK_COMMENT";
-    case(FILE_END):
+    case(END_OF_FILE):
       return "EndOfFile";
     case(FILE_CHANGE):
       return "FILE_CHANGE";

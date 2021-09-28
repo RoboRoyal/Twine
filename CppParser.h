@@ -50,7 +50,7 @@ vector<TokenData>* getTokenisedFile(const string& fileName){
 }
 
 void parseCppTop(){
-  while(!accept(TokenData::FILE_END)){
+  while(!accept(TokenData::END_OF_FILE)){
     bool changed = false;
     allow(";");
     if(peek("class")){

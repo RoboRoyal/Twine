@@ -213,8 +213,8 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
       return false;
     }
   }
-  tokens->emplace_back("EOF", line, charPos, TokenData::FILE_END);
-  tokens->emplace_back("EOF", line, charPos, TokenData::FILE_END);
+  tokens->emplace_back("EOF", line, charPos, TokenData::END_OF_FILE);
+  tokens->emplace_back("EOF", line, charPos, TokenData::END_OF_FILE);
   //TODO free memory
   report("Success Lexing file",0);
   return true;
