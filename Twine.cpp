@@ -16,9 +16,10 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #include "Formater.cpp"
 #include "resolver.cpp"
 //#include "trial.cpp"
-#include "testBench.cpp"
+//#include "testBench.cpp"
 
-#include <execinfo.h> //stack trace
+//#include <execinfo.h> //stack trace
+#include <unwind.h>
 #include <cstring>//segfualt
 #include <signal.h>//segfualt
 #include <chrono>//high_resolution_clock
@@ -38,7 +39,9 @@ bool compile(const string& fileInName, const string& fileOutName);     //compile
 bool execute(const string& outName);                                   //executes a given file
 bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, executer chain / linter / formater
 void freeProg();                                                       //frees memory-TODO
+#if defined(unix)
 void segfaultHandler(int signal, siginfo_t *si, void *arg);
+#endif
 void handler(int sig);
 
 
@@ -52,19 +55,21 @@ int main(int argc, char** argv){
     signal(SIGABRT, handler);
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
-    
+
+#if defined(unix)
     struct sigaction sa;
     memset(&sa, 0, sizeof(struct sigaction));
     sigemptyset(&sa.sa_mask);
     sa.sa_sigaction = segfaultHandler;
     sa.sa_flags   = SA_SIGINFO;
     sigaction(SIGSEGV, &sa, NULL);
+#endif
   }
 
   
   usingPreCompiledHeaders = false;//TODO for now....
 #ifndef TWINE_INSTALL_BUILD
-  cout<<"Term: "<<getenv("TERM")<<endl;
+  //cout<<"Term: "<<getenv("TERM")<<endl;
   reportingLevel = -2;
   INSTALL_PATH = "";
   removeCPPFileAfter = false;
@@ -79,7 +84,7 @@ int main(int argc, char** argv){
 #ifdef TWINE_USING_CLANG
   usingClang = true;
 #endif
-  
+  cout<<"here at lease"<<endl;
   if(argc == 1){
     setFlag("DEFUALT_RETURN", false);
     Interp();
@@ -201,7 +206,11 @@ bool compile(const string& fileInName, const string& fileOutName){
 }
 bool execute(const string& name){
   report("Executing...",0);
-  string command = string("./"+name + ' ' + argsForProg);
+  string command = "";
+#if defined(unix)
+  command = string("./");
+#endif
+  command += name + ' ' + argsForProg;
   int returnStatus;
   try{
     report(command,0);
@@ -209,7 +218,11 @@ bool execute(const string& name){
       report("Executing successful! (exit code: "+to_string(returnStatus)+')',0);
       return true;
     }else{
+#if defined(unix)
       report("ERROR while executing code: "+to_string(WEXITSTATUS(returnStatus)),4);
+#else
+        report("ERROR while executing code: IDK cuz we on windows", 4);
+#endif
     }
   }catch(int e){
     report("ERROR, exception occured while try to execute code",4);
@@ -552,11 +565,20 @@ void freeProg(){
   }*/
 #include "includes/error.hpp"
 
+
+#if defined(unix)
 void segfaultHandler(int signal, siginfo_t *si, void *arg){
   cout<<"Segfualt cuased abort; adress "<<si->si_addr<<endl;
   printStack(0,1);
   exit(signal);
 }
+#else
+void segfaultHandler(int signal, void * si, void *arg){
+    cout<<"Segfualt cuased abort; signal "<<signal<<endl;
+    printStack(0,1);
+    exit(signal);
+}
 
+#endif
 
 void __finish__(){}

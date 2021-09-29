@@ -9,6 +9,9 @@
 #include <math.h>//pow, sqrt
 #include <iomanip> //#include <iomanip>
 
+#if defined(__CYGWIN__)
+#include <windows.h>
+#endif
 
 #include "Object.h"
 #include "__ANY__.h"
@@ -124,7 +127,13 @@ __ANY__ sub(int start, __ANY__ var, int step = 1){
   return sub(start, var.size(), var, step);
 }
 
-int system(const string command){return WEXITSTATUS(system(command.c_str()));}//TODO, add options to get string output, not wait, etc
+int system(const string command){
+#if defined(unix)
+    return WEXITSTATUS(system(command.c_str()));
+#else
+    return 0; //TODO
+#endif
+}//TODO, add options to get string output, not wait, etc
 //#define System(command) (WEXITSTATUS(system(command.c_str())))
 
 
@@ -471,7 +480,13 @@ double randDouble(double min = 0.0, double max = 1.0){//TODO
   long long tmp2 = (long long)(4294967296)*RAND_MAX + (long long)RAND_MAX;
   return (min+(tmp/(tmp2/(max-min))));
 }
-void sleep(double sleepTime){  this_thread::sleep_for(chrono::microseconds(int(sleepTime*1000000)));  }//TODO another is already included
+void sleep(double sleepTime){
+#if defined(unix)
+    this_thread::sleep_for(chrono::microseconds(int(sleepTime*1000000)));
+#elif defined(__CYGWIN__)
+    Sleep(sleepTime * 1000);
+#endif
+}//TODO another is already included
 
 bool write(const string fileName, const string text, const bool append = false){//TODO readFile/writeFile?
   ofstream outputFile;

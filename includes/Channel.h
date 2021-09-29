@@ -15,6 +15,10 @@
 #include <mutex>
 #include <deque>
 
+#if defined(__CYGWIN__)
+#include <windows.h>
+#endif
+
 #include "Object.h"
 #include "TypeInfoLib.h"
 
@@ -69,7 +73,11 @@ public:
       if(producerNumbers == 0)throw invalid_argument("Trying to read channel when its empty and there are no producers: deadlock");
 #endif //TWINE_QUITE
       //sleep(waitTime);
+#if defined(unix)
       this_thread::yield();
+#else
+      Yield();
+#endif
       this->channelLock.lock();
     }
     T tmp = this->channelQ.front();
@@ -82,7 +90,11 @@ public:
     this->channelLock.lock();
     while(this->channelQ.empty()){
       this->channelLock.unlock();
-      this_thread::yield();
+#if defined(unix)
+        this_thread::yield();
+#else
+        Yield();
+#endif
       this->channelLock.lock();
     }
     T tmp = this->channelQ.front();
@@ -94,7 +106,11 @@ public:
     this->channelLock.lock();
     while(this->channelQ.size() < position){//wait for there to be at position
       this->channelLock.unlock();
-      this_thread::yield();
+#if defined(unix)
+        this_thread::yield();
+#else
+        Yield();
+#endif
       this->channelLock.lock();
     }
     T tmp = this->channelQ.at(position);

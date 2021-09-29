@@ -6,7 +6,8 @@
 #include <thread>//for threads
 #include <atomic>// used for atomic static member vars
 
-#include <execinfo.h> //for printing stack trace
+//#include <execinfo.h> //for printing stack trace
+#include <unwind.h>
 //#include <stdio.h>
 
 #include <string>//String
@@ -23,11 +24,15 @@
 //#include <cstdlib>
 //#include <initializer_list>
 //#include <typeinfo>
+#ifndef unix
+#undef TWINE_SEGFUALT_PROTECTION
+#endif
 
 #ifdef TWINE_SEGFUALT_PROTECTION
 #include <cstring>
 #include <signal.h>
 #endif //TWINE_SEGFUALT_PROTECTION
+
 
 using namespace std;
 

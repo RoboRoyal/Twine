@@ -467,7 +467,7 @@ public:
       return 0;
     }else{
       //return (sizeof(ptr));//i know this is const,  just dont know what else to do, maybe return address(ptr)?
-      return (long)ptr;
+      return (long long) ptr;
     }
   };
   string toString()const{

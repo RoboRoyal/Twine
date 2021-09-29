@@ -180,7 +180,7 @@ void matchEnd(int indent = 0){
     if(indent && !ate)//check for EOF?
       nextSym();
 
-    if(peek(TokenData::FILE_END) && indent){
+    if(peek(TokenData::END_OF_FILE) && indent){
       cout<<"indent: "<<indent<<endl;
       error("Missing closing '}'", false);
 
@@ -191,7 +191,7 @@ void printSyms(){
   cout<<"Sym: "<<sym->tokenText<<endl;
   cout<<"lastSym: "<<lastSym->tokenText<<endl;
   cout<<"twoSymbAgo: "<<twoSymbAgo->tokenText<<endl;
-  if(sym->tokenType != TokenData::FILE_END)
+  if(sym->tokenType != TokenData::END_OF_FILE)
     cout<<"Next sym: "<<(sym+1)->tokenText<<endl;
 }
 expression3 * stringToExp(string in){

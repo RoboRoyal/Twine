@@ -173,7 +173,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
 //then parsing them after the funcition gets defined
 bool preScan(){
   debug("prescan()");
-  while(!accept(TokenData::FILE_END)){//loop throught whole file
+  while(!accept(TokenData::END_OF_FILE)){//loop throught whole file
     if(accept("func")){//find all functions
 
       Funk * skell = new Funk();
@@ -281,7 +281,7 @@ void parseClassPre(object * obj){
       obj->memberVars.push_back(parseClassVar());
       //obj->memberVars.push_back(new var(parseVar()));
     }
-    if(sym->tokenType == TokenData::FILE_END)
+    if(sym->tokenType == TokenData::END_OF_FILE)
       error("Missing close '}' for class "+obj->name, false);
   }
   //TODO add unimplimented OPs
@@ -555,7 +555,7 @@ void checkReturn(Funk * F){
 void parseTop(){
   debug("parseTop()");
   //TODO have to do scopes
-  while(!accept(TokenData::FILE_END)){
+  while(!accept(TokenData::END_OF_FILE)){
     if(accept("func") || accept("def")){
       Funk tmpF = Funk();
       pushScope();

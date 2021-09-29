@@ -24,6 +24,34 @@ string demangleName(const string& mangled){
    return mangled;
  }
 
+#if defined(unix)
+vector<string> getStack(){
+  vector<string> ret = vector<string>();
+  void *array[maxStackTraceSize];
+  size_t arrSize;
+  arrSize = backtrace(array, maxStackTraceSize);
+
+  char ** stackString = backtrace_symbols(array, arrSize);
+  for(unsigned i = 1; i < arrSize - 1; i++){
+    string me = string(stackString[i]);
+    int st = me.find_first_of("(")+1;
+    me = me.substr(st, me.length()-st);
+    int ft = me.find_first_of("+");
+    me = me.substr(0, ft);
+    ret.push_back(demangleName(me));
+  }
+  free(stackString);
+  return ret;
+}
+#else
+vector<string> getStack() {
+  vector<string> ret = vector<string>();
+  ret.push_back("Stack trace only works on linux for now");
+  return ret;
+}
+#endif
+
+#if defined(unix)
 void printStack(const unsigned deBuffSize = 1, const unsigned endBuffSize = 3) {
   void *array[maxStackTraceSize];
   size_t arrSize;
@@ -58,25 +86,12 @@ void printStack(const unsigned deBuffSize = 1, const unsigned endBuffSize = 3) {
   free(stackString);
 
 }
-
-vector<string> getStack(){
-  vector<string> ret = vector<string>();
-  void *array[maxStackTraceSize];
-  size_t arrSize;
-  arrSize = backtrace(array, maxStackTraceSize);
-
-  char ** stackString = backtrace_symbols(array, arrSize);
-  for(unsigned i = 1; i < arrSize - 1; i++){
-    string me = string(stackString[i]);
-    int st = me.find_first_of("(")+1;
-    me = me.substr(st, me.length()-st);
-    int ft = me.find_first_of("+");
-    me = me.substr(0, ft);
-    ret.push_back(demangleName(me));
-  }
-  free(stackString);
-  return ret;
+#else
+void printStack(const unsigned deBuffSize = 1, const unsigned endBuffSize = 3) {
+  cout << getStack()[0] << endl;
 }
+
+#endif
 
 string getErrorType(const int signal){
   switch(signal){
@@ -105,7 +120,7 @@ void handler(const int sig){
   __finish__();
   exit(sig);
 }
-
+#if defined(unix)
 void segFaultHandler(int signal, siginfo_t *si, void *arg){
   
   cout<<"Error in program "<<signal;
@@ -118,6 +133,13 @@ void segFaultHandler(int signal, siginfo_t *si, void *arg){
   __finish__();
   exit(signal);
 }
+#else
+/*void segfaultHandler(int signal, void * si, void *arg){
+    cout<<"Segfualt cuased abort; signal "<<signal<<endl;
+    printStack(0,1);
+    exit(signal);
+}*/
 
+#endif
 
 #endif //_ERROR_H_
