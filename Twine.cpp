@@ -84,7 +84,7 @@ int main(int argc, char** argv){
 #ifdef TWINE_USING_CLANG
   usingClang = true;
 #endif
-  cout<<"here at lease"<<endl;
+
   if(argc == 1){
     setFlag("DEFUALT_RETURN", false);
     Interp();
