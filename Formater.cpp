@@ -23,7 +23,7 @@ void Format(vector<TokenData> * t){
   int expectIndent = 0;
   bool expectNewline = false;
   for(; i < tokens->size()-1; i++){
-    if(tokens->at(i).tokenType == TokenData::FILE_END) break;
+    if(tokens->at(i).tokenType == TokenData::END_OF_FILE) break;
     if(tokens->at(i).tokenType == TokenData::FILE_CHANGE) continue;
     out += tokens->at(i).tokenText;
     if(tokens->at(i).tokenText == "{"){
