@@ -16,7 +16,7 @@ jobs:
     - name: make
       run: make
     - name: enable
-      run: chmod twine +x
+      run: chmod +x twine
     - name: first
       run: make prog
     - name: test
