@@ -605,7 +605,6 @@ __ANY__ interpAtom(atom * a){
       if(name == "false")
 	return false;
     }
-    //cout<<"F"<<endl;
     report("Returning stright lit: "+name, -2);
     __ANY__ me = __ANY__(name);
     return me;//make string

@@ -211,7 +211,7 @@ const functions builtInFunctions[] = {//TODO finish and organize
 				      {"exit","void","int exitStatus=0","Exits the program. A return status of 0 means succsess, other numbers represent some failure"},
 				      {"fualt", "void", "void", "Creats an unrecoverable error"},
 				      {"getenv", "string", "string varName", "Gets the value of the passed in enviromental variable from the system"},
-				      {"getStack()", "__ANY__", "void", "Returns list of the names of the functions on the stack"},//TODO replace with string[]
+				      {"getStack", "__ANY__", "void", "Returns list of the names of the functions on the stack"},//TODO replace with string[]
 				      {"input","string","string msg=\"\"","Gets input from the user. Can pass a string to pass to the user first"},
 				      {"insert", "void", "* list, int pos, * data", "Ineserts data into list and give position"},
 				      {"len","int","__ANY__ target","Returns the length of a list passed, otherwise returns 1"},

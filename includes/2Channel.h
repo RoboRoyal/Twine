@@ -19,15 +19,17 @@ using namespace std;
 
 template <class T>
 class ChannelTwo{
-  mutex * channelLock;
+  mutex * channelLock; //should be semaphore
   deque<T> * channelQ;
   atomic<int> producerNumbers;
+  int_64 max_size;
 
 public:  
   ChannelTwo(){
     channelLock = new mutex;
     channelQ = new deque<T>();
     producerNumbers = 0;
+    max_size = 0;
   }
 
   ChannelTwo(ChannelTwo<T>& other){
@@ -41,8 +43,8 @@ public:
 
   int getProducerNumbers(){return producerNumbers;}
   
-  int size(){
-    channelLock->lock();
+  int size(){// could use an atomic int for keeping track of size which would mean we don't need to lock the channel when looking at the size, but would add overhead in read/write
+    channelLock->lock();//must we lock?
     int sz = channelQ->size();
     channelLock->unlock();
     return sz;
@@ -53,7 +55,9 @@ public:
     while(channelQ->empty()){
       channelLock->unlock();
 #ifndef TWINE_QUITE //this may not even neccisarily be an error is a producer is made latter
+#ifdef TWINE_PED
       if(producerNumbers == 0)throw invalid_argument("Trying to read channel when its empty and there are no producers: deadlock");
+#endif //TWINE_PED
 #endif //TWINE_QUITE
       this_thread::yield();
       channelLock->lock();
@@ -92,6 +96,11 @@ public:
   
   void write(const T &data){//adds data to message queue
     channelLock->lock();
+#ifndef TWINE_QUITE
+    if(max_size && channelQ->size() >= this.max_size){
+      throw invalid_argument("Trying to write to channel that is already at max size: " + to_string(this.max_size));
+    }
+#endif //TWINE_QUITE
     channelQ->push_back(data);
     channelLock->unlock();
   }

@@ -123,6 +123,19 @@ user = input("was hello world on one line and this on a new line?: (yes/no) ")
 match(user, "yes", "User IO Test")
 }
 
+
+/*************test for objects and inheritance**********/
+class basic{
+string name = "base for all"
+string getName(){
+return name
+}
+}
+
+class extend basic{
+
+}
+
 /*main*/
 func mainTest(){
 

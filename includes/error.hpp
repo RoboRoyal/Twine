@@ -6,7 +6,7 @@
 
 
 void __finish__();
-const int maxStackTraceSize = 24 + 6;
+const int maxStackTraceSize = 24 + 6;//6 function calls are required for Twine background
 
 string demangleName(const string& mangled){
    const char * name= mangled.data();

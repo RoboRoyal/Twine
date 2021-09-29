@@ -1,4 +1,8 @@
 
+/*
+ * 2Parser.cpp
+ * Main parser file. Takes a list of tokens and creats a custom prog object.
+ */
 
 #include "2Parser.h"
 
@@ -700,6 +704,8 @@ void parseFunkKW(Funk* F){//TODO lint checks happen twice here
   debug("parseFunkKW() done");
 }
 
+/* converts complicated types into only a few simple ones
+   This make dealing with the diffrent data types easily*/
 string convertedType(string type){
   if(type == "num"||type == "int"||type == "double"||type == "bool"){
     return "num";
@@ -710,31 +716,34 @@ string convertedType(string type){
   }
 }
 
-var getTypeAtomHelper(atom * a){
+/**/
+string getTypeAtomHelper(atom * a){
   if(a->cast == ""){
-    return a->helper;
+    return a->helper.type;
   }else{
-    var v = a->helper;
-    v.type = a->cast;
-    return v;
+    return a->cast;
   }
 }
 
 //returns the type the exp will resolve to
 string getTypeExp(expression3 * EXP){
   debug("getTypeExp()- ");
-  bool strings = false, anys = false, nums = false;
+  bool strings = false, anys = false, nums = false, bools = false;
   string other = "";
   int highestPriorety = -42, pos = 0;
   for(int i = 0;i<EXP->bigAtoms->size();i++){
     if(EXP->bigAtoms->at(i)->type == bigAtom::ATOM){
-      string tp = convertedType(getTypeAtomHelper(EXP->bigAtoms->at(i)->a).type);
+      string tp = convertedType(getTypeAtomHelper(EXP->bigAtoms->at(i)->a));
+      if(getTypeAtomHelper(EXP->bigAtoms->at(i)->a) == "bool")
+	 tp = "bool";
       if(tp == "num"){
 	nums = true;
       }else if(tp == "string"){
 	strings = true;
       }else if(tp == "__ANY__"){
 	anys = true;
+      }else if(tp == "bool"){
+	bools = true;
       }else{
 	//TODO
 	if(other == "")
@@ -745,6 +754,7 @@ string getTypeExp(expression3 * EXP){
       pos = i;
     }
   }
+  cout<<strings<<anys<<nums<<bools<<endl;
   if(pos && getOP(EXP->bigAtoms->at(pos)->op).returnsBool)
     return "bool";
   if(other != ""){
@@ -753,8 +763,10 @@ string getTypeExp(expression3 * EXP){
     return "__ANY__";
   }else if(strings){
     return "string";
-  }else if("nums"){
+  }else if(nums){
     return "num";
+  }else if(bools){
+    return "bool";
   }
   report("getTypeExp didn't know the type", -1);
   return "__ANY__";//error?
@@ -1248,6 +1260,8 @@ void parseKW(parseNode* PN){
     }else if(lastSym->tokenText == "continue"){
       PN->type = "C++";
       PN->data = "continue;";
+    }else if(lastSym->tokenText == "static"){
+      error("Use of 'static' outside of class");
     }else{
       error("Invalid use of key word (it might just be a word reserved by C++)");
     }

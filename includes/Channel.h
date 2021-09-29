@@ -120,7 +120,14 @@ public:
     this->channelLock.lock();
 
     const unsigned size = sizeof(data)/sizeof(data[0]);
+
+    if(this->max_size && this->max_size >= channelQ.size() + size){
+      this->channelLock.unlock();
+      throw invalid_argument("Insufficiant size left in the queue. Max queu size: " + to_string(this->max_size) + ". Current queue size: " + to_string(this->channelQ.size() + ". Size of data to be added: " + to_string(size)));
+      return;
+    }
     //channelQ.get_allocator().allocate(size);
+    
     
     for(unsigned i = 0; i < size;i++)
       this->channelQ.push_back(data[i]);
@@ -130,7 +137,11 @@ public:
   void bulkSend(const vector<T> &data){
     this->channelLock.lock();
     //channelQ.get_allocator().allocate(data.size());
-
+    if(this->max_size && this->max_size >= channelQ.size() + data.size()){
+      this->channelLock.unlock();
+      throw invalid_argument("Insufficiant size left in the queue. Max queu size: " + to_string(this->max_size) + ". Current queue size: " + to_string(this->channelQ.size() + ". Size of data to be added: " + to_string(data.size())));
+      return;
+    }
     for(unsigned i = 0; i < data.size();i++)
       this->channelQ.push_back(data[i]);
     this->channelLock.unlock();
