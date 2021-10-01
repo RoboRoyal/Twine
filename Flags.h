@@ -53,7 +53,7 @@ string O_OUT_FILE = "";
 const string warningIgnore = "-Wnarrowing -Wno-return-type";
 
 string compileOptions = "";
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 const string specialOptions = "-fmerge-all-constants -g -rdynamic -fno-signed-zeros -fno-keep-static-consts -pthread -march=native -funsafe-math-optimizations -fpermissive";//fun and safe math? sign me up!
 const string specialOptions_clang = "-fmerge-all-constants -rdynamic -fno-signed-zeros -funsafe-math-optimizations -march=native -pthread -fpermissive";
 #else

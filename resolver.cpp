@@ -9,7 +9,7 @@ void applyCast(atom * a, string targetType);*/
 
 int recused = 0;
 
-/*USed to tell if a var type is an object
+/*Used to tell if a var type is an object
   Object does not need ot be user created*/
 bool isObj(const string& name){
   if(convertedType(name) == "num")
@@ -19,7 +19,8 @@ bool isObj(const string& name){
   return true;
 }
 
-/*Checks warning/eror if a cast 'from' to 'targetType' is allowed.*/
+/*Checks warning/eror if a cast 'from' to 'targetType' is allowed.
+The return value can be ignored, it is only used to track/throw warning and errors*/
 bool checkCast(const string& from, const string& targetType, bool output = true){
   if(targetType == "string" && convertedType(from) == "num" && from != "bool"){
     if(getLintFlag("NUM_TO_STRING") == 1){
@@ -437,6 +438,7 @@ expression2 * resolveAtoms(atom * left, atom * right, string OP){
   EXP->rightAtom = right;
   EXP->rightIsExp = false;
   EXP->leftIsExp = false;
+
   debug("resolveAtoms("+EXP->helper+") done");
   return EXP;
 }

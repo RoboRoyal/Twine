@@ -42,6 +42,7 @@ void TransClassVar(var * N, string obj);
 bool Trans(string outFileName, vector<Funk> * Prog);
 //bool Trans(string outFileName);
 
+bool TransThrow(throw_e * e);
 bool TransTRY(tryCatch * N);
 bool TransIF(IF * N);
 bool TransWHILE(WHILE * N);

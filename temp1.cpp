@@ -66,11 +66,16 @@ int main(int argc, char *argv[]){
   try{
     returnStat = __userMain__(p);
     __finish__();
-  }catch(const exception& e){
+  }catch(const baseException& e){
+#ifndef TWINE_QUIET
+    cout<<e.what()<<endl;
+#endif //TWINE_QUIET
+    returnStat = -2;
+  }catch(const baseException& e){
 #ifndef TWINE_QUIET
     cout<<"FAILED: "<<e.what()<<endl;
 #endif //TWINE_QUIET
-    returnStat = -2;
+    returnStat = -3;
   }
   //delete params;
   return  returnStat;

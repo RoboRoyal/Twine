@@ -1250,7 +1250,10 @@ void parseKW(parseNode* PN){
       PN->theThing = tc;
     }else if(lastSym->tokenText == "throw"){
       PN->type = "throw";
-      PN->theThing = parseExpression("string");
+      //PN->theThing = parseExpression("string");
+      throw_e * e = new throw_e();
+      parseThrow(e);
+      PN->theThing = e;
     }else if(lastSym -> tokenText == "Cpp_code"){
       PN->type = "C++";
       expect(TokenData::STRING_LITERAL);
@@ -1267,7 +1270,16 @@ void parseKW(parseNode* PN){
     }
     debug("parseKW() done");
   }
-  
+
+void parseThrow(throw_e * e){
+  debug("parseThrow()");
+  e->file = currentParsingFile;
+  e->line = lastSym->line;
+  e->func = currentFunk->name;
+  e->what = parseExpression(string("string"));
+  debug("parseThrow() done");
+}
+
 void parseIF(IF* IF){
   debug("parseIF()");
   currentFunk->complexity.conditionals+=1;

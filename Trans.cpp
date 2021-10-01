@@ -436,9 +436,10 @@ bool TransLine(parseNode * N){
   }else if(N->type == "TRY"){
     TransTRY((tryCatch *)N->theThing);
   }else if(N->type == "throw"){
-    out+= "throw runtime_error(";
-    TransExp((expression3 *)N->theThing);
-    out+=");";
+    //out+= "throw runtime_error(";
+    //TransExp((expression3 *)N->theThing);
+    //out+=");";
+    TransThrow((throw_e *)N->theThing);
   }else if(N->type == "EMPTY"){
     //Do nothing
   }else if(N->type == "IMPORT"){
@@ -764,6 +765,16 @@ bool TransBoolState(boolStatment * N){//TODO get rid of
   debugT("TransBoolState() done");
   return true;
 }
+
+bool TransThrow(throw_e * e){
+  debugT("TransThrow()");
+  out += "throw baseException(string(";
+  TransExp(e->what);
+  out += ").c_str(), \"" + e->file + "\", " + to_string(e->line) + ", \"" + e->func + "\");";
+  debugT("TransThrow()");
+  return true;
+}
+
 bool TransIF(IF * N){
   debugT("TransIF()");
   out+="if(";

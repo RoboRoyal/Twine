@@ -3,7 +3,8 @@
 #define _ERROR_H_
 
 #include <cxxabi.h>
-
+#include <execinfo.h>
+#include <signal.h>
 
 void __finish__();
 const int maxStackTraceSize = 24 + 6;//6 function calls are required for Twine background
@@ -24,8 +25,8 @@ string demangleName(const string& mangled){
    return mangled;
  }
 
-#if defined(unix)
-vector<string> getStack(){
+#if defined(unix) || defined(__unix__)
+vector<string> getStack(){//TODO ints for buff/debuff, bool for pretty
   vector<string> ret = vector<string>();
   void *array[maxStackTraceSize];
   size_t arrSize;
@@ -51,7 +52,7 @@ vector<string> getStack() {
 }
 #endif
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 void printStack(const unsigned deBuffSize = 1, const unsigned endBuffSize = 3) {
   void *array[maxStackTraceSize];
   size_t arrSize;
@@ -120,14 +121,13 @@ void handler(const int sig){
   __finish__();
   exit(sig);
 }
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 void segFaultHandler(int signal, siginfo_t *si, void *arg){
   
   cout<<"Error in program "<<signal;
   string tmp = getErrorType(signal);
   if(tmp != "")
     cout<<"("+tmp+")";
-  //cout<<" at address "<<si->si_addr<<endl;
   printf(" at address: 0x%lx\n",(long) si->si_addr);
   printStack(3);
   __finish__();
@@ -140,6 +140,37 @@ void segFaultHandler(int signal, siginfo_t *si, void *arg){
     exit(signal);
 }*/
 
-#endif
+#endif //defined(unix) || defined(__unix__)
 
+
+class baseException : public std::exception{
+  const char * file;
+  const int line;
+  const char * function;
+  const vector<string> stack;
+  const string msg;
+  
+public:
+  baseException(const string msg_, const char* file_, int line_, const char* func_) : msg(msg_),//set base class?
+										     line (line_),
+										     file (file_),
+										     function (func_),
+										     stack (getStack())
+  {
+    //this->stack = getStack();
+  }
+
+  void printStack(){
+    for(int i = 0; i < stack.size(); i++){
+      cout<<this->stack[i]<<endl;
+    }
+  }
+  string what(){
+    string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " + to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
+    for(int i = 1; i < stack.size() - 2; i++)
+      ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack[i] + "\n";
+    return ret; 
+  }
+};
+  
 #endif //_ERROR_H_

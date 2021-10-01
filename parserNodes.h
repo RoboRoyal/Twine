@@ -37,6 +37,7 @@ class expression2;     //old expression in type [atom/exp2] OP [atom/exp2]
 class bigAtom;         //used of exp3, hold atom or op and type
 class expression3;     //new expression, vector of bigAtoms and cast
 class tryCatch;        //try{BLOCK}catch(VAR){BLOCK}
+class throw_e;         //throw exception
 class object;          //object-implimented as class
 class channel;         //used to communicate between threads
 class branch;          //a main thread
@@ -645,6 +646,17 @@ public:
     return ret;
   }
 };
+class throw_e{
+public:
+  string file;
+  int line;
+  string func;
+  expression3* what;
+  throw_e(){file = "?"; line = -1; func = "?"; what = NULL;}
+  throw_e(const string file_, const int line_, const string func_, expression3* what_){
+    file = file_; line = line_; func = func_; what = what_;}
+};
+
 struct templateType{
   string name;
   string type;

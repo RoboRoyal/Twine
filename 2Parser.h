@@ -85,6 +85,7 @@ string convertedType(string type);
 bool parseAtom(atom * a, string base, bool baseStatic);
 
 void parseIF(IF* IF);
+void parseThrow(throw_e * e);
 void parseWHILE(WHILE* WHILE);
 WHILE* parseDoWHILE();
 void parseFOR(FOR2* FOR);

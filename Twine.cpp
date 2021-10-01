@@ -18,7 +18,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 //#include "trial.cpp"
 //#include "testBench.cpp"
 
-//#include <execinfo.h> //stack trace
+
 #include <unwind.h>
 #include <cstring>//segfualt
 #include <signal.h>//segfualt
@@ -39,7 +39,8 @@ bool compile(const string& fileInName, const string& fileOutName);     //compile
 bool execute(const string& outName);                                   //executes a given file
 bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, executer chain / linter / formater
 void freeProg();                                                       //frees memory-TODO
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
+#include <execinfo.h> //stack trace
 void segfaultHandler(int signal, siginfo_t *si, void *arg);
 #endif
 void handler(int sig);
@@ -49,6 +50,8 @@ void handler(int sig);
 int main(int argc, char** argv){
   //testThing();
   //exit(5);
+
+
   if(true){
 
     signal(SIGSEGV, handler);
@@ -56,7 +59,7 @@ int main(int argc, char** argv){
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
 
-#if defined(unix)
+#if defined(__unix__)
     struct sigaction sa;
     memset(&sa, 0, sizeof(struct sigaction));
     sigemptyset(&sa.sa_mask);
@@ -65,7 +68,6 @@ int main(int argc, char** argv){
     sigaction(SIGSEGV, &sa, NULL);
 #endif
   }
-
   
   usingPreCompiledHeaders = false;//TODO for now....
 #ifndef TWINE_INSTALL_BUILD
@@ -566,7 +568,7 @@ void freeProg(){
 #include "includes/error.hpp"
 
 
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
 void segfaultHandler(int signal, siginfo_t *si, void *arg){
   cout<<"Segfualt cuased abort; adress "<<si->si_addr<<endl;
   printStack(0,1);
