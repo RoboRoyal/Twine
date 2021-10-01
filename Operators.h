@@ -174,19 +174,20 @@ struct preSetVar{
   string name;
   string type;
   string help;
+  bool isConst;
   string toString()const{
     return (name+"\t\t"+(name.length()<10?("\t"):(""))+type+"\t  "+help);
   }
 };
 
 const preSetVar builtInValues[] = {
-				   {"RUNNING_TIME","double","Time since the program started in seconds"},//not constants, should be lower case?
-				   {"CURRENT_TIME_MS","double","Current system time in milliseconds"},
-				   {"INT_MAX","int","Maximum value an integer can take on(+2147483647)"},
-				   {"INT_MIN","int", "Minimum value an integer can take(-2147483648)"},
-				   {"EXECUTION_TIME","double","Length of time the program has taken on the CPU in seconds (doesn't include time for sleep() or waiting for user input)"},//in sec? ms?
-				   {"PI", "double","The value of PI (as defined by 3.14159265358979323846)"},
-				   {"twine", "twine", "Used to force calls to the standard library"},
+				   {"RUNNING_TIME",     "double","Time since the program started in seconds", true},//not constants, should be lower case?
+				   {"CURRENT_TIME_MS",  "double","Current system time in milliseconds", true},
+				   {"INT_MAX",          "int","Maximum value an integer can take on(+2147483647)", true},
+				   {"INT_MIN",          "int", "Minimum value an integer can take(-2147483648)", true},
+				   {"EXECUTION_TIME",   "double","Length of time the program has taken on the CPU in seconds (doesn't include time for sleep() or waiting for user input)", true},//in sec? ms?
+				   {"PI",               "double","The value of PI (as defined by 3.14159265358979323846)", true},
+				   {"twine",            "twine", "Used to force calls to the standard library", true},
 };
 
 struct functions{

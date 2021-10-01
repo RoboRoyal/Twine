@@ -151,7 +151,7 @@ var getVar(const string& varName){
   return var("DNE", "DNE");
 }
 void setVar(const string& name, const string& type = "__ANY__", bool global = false, const bool constant = false, const bool isList = false){
-  report("Setting var (complex): "+name+" with type: "+type+" Global: "+(global?"True":"False"),-2);
+  report(string("Setting var (complex: ") + (global?"Global:":"Local:") + (constant?" Constant":" Mutable") + ") "+name+" with type: "+type,-2);
   if(global){
     globalVars->varsInScope.push_back(var(name, type, constant, isList));
   }else{
@@ -200,9 +200,9 @@ string valType(const string& s){
 }
 
 void initDefualtVars(){
-  setVar("args","__ANY__");
+  setVar("args","__ANY__", false, false);
   for(int i =0;i<sizeof(builtInValues)/sizeof(builtInValues[0]);i++){
-    setVar(builtInValues[i].name,builtInValues[i].type);
+    setVar(builtInValues[i].name,builtInValues[i].type, true, builtInValues[i].isConst);
   }
 }
 
