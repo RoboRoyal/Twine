@@ -71,7 +71,7 @@ int main(int argc, char *argv[]){
     cout<<e.what()<<endl;
 #endif //TWINE_QUIET
     returnStat = -2;
-  }catch(const baseException& e){
+  }catch(const exception& e){
 #ifndef TWINE_QUIET
     cout<<"FAILED: "<<e.what()<<endl;
 #endif //TWINE_QUIET

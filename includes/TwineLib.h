@@ -58,7 +58,7 @@ vector<T> sub(int start, int end, const vector<T>& vec, const int step=1){
   //vector<T> newVec( vec.begin() + start, vec.begin() + end);
   vector<T> newVec;newVec.reserve(abs((end-start)/step));
   if(step > 0){//go forward
-    for(;start < end; start+=step)//TODO add support for negitive step/start/end
+    for(;start < end; start+=step)//TODO add support for negative step/start/end
       newVec.push_back(vec[start]);
   }else{
     end-=1;
@@ -137,7 +137,7 @@ int system(const string command){
 //#define System(command) (WEXITSTATUS(system(command.c_str())))
 
 
-void fualt(){*(int*)0 = 0;}//Used to cuased segfualt
+void fualt(){*(int*)0 = 0;}//Used to cause segfault
 
 __ANY__ sort(__ANY__ x, string mode=""){//should this be a member func of __ANY__?
   if(x.type == "_V")
@@ -147,7 +147,7 @@ __ANY__ sort(__ANY__ x, string mode=""){//should this be a member func of __ANY_
   return x;
 }
 template<typename T> bool _LESS(T a, T b){ return a<b;}
-//bool _LESS(int a, int b){ return a<b;}
+
 template<typename T> vector<T> sort(vector<T> data){
   std::sort(data.begin(), data.end(), _LESS<T>);
   return data;
@@ -185,17 +185,17 @@ double pow(double exponent=1.0){//double pow(double, double) is defined in math.
 //TODO check for errors
 int toInt(const string s,int base = 10){//TODO just call it int?
 #ifndef TWINE_QUIET
-  try{
+  //try{
 #endif
   return stoi(s,nullptr,base);
 #ifndef TWINE_QUIET
-  }catch(const overflow_error& e){
-    //cout<<"The string you are tying to conver to an int using toInt is too big to be an integer. String: "<<s<<"\n";
+  /*}catch(const overflow_error& e){
+    //cout<<"The string you are tying to convert to an int using toInt is too big to be an integer. String: "<<s<<"\n";
   }catch(const invalid_argument& e){
-    //cout<<"The string you are tying to conver to an int using toInt is not a number. String: "<<s<<"\n";
-  }
+    //cout<<"The string you are tying to convert to an int using toInt is not a number. String: "<<s<<"\n";
+  }*/
 #endif
-  return -1;
+  //return -1;
 }
 int toInt(const __ANY__& a,int base = 10){
   if(a.type == "_S"){
@@ -228,7 +228,7 @@ string toString(const bool& b){
   return "false";
 }
 
-string toString(const double pol, int decmalCount = -1){//TODO 
+string toString(const double pol, int decmalCount = -1){//TODO
   //TODO
   ostringstream oss;
   string tmp;
@@ -278,14 +278,23 @@ double min(const __ANY__ &x){
   }
   return min;
 }
+
+
+
+template<typename T>
+int len(const vector<T>& x){
+    return x.size();
+}
+
 int len(const __ANY__ &x){//TODO need this?
   if(x.type != "_V")
-    return 1;
+    return ((const vector<__ANY__> *)x.ptr)->size();
   return x.toNum();
 }
-int len(string x){
+int len(const string& x){
   return x.length();
 }
+
 double abs(const __ANY__ &x){
   if(x.toNum()<0) return -x.toNum();
   return x.toNum();
@@ -294,7 +303,9 @@ double round(double x){
   x+=.5;
   return ((int) x);
 }
-bool canOutputColor(){//TODO turn into constant at beggining of compile
+bool canOutputColor(){//TODO turn into constant at beginning of compile
+    if(!getenv("TERM"))
+        return false;
   string terminal = getenv("TERM");
   if(terminal.substr(0,5) == "xterm") return true; //TODO
   if(terminal.substr(0,2) == "VT") return true; //TODO
@@ -303,9 +314,9 @@ bool canOutputColor(){//TODO turn into constant at beggining of compile
   return false;
 }
 
-//TODO, get forground/background color can be upgraded with more colors using RGB values
+//TODO, get foreground/background color can be upgraded with more colors using RGB values
 //and string_to int values (user passes in RGB values as parameters)
-int getForgroundColorCode(const string& color){
+int getForegroundColorCode(const string& color){
   if(color == "black")
     return 30;
   if(color == "red")
@@ -375,7 +386,7 @@ void print(const __ANY__& data, const string& text_color = "", const string& bac
   if(!canColor){
     cout<<__tmp__<<'\n';
   }else{
-    cout<<"\033["<<getForgroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<__tmp__<<"\033[0m\n";
+    cout<<"\033["<<getForegroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<__tmp__<<"\033[0m\n";
   }
 }
 
@@ -384,7 +395,7 @@ template<typename T> void print(const T& data, const string& text_color = "", co
   if(!canColor){
     cout<<data<<'\n';
   }else{
-    cout<<"\033["<<getForgroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<data<<"\033[0m\n";
+    cout<<"\033["<<getForegroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<data<<"\033[0m\n";
   }
 }
 
@@ -394,20 +405,20 @@ void print(){
 
 //void print(const string& str, const string& end, int background_color, int text_color){//TODO what standard should i use for print?
 void print(const string& str, const string& text_color, const string& background_color = ""){
-  //should it be one print like python, 2 like java, standard for color, etc?
+  //should it be one print like python, 2 like java, standard for color, etc.?
   static bool canColor = canOutputColor();//TODO can make this one var for both functions?
   if(!canColor){
     cout<<str<<'\n';
   }else{
-    cout<<"\033["<<getForgroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<str<<"\033[0m\n";
+    cout<<"\033["<<getForegroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<str<<"\033[0m\n";
   }
 }
 void printn(const string& str, const string& text_color, const string& background_color = ""){
-  //should it be one print like python, 2 like java, standard for color, etc?
+  //should it be one print like python, 2 like java, standard for color, etc.?
   if(!canOutputColor()){
     cout<<str<<'\n';
   }else{
-    cout<<"\033["<<getForgroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<str<<"\033[0m";
+    cout<<"\033["<<getForegroundColorCode(text_color)<<";"<<getBackgroundColorCode(background_color)<<"m"<<str<<"\033[0m";
   }
 }
 void print(const string& str){
@@ -451,7 +462,7 @@ void printn(const string * str){
 }
 void print(const void * ptr){cout<<ptr<<'\n';}
 void printn(const void * ptr){cout<<ptr;}
-//template<typename T> void print(const T& str){cout<<str<<'\n';}
+
 string input(const string msg = ""){
   cout<<msg<<flush;
   string str;
@@ -476,7 +487,7 @@ string randStr(int length = 10){//randString?
   return out;
 }
 double randDouble(double min = 0.0, double max = 1.0){//TODO
-  long long tmp = (long long)(RAND_MAX)*rand()+rand();//trying to get 64 bit double percition
+  long long tmp = (long long)(RAND_MAX)*rand()+rand();//trying to get 64 bit double precision
   long long tmp2 = (long long)(4294967296)*RAND_MAX + (long long)RAND_MAX;
   return (min+(tmp/(tmp2/(max-min))));
 }

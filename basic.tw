@@ -1,2 +1,6 @@
 
-print("Hello windows")
+const int[5] me = {1,2,3,4,5}
+
+me += 4
+
+print(me)

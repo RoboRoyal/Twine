@@ -12,8 +12,8 @@
 
 //Gets classifier for single char
 inline CharClassifier::Type CharClassifier::get(char C){
-  return this->tk.find(C)->second;
-
+    cout<<(unsigned char)C<<endl;
+    return this->tk.find((unsigned char)C)->second;//breaks here when using unicode
 }
 
 /*This is the function called to lex. It calls the main tokeniser and the lexer if appropriate*/ 
@@ -185,7 +185,8 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
       }
     }
     lastCharClass = charType;
-    lastChar = C; 
+    lastChar = C;
+    cout<<lastChar<<endl;
   }//end FOR loop
 
   //post check of input stream, because, you know, function wasn't long enough already
@@ -330,7 +331,7 @@ void CharClassifier::init(){
   TypeNames[9] = "OTHER";
   TypeNames[10] = "INVALID";
 
-  for(char C = 0; C<127;C++){//currently only ASCII works. If i was a better programmer I would add unicode support, UTC-8?
+  for(unsigned char C = 0; C<255;C++){//currently only ASCII works. If i was a better programmer I would add unicode support, UTC-8?
     if((C >= 'a' && C <= 'z') || (C >= 'A' && C <= 'Z')||C == '_')
       tk[C] = LETTER;
     else if(C == ' ' || C == '\t' || C == '\n')

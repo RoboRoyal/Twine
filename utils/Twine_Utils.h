@@ -45,7 +45,7 @@ vector<string> split(string str, string sep);
 
 bool connectFiles(vector<string>* inFiles, string* data){
   for(vector<string>::iterator i = inFiles->begin(); i != inFiles->end(); i++){
-    *data += string(string("\n#FILE ")+i->c_str()+"\n");//TODO this doenst properly insert a newline
+    *data += string(string("\n#FILE ")+i->c_str()+'\n');//TODO this doenst properly insert a newline
     if(!readFile(i->c_str(),data)){
       report("Error reading file: "+*i,4);
       if(!FORCE)

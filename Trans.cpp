@@ -81,7 +81,7 @@ void TransThing(){
       out += "if(\"" + (*j)->name + "\" == varName){\n";
       out+= "return (("+objName+" *)obj.ptr)->"+(*j)->name+";\n}\n";
     }
-    out += "throw invalid_argument(\"No class varriable \"+varName+\" in class "+objName+"\");}\n";
+    out += "throw invalid_argument(\"No class variable \"+varName+\" in class "+objName+"\");}\n";
   }
   out+="throw invalid_argument(\"No class '\"+obj.type+\"' found. Looking for var '\"+ varName+\"'\");\n";
   out+="}";
@@ -929,11 +929,11 @@ const string varListDef(var * v){
     unsigned len = 0;
     for(;len<v->arr.size();len++){
       if(v->arr[len] == 0){
-	ret+="vector<";
-	end = ">" + end;
+	    ret+="vector<";
+	    end = ">" + end;
       }else{
-	ret += "array<";
-	end = ","+to_string(v->arr[len]) + ">" + end;
+	    ret += "array<";
+	    end = ","+to_string(v->arr[len]) + ">" + end;
       }
     }
     ret+=v->type;
