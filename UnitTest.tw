@@ -135,7 +135,7 @@ return name
 /*main*/
 func mainTest(){
 
-testTryCatchTrow()
+//testTryCatchTrow()
 fileIO()
 listTest()
 paramTest()
