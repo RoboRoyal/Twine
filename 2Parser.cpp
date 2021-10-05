@@ -2160,7 +2160,7 @@ void warn(const string& msg){//TODO make look a bit nicer
         return;
     }
     string warningMsg;
-    if(string(getenv("TERM")) == string("xterm")){
+    if(getenv("TERM") && string(getenv("TERM")) == string("xterm")){
         warningMsg = "\033[35mWARNING\033[0m";//purple warning msg
     }else{
         warningMsg = "WARNING";

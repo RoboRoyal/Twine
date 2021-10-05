@@ -76,6 +76,7 @@ void applyCast(expression2 * EXP, string targetType){
     }else if(targetType == "string" && isObj(EXP->helper)){
         EXP->cast = "toString";
     }else if(convertedType(targetType) == "num" && EXP->helper == "string"){
+        cout<<"123"<<endl;
         EXP->cast = "string to num";
 
         //TODO cast warning/check allow
