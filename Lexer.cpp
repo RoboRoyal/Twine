@@ -12,7 +12,6 @@
 
 //Gets classifier for single char
 inline CharClassifier::Type CharClassifier::get(char C){
-    cout<<(unsigned char)C<<endl;
     return this->tk.find((unsigned char)C)->second;//breaks here when using unicode
 }
 
@@ -186,7 +185,6 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
     }
     lastCharClass = charType;
     lastChar = C;
-    cout<<lastChar<<endl;
   }//end FOR loop
 
   //post check of input stream, because, you know, function wasn't long enough already
