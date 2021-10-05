@@ -220,7 +220,7 @@ bool execute(const string& name){
       report("Executing successful! (exit code: "+to_string(returnStatus)+')',0);
       return true;
     }else{
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
       report("ERROR while executing code: "+to_string(WEXITSTATUS(returnStatus)),4);
 #else
         report("ERROR while executing code: IDK cuz we on windows", 4);
