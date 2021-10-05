@@ -96,7 +96,7 @@ format: twine
 
 #Unit tests
 test:   twine
-	./twine $(TEST) -rl 2 IGNORE_ALL_WARNING
+	./twine $(TEST) IGNORE_ALL_WARNING
 
 inttest:  twine
 	./twine $(INTERP_TEST_) -rl 2 -interp

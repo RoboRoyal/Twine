@@ -122,15 +122,15 @@ bool isCallable(string a);
 bool peek(TokenData::Type sym);
 bool peek(string s);
 string peek();
-bool accept(string sym);
+bool accept(const string& sym);
 bool accept(TokenData::Type sym);
-bool expect(string sym, bool allowForce = true);
+bool expect(const string& sym, bool allowForce = true);
 bool expect(TokenData::Type sym, bool allowForce = true);
 bool shouldThread(const Funk* i_am_a_funkky_pointer);
 
 void nextSym();
 
-void forceAdd(string newSym);
+void forceAdd(const string& newSym);
 void forceSkip();
 
 //void error(string msg, bool passable = false);

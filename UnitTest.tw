@@ -132,10 +132,6 @@ return name
 }
 }
 
-class extend basic{
-
-}
-
 /*main*/
 func mainTest(){
 
