@@ -11,7 +11,7 @@ USING_GCC=true
 
 if (( $EUID != 0)); then
     echo "You need to be root to install Twine"
-    echo "Alternitivly you can use run make local or make localClang to only install twine in this director"
+    echo "Alternatively you can use run make local or make localClang to only install twine in this director"
     echo "Then use ./twine to run"
     exit 1
 fi
@@ -34,20 +34,20 @@ type twine >/dev/null 2>&1 && {
 echo 
 
 #echo "Twine can be install using clang++ or g++"
-#echo "The defualt is g++"
+#echo "The default is g++"
 echo "This install may mess with other files in this or sub directories. Please make sure they are clear"
 
 #check for g++
 if hash g++ 2>/dev/null; then
     echo "Using g++ for compiling/execution"
 	#using g++
-	#do nothing, its the defualt
+	#do nothing, its the default
 elif hash clang 2>/dev/null; then
 	#using clang
     USING_GCC=false
     echo "Using clang for compiling/execution"
 else
-    echo "A C++ compiler is neccesary for installation"
+    echo "A C++ compiler is necessary for installation"
     echo -n "Would you like to install g++ now?(y/n) "
     read -n 1 ans
     echo
@@ -75,8 +75,8 @@ fi
 
 #check for wget
 type wgeta >/dev/null 2>&1 || {
-    echo "wget is neccesary for including files from the web"
-    echo "All other features will work without it, and you can instal it later at any time"
+    echo "wget is necessary for including files from the web"
+    echo "All other features will work without it, and you can install it later at any time"
     echo -n "Would you like to install wget now?(y/n) "
     read -n 1 ans
     echo 
@@ -86,10 +86,10 @@ type wgeta >/dev/null 2>&1 || {
     fi
 }
 
-DEFUALT_INSTALL="YES"
+DEFAULT_INSTALL="YES"
 
-#ask for prefered installed path
-echo -n "Defualt install path of twine is at "
+#ask for preferred installed path
+echo -n "Default install path of twine is at "
 echo $INSTALL_PATH
 echo -n "Would you like to install using the default path?(y/n) "
 read -n 1 ans
@@ -97,7 +97,7 @@ echo
 if [[ $ans != "y" ]]; then
     echo -n "Enter the absolute path you would like to install twine at (it should start with an '/'): "
     read INSTALL_PATH
-    DEFUALT_INSTALL="NO"
+    DEFAULT_INSTALL="NO"
 fi
 
 echo "Installing at: $INSTALL_PATH"
@@ -118,7 +118,7 @@ fi
 #-------make twine command----------
 touch /bin/twine
 
-if [[ "$DEFUALT_INSTALL" == "YES" ]]; then
+if [[ "$DEFAULT_INSTALL" == "YES" ]]; then
     echo "#!/bin/bash
 
 #Luancher for twine
@@ -126,7 +126,7 @@ $INSTALL_PATH/src/twine \$@" > /bin/twine
 else
     echo "#!/bin/bash
 
-#Alt-luancher for twine
+#Alt-launcher for twine
 $INSTALL_PATH/src/twine -INSTALL_PATH $INSTALL_PATH/src/ \$@" > /bin/twine
 fi
 
@@ -179,8 +179,8 @@ if [ type twine >/dev/null 2>&1 ]; then
 	echo "You can also check out 'man twine' and 'twine -help' for help with running twine"
 	echo "Thanks for trying out twine, all feedback is greatly appreciated"
 else
-    echo "An unknow error has occured"
-    echo "Try running uncomm.sh [sudo ./uncomm.sh] to uninstall and then try reinstalling again with defualt options"
+    echo "An unknown error has occurred"
+    echo "Try running uncomm.sh [sudo ./uncomm.sh] to uninstall and then try reinstalling again with default options"
 fi
 #------------------------------------------
 

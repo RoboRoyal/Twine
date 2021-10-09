@@ -7,7 +7,7 @@ CXX = g++
 FIRST = "first.tw"		#main tester file
 SECOND = "second.tw"		#other testing file
 TEST = "UnitTest.tw"		#unit tests for testing full functionality of program
-BENCHMARK = "Bencmark1.tw"	#testing the speed of parsing and efficiency of ouput code
+BENCHMARK = "Bencmark1.tw"	#testing the speed of parsing and efficiency of output code
 INTERP_TEST = "Interp_test.tw"
 INSTALL =TWINE_INSTALL_BUILD
 CLANG =TWINE_USING_CLANG
@@ -58,7 +58,7 @@ clean:
 	find . -type f -name '*.gch' -delete
 	find . -type f -name '*.tw.*' -delete
 
-#Runs program(compile and execute) with defualt file
+#Runs program(compile and execute) with default file
 run:    twine
 	./twine $(FIRST)
 
@@ -66,7 +66,7 @@ run:    twine
 interp: twine
 	./twine -interp -rl 3
 
-#Runs linter on defualt file
+#Runs linter on default file
 lint:   twine
 	./twine $(FIRST) -rl 2 -lint -setAll
 

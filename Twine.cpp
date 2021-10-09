@@ -209,7 +209,7 @@ bool compile(const string& fileInName, const string& fileOutName){
 bool execute(const string& name){
   report("Executing...",0);
   string command = "";
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
   command = string("./");
 #endif
   command += name + ' ' + argsForProg;

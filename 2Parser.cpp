@@ -2054,15 +2054,18 @@ string peek(){
 //0;136;0c
 //^[[>0;136;0c
 void nextSym(){
+    //update markers
     twoSymbAgo = lastSym;
     lastSym = sym;
 
-    if(currentLineOn)currentLine.push_back(*sym);
+    //save current line for errors/warnings
+    if(currentLineOn) currentLine.push_back(*sym);
 
+    //look over next symbols, skipping comments, white spaces, and end lines
     do{
         sym++;
 
-        if(sym->tokenType == TokenData::BLOCK_COMMENT){
+        if(sym->tokenType == TokenData::BLOCK_COMMENT){//save comments if we need to
             totalComments++;
             if(currentLineOn){
                 parseNode * com = new parseNode();
@@ -2070,20 +2073,24 @@ void nextSym(){
                 com->data = sym->tokenText;
                 currentFunk->funkBlock->Lines.push_back(com); concecutiveNewLines = 0;
             }
-        }else if(sym->tokenType == TokenData::LINE_COMMENT){
+
+        }else if(sym->tokenType == TokenData::LINE_COMMENT){//save comments if we need to
             totalComments++;
             if(currentLineOn){
                 parseNode * com = new parseNode();
                 com->type = "SINGLE_COM";
                 com->data = sym->tokenText;
                 currentFunk->funkBlock->Lines.push_back(com); concecutiveNewLines = 0;}
-        }else if(sym->tokenType == TokenData::LINE_END && lint){//TODO should i check for lint and lint flag? will new line be here for any other reason?
+
+        }else if(sym->tokenType == TokenData::LINE_END && lint){//check for lint criteria
             concecutiveNewLines++;
             if(getLintFlag("EXCESS_NEW_LINE") && getLintFlag("EXCESS_NEW_LINE") < concecutiveNewLines && currentLineOn)
                 lintReport("Too many blank lines in a row ("+to_string((long long) concecutiveNewLines)+"/"+to_string((long long) getLintFlag("EXCESS_NEW_LINE"))+")", 1);
         }else{
             concecutiveNewLines = 0;
         }
+
+        //skip comments, white spaces and end lines
     }while(sym->tokenType == TokenData::BLOCK_COMMENT || sym->tokenType == TokenData::LINE_COMMENT || //sym->tokenType == TokenData::FILE_CHANGE ||
            (sym->tokenType == TokenData::WHITESPACE || sym->tokenType == TokenData::LINE_END));
 }
@@ -2111,8 +2118,8 @@ void error(const string& msg, bool passable){
 
     //save the current line
     string line = "";
-    for(int i = 0; i<currentLine.size();i++){//TODO add color
-        line+=currentLine.at(i).tokenText;//+" ";//TODO only add " " if not saving white spaces
+    for(int i = 0; i<currentLine.size();i++){
+        line+=currentLine.at(i).tokenText;
         if(!SAVE_WHITESPACE)
             line+=' ';
     }
