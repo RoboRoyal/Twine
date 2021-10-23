@@ -15,7 +15,7 @@ inline CharClassifier::Type CharClassifier::get(char C){
     return this->tk.find((unsigned char)C)->second;//breaks here when using unicode
 }
 
-/*This is the function called to lex. It calls the main tokeniser and the lexer if appropriate*/ 
+/*This is the function called to lex. It calls the main tokenizer and the lexer if appropriate*/
 bool Lexer(const string * data, vector<TokenData>* tokens){
   if(data->size() == 0) return false;//error if there is nothing
   

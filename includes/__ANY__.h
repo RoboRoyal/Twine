@@ -270,12 +270,12 @@ public:
     else if(type == BOOL){
       return b;
     }
-#ifdef TWINE_WIERD_CONVERTIONS
+#ifdef TWINE_WEIRD_CONVERSIONS
     if(type == INT)
       return to_string(this->i).at(position);
     if(type == DOUBLE)
       return to_string(*(double *)this->ptr).at(position);
-#endif //TWINE_WIERD_CONVERTIONS
+#endif //TWINE_WEIRD_CONVERSIONS
     return this->i;
      */
     throw invalid_argument("Can not 'at' a non vector object, not implimented for type: "+this->getType());
@@ -447,9 +447,9 @@ public:
       //return(*(double *) ptr);
       return d;
     }else if(type == STRING){//TODO
-#ifndef TWINE_WIERD_CONVERTIONS
-      throw invalid_argument("Invalid convertion from string to num. Use TWINE_WIERD_CONVERTIONS to allow this");      
-#endif //TWINE_WIERD_CONVERTIONS
+#ifndef TWINE_WEIRD_CONVERSIONS
+      throw invalid_argument("Invalid convertion from string to num. Use TWINE_WEIRD_CONVERSIONS to allow this");
+#endif //TWINE_WEIRD_CONVERSIONS
       
       return((double)(*(string *)ptr).length());//FIX this
     }else if(type == BOOL){
@@ -459,9 +459,9 @@ public:
 	return 0.0;
       }
     }else if(type == VECTOR){
-#ifndef TWINE_WIERD_CONVERTIONS
-      throw invalid_argument("Invalid convertion from List to num. Use TWINE_WIERD_CONVERTIONS to allow this");
-#endif //TWINE_WIERD_CONVERTIONS
+#ifndef TWINE_WEIRD_CONVERSIONS
+      throw invalid_argument("Invalid convertion from List to num. Use TWINE_WEIRD_CONVERSIONS to allow this");
+#endif //TWINE_WEIRD_CONVERSIONS
       return ((vector<__ANY__> *) ptr)->size();
     }else if(type == "NT"){//no type, garbage data
       return 0;

@@ -88,13 +88,13 @@ int main(int argc, char** argv){
 #endif
 
   if(argc == 1){
-    setFlag("DEFUALT_RETURN", false);
+    setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
   getFlags(argc, argv);//parse command line args, they get tored in Flags and vecctor<string> inFiles, along with a few globals
   if(inFiles.size() == 0 && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
-    setFlag("DEFUALT_RETURN", false);
+    setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
@@ -209,7 +209,7 @@ bool compile(const string& fileInName, const string& fileOutName){
 bool execute(const string& name){
   report("Executing...",0);
   string command = "";
-#if defined(unix)
+#if defined(unix) || defined(__unix__)
   command = string("./");
 #endif
   command += name + ' ' + argsForProg;
@@ -220,7 +220,7 @@ bool execute(const string& name){
       report("Executing successful! (exit code: "+to_string(returnStatus)+')',0);
       return true;
     }else{
-#if defined(unix) || defined (__unix__)
+#if defined(unix) || defined(__unix__)
       report("ERROR while executing code: "+to_string(WEXITSTATUS(returnStatus)),4);
 #else
         report("ERROR while executing code: IDK cuz we on windows", 4);
@@ -259,7 +259,7 @@ void getFlags(int argc, char** argv){
 	about();
       }else if(flag == "interp"){//should just run when no parameters are passed?
 	doneOtherThings = true;
-	setFlag("DEFUALT_RETURN", false);
+	setFlag("DEFAULT_RETURN", false);
 	Interp();
 	//might need to re-add prog?
       }else if(flag == "d" || flag == "debug"){
@@ -426,7 +426,7 @@ void help(string what){
     cout<<"To set a compiler flag, use the set keyword"<<endl;
     cout<<"Example:    ./twine first.tw -set SAVE_LINE_COMMENTS\n"<<endl;
     cout<<"To unset a compiler flag, use the unset keyword"<<endl;
-    cout<<"Example:    ./twine first.tw -unset DEFUALT_RETURN"<<endl;
+    cout<<"Example:    ./twine first.tw -unset DEFAULT_RETURN"<<endl;
     cout<<'\n';
     cout<<"To get a full list of command-line options, use options"<<endl;
     cout<<"./twine -help options"<<endl;
@@ -553,18 +553,7 @@ void freeProg(){
   report("Time to clean: "+to_string((long double) time_span.count())+" seconds.",0);
 }
 
-/*void handler(const int sig) {//TODO get rid of stack trace that occures before __userMain__
-  void *array[12];
-  size_t size;
 
-  // get size of stack
-  size = backtrace(array, 12);
-
-  // print out all the frames to stderr
-  fprintf(stderr, "Error:  %d:\n", sig);
-  backtrace_symbols_fd(array, size, 2);//STDERR_FILENO
-  exit(sig);
-  }*/
 #include "includes/error.hpp"
 
 
@@ -576,7 +565,7 @@ void segfaultHandler(int signal, siginfo_t *si, void *arg){
 }
 #else
 void segfaultHandler(int signal, void * si, void *arg){
-    cout<<"Segfualt cuased abort; signal "<<signal<<endl;
+    cout<<"Segfault caused abort; signal "<<signal<<endl;
     printStack(0,1);
     exit(signal);
 }

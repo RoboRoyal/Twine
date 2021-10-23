@@ -2,7 +2,7 @@
 #ifndef _CONFIG_H_
 #define _CONFIG_H_
 /*
-  TWINE_WIERD_CONVERTIONS //bool to string
+  TWINE_WEIRD_CONVERSIONS //bool to string
   TWINE_WIERD_ASSIGNMENTS //add bool to ints
   TWINE_VERY_WIERD_ASSINGMENTS //[] into ints, take the power of strings
   TWINE_QUITE //if defined, Twine wont throwe error messages. if defined, error are silent; undefined by defualt
@@ -17,7 +17,7 @@
 #ifdef TWINE_TYPE_SAFE//TWINE_STRICKED?
 #undef TWINE_WIERD_ASSIGNMENTS
 #undef TWINE_VERY_WIERD_ASSINGMENTS
-#undef TWINE_WIERD_CONVERTIONS
+#undef TWINE_WEIRD_CONVERSIONS
 #undef TWINE_WIERD_TYPE_CHECKS
 #undef TWINE_QUITE
 #define TWINE_SEGFUALT_PROTECTION
@@ -28,7 +28,7 @@
 #endif //TWINE_VERY_WIERD_ASSINGMENTS
 
 #ifdef TWINE_FORCE
-#define TWINE_WIERD_CONVERTIONS
+#define TWINE_WEIRD_CONVERSIONS
 #define TWINE_WIERD_ASSIGNMENTS
 #define TWINE_VERY_WIERD_ASSINGMENTS
 #define TWINE_WIERD_TYPE_CHECKS

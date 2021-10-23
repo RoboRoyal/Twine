@@ -100,7 +100,7 @@ Flag compileFlags[] = {
 		       //effects durring C++ compiling, used in Trans
 		       {"FORCE",false,"Attempts to fix mistakes and force prgram to run(Also enables other flags)"},
 		       {"TWINE_WIERD_ASSIGNMENTS", true,"Allows wierd assignments to be done such as adding bools to ints"},
-		       {"TWINE_WIERD_CONVERTIONS", true,"Allows wierd convertions of type, such as converting bool to string"},
+		       {"TWINE_WEIRD_CONVERSIONS", true,"Allows wierd convertions of type, such as converting bool to string"},
 		       {"TWINE_VERY_WIERD_ASSINGMENTS", false,"Allows wierd operations, such as [] into ints"},
 		       {"TWINE_QUITE", false, "If enabled, Twine wont throw errors(errors will be silent)"},
 		       {"TWINE_DEBUG", false, "Prints some debug info to the sceen"},
@@ -113,7 +113,7 @@ Flag compileFlags[] = {
 		       //should be these in a different list?
 		       //these are used internal to the lex-parse-trans process
 		       /*Parser*/
-		       {"DEFUALT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
+		       {"DEFAULT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
 		       {"CLASS_REDEFINITIONS", false,"Allows redefinitions of classes"},//redef or addition?
 		       {"FUNCTION_REDEFINITION", true,"Allows redefinition of fucntions"},
 		       {"WARNINGS_ARE_ERRORS", false, "Turns all warnings into errors"},
@@ -124,7 +124,7 @@ Flag compileFlags[] = {
 		       {"__TWINE__", true, "Should always be enabled. Used to signal to included files that they are being used in a twine program"},
 };
 Flag parserFlags[] = {
-		      {"DEFUALT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
+		      {"DEFAULT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
 		      {"LOCAL_VAR_REDEFINITION", false, "Allows for the redefinition of local vars. (ex. int x=0 string x=\"str\")"},
 		      {"VAR_REDEFINITION", true, "Allows redefinitions of vars from higher scopes. (ex. int x=0 {string x=\"str\"})"},
 		      {"AUTO_FUNCTIONS", true, "Adds in defualt functions for classes"},

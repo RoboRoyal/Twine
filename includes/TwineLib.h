@@ -528,7 +528,9 @@ template<typename T>
 void insert(vector<T>& in, const long pos, const T& thing){
   in.insert(in.begin()+pos, thing);
 }
-
+double root(const double a, const double b){
+    return pow(a, 1.0/b);
+}
 
 //template<typename T>
 double mod(const double a, const double b){

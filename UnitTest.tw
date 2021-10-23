@@ -125,11 +125,31 @@ match(user, "yes", "User IO Test")
 
 
 /*************test for objects and inheritance**********/
-class basic{
+class basic_class{
 string name = "base for all"
+func basic_class(){}
 func string getName(){
 return name
 }
+}
+
+class ab extends basic_class{
+int b
+func ab(){
+b=5
+}
+func int num(){
+return this.b
+}
+}
+
+
+func basicClass(){
+ab ob = ab()
+match("Num: "+ob.num(), "Num: 5", "Object::Resolve member function")
+basic_class IamAfunkyTURTLE = basic_class()
+match(IamAfunkyTURTLE.name, "base for all", "Object::Default member function")
+match(ob.getName(), "base for all", "Object::Inherit function")
 }
 
 /*main*/
@@ -144,6 +164,7 @@ opsTest()
 simpleMath()
 ANYTest()
 resolver()
+basicClass()
 
 
 print("All tests done, "+succs+" succsseded, " + fails + " failed("+(100*succs/(succs+fails))+"%)")

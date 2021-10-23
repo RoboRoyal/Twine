@@ -172,7 +172,7 @@ expression2 * resolveExpression2(expression3 * expIn, string targetType){//helpe
 //expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, int start, int end, string typeCalledOn = "", bool isStatic = false, vector<unsigned long> arr = {}){
 expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, const int start, const int end, string typeCalledOn,  bool isStatic, vector<unsigned long> arr){
     expression2 * EXP = new expression2();
-    debug("resolveExpressionHelper("+targetType+")");
+    debug("resolveExpressionHelper(Target type: "+targetType+" and size: " + to_string(end-start) + ")");
     recused++;
     //report(to_string((long long)start)+" / "+to_string((long long)end), -2);
     //printExp(expIn, start, end);
@@ -218,7 +218,7 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
         EXP = resolveAtoms(expIn->bigAtoms->at(start)->a, (expIn->bigAtoms->at(start+2)->a), expIn->bigAtoms->at(start+1)->op);
     }else{
 
-        //get *LOWEST* priorety OP position
+        //get *LOWEST* priority OP position
         int position = -1, highestPriority = 999, dots = 0;
         for(int i = start; i < end/*expIn->bigAtoms->size()*/; i++){
             if(expIn->bigAtoms->at(i)->type == bigAtom::OP && getOP(expIn->bigAtoms->at(i)->op).priority < highestPriority){//>= to go right to left
@@ -234,7 +234,7 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
         }
         //cout<<"Next OP is: "<<expIn->bigAtoms->at(position)->op<<" at position "<<position<<endl;
         if(position == -1)
-            throw invalid_argument("I have failed you: postion at -1 in resolveExpressionHelper("+EXP->helper+")");
+            throw invalid_argument("I have failed you: position at -1 in resolveExpressionHelper("+EXP->helper+")");
 
         report("Next OP is: "+expIn->bigAtoms->at(position)->op+" at position "+::toString(position), -4);
         if(position != -1){

@@ -44,7 +44,7 @@ fi
 
 
 echo "I am about to run the command rm -rf  $INSTALL_PATH"
-echo "If you are uncomfortable with a scrips with sudo privliges running an rm -rf command or if this is not the installed path of twine, please DONT DO THIS"
+echo "If you are uncomfortable with a scrips with sudo privileges running an rm -rf command or if this is not the installed path of twine, please DONT DO THIS"
 echo -n "Are you sure you want to proceed?(y/n) "
 read -n 1 ans
 echo 
@@ -58,28 +58,29 @@ if [[ $ans != "y" ]]; then
 fi
 
 echo -n "Are you positive you want to run the command rm -rf $INSTALL_PATH ?"
-echo "This will perminantly delete all the files at that location. Make sure there is nothing there you want."
+echo "This will permanently delete all the files at that location. Make sure there is nothing there you want."
 echo -n "Continue?(y/n) "
 read -n 1 ans
 echo 
 if [[ $ans != "y" ]]; then
+    #big uninstall here
+    rm -rf $INSTALL_PATH
+
+    #removing support files here
+    rm /bin/twine
+    rm /usr/local/share/man/man1/twine.1.gz
+    sudo manndb
+
+    if [ -f "comm.sh" ]; then
+            rm comm.sh
+    fi
+
+    echo "Uninstalled twine"
     echo -n "twine command removed. If you want to do a full removal of all twine files, I would recommend doing an "
     echo -n \"rm -rf\"
     echo " at the installed path. The default install path is at $INSTALL_PATH"
     echo Exiting uninstaller
-exit 1
+    exit 0
 fi
 
-#big uninstall here
-rm -rf $INSTALL_PATH
-
-#removing support files here
-rm /bin/twine
-rm /usr/local/share/man/man1/twine.1.gz
-sudo manndb
-
-if [ -f "comm.sh" ]; then
-        rm comm.sh
-fi
-
-echo "Uninstalled twine"
+echo -n "Exiting with uninstalling"

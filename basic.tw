@@ -1,22 +1,13 @@
 
 
-class cow{
-string name
-int age
-
-func cow(string s, int a){
-this.name = s
-this.age = a
+func me(){
+print("Hello")
+throw("I am unhappy")
 }
 
-func int getAge(){
-return age
+func you(){
+print("Hi!")
+me()
 }
-}
-print("Hellow world!")
-cow me = cow("bessy", 5)
-cow you = cow(input("Name?"), 1)
-print(me.toString())
-print(you.toString())
 
-//print("Bessy age: " + me.age)
+you()
