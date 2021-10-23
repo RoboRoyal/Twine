@@ -1,6 +1,22 @@
 
-const int[5] me = {1,2,3,4,5}
 
-me += 4
+class cow{
+string name
+int age
 
-print(me)
+func cow(string s, int a){
+this.name = s
+this.age = a
+}
+
+func int getAge(){
+return age
+}
+}
+print("Hellow world!")
+cow me = cow("bessy", 5)
+cow you = cow(input("Name?"), 1)
+print(me.toString())
+print(you.toString())
+
+//print("Bessy age: " + me.age)

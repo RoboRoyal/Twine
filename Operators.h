@@ -102,7 +102,8 @@ const singleOP Operators[] = {
 			      {"%=", 70, false, false, false, true, true},
 			      {"&=", 70, false, false, false, true, true},
 			      {"|=", 70, false, false, false, true, true},
-			      {"=", 70, false, false, false, true, true},			      
+			      {"=", 70, false, false, false, true, true},
+			      
 			      {"<=", 70, false, false, true, true, false},
 			      {">=", 70, false, false, true, true, false},
 			      {">", 70, false, false, true, true, false},

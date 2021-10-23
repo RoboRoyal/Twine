@@ -127,19 +127,15 @@ match(user, "yes", "User IO Test")
 /*************test for objects and inheritance**********/
 class basic{
 string name = "base for all"
-string getName(){
+func string getName(){
 return name
 }
-}
-
-class extend basic{
-
 }
 
 /*main*/
 func mainTest(){
 
-testTryCatchTrow()
+//testTryCatchTrow()
 fileIO()
 listTest()
 paramTest()

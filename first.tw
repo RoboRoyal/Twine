@@ -69,8 +69,10 @@ same = ben != aBen
 print("Are they not the same person? " + same)
 print("How about you and me? Same:"+(me==you)+" Diff: "+(you!=me))
 print(you.toString())
-//print("I am "+(me.toString()))
-//print("Number of ppl: "+person.number())
+
+print("I am "+(me.toString()))
+print("Number of ppl: "+person.number())
+
 Cpp_code"cout<<(person::number())<<endl;"
 
 func void live(person p){
