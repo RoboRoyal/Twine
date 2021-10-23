@@ -18,7 +18,7 @@ public:
   atomic<bool> * __pause__;
   thread __thread__;
   bool __finish__ = false;
-  bool __succsess__ = false;
+  bool __success__ = false;
 
   virtual void run() = 0;
   //virtual void init() = 0;
@@ -62,7 +62,7 @@ public:
 	}
       }//end of run
       //end
-      __succsess__ = true;//if we get here, no uncaught were thrown
+      __success__ = true;//if we get here, no uncaught were thrown
     }catch(const exception& e){
       __finish__ = true;//either way were done
       throw e;
@@ -105,7 +105,7 @@ public:
     __thread__.join();
   }
   
-  //reimpliment recieve to be non-blocoking when thread is dead
+  //reimplement receive to be non-blocking when thread is dead
   /*T receive(){//gets data from queue, removing it in the process
     this->channelLock.lock();
     while(this->channelQ.empty()){//wait for data

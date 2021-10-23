@@ -1,6 +1,13 @@
 
-const int[5] me = {1,2,3,4,5}
 
-me += 4
+func me(){
+print("Hello")
+throw("I am unhappy")
+}
 
-print(me)
+func you(){
+print("Hi!")
+me()
+}
+
+you()

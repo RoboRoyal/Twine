@@ -19,7 +19,7 @@
 #include <sys/stat.h>//fileExists
 
 
-#define TWINE_WIERD_CONVERTIONS
+#define TWINE_WEIRD_CONVERSIONS
 #define TWINE_WIERD_ASSIGNMENTS
 
 using namespace std;

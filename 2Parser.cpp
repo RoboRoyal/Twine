@@ -530,7 +530,7 @@ void checkReturn(Funk * F){
         return;
     }
 
-    if(getFlag("DEFUALT_RETURN") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
+    if(getFlag("DEFAULT_RETURN") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
         //check las lines for implicet return?
         parseNode * newReturn = new parseNode();
         expression3 * returnExp = new expression3();
