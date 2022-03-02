@@ -20,8 +20,8 @@ isBigger = isGreater(6)//return values also work for cpp functions
 
 
 for i in "this is a string"{//looping through a string works
-if i != " "//no () or {} are required for if statments
-printn(i)//printn means dont print a newline after the statent
+if i != " "//no () or {} are required for if statements
+printn(i)//printn means dont print a newline after the statement
 }
 print()//print new line
 
@@ -30,7 +30,7 @@ printn(i)
 }
 print()
 
-print("i am colorfull", "red", "yellow")//forground and background color can be set when printing
+print("i am colorful", "red", "yellow")//foreground and background color can be set when printing
 
 
 
@@ -40,12 +40,12 @@ print(args)
 print(args[0])
 
 
-//static sized, multi dimentional arrays arrays
+//static sized, multi dimensional arrays arrays
 //int[3][2] foo = {{1,2},{3,4},{5,6}}
 int[][3] foo = {{0,1,2}, {1,2,3}}
 print(foo)
 
-//dynamic-varried sized array
+//dynamic-varied sized array
 bar = {1,2.34, "five", {6,"seven and 8", {9}}}
 print(bar)
 

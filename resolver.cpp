@@ -220,7 +220,8 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
 
         //get *LOWEST* priority OP position
         int position = -1, highestPriority = 999, dots = 0;
-        for(int i = start; i < end/*expIn->bigAtoms->size()*/; i++){
+        for(int i = end - 1; i >= start/*expIn->bigAtoms->size()*/; i--){
+        //for(int i = start; i < end/*expIn->bigAtoms->size()*/; i++){
             if(expIn->bigAtoms->at(i)->type == bigAtom::OP && getOP(expIn->bigAtoms->at(i)->op).priority < highestPriority){//>= to go right to left
                 if(expIn->bigAtoms->at(i)->op == "."){
                     dots++;

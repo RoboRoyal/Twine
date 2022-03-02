@@ -110,7 +110,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
     currentVars = varsPassedIn;//?????
     localVars = new vector<scope *>;
 
-    if(varsPassedIn != NULL){
+    if(varsPassedIn != nullptr){
         globalVars = varsPassedIn;
     }else{
         globalVars = new scope();
@@ -118,7 +118,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
 
     currentLineOn = false;
     Prog = p;
-    currentClass = NULL;
+    currentClass = nullptr;
 
     setIterators();
 
@@ -159,7 +159,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
     }
     if(reportingLevel < -1)
         cout<<Prog->toString();
-    if(varsPassedIn == NULL)//delete vars if we made them
+    if(varsPassedIn == nullptr)//delete vars if we made them
         cleanScopes();
 
     if(numberOfScopes()>1 && !errors)
@@ -179,7 +179,7 @@ bool preScan(){
             Funk * skell = new Funk();
             parseFunkKW(skell);//get name/returntype/parameters
 
-            if(getFunk(skell->name) != NULL){
+            if(getFunk(skell->name) != nullptr){
                 if(getFlag("FUNCTION_REDEFINITION") || interpMode){
                     removeFunk(skell->name);
                     warn("Redefinition of function '"+skell->name+"'");
@@ -195,20 +195,20 @@ bool preScan(){
             parseClassDec(obj);
 
             //check if it is a new class
-            if(getClass(obj->name) != NULL && !getFlag("CLASS_REDEFINITIONS")){
+            if(getClass(obj->name) != nullptr && !getFlag("CLASS_REDEFINITIONS")){
                 error("Redefinition of class "+obj->name, true);
-                //TODO delete old implimentation
+                //TODO delete old implementation
                 removeClass(obj->name);
             }
             //add it to Prog
             Prog->classes.push_back(obj);
 
-            //prescan it go get function defs and member vars
+            //pre-scan it; go get function defs and member vars
             parseClassPre(obj);
         }else if(accept("branch")){
             branch * B = new branch;
             parseBranchDec(B);
-            if(getClass(B->name) != NULL && !getFlag("CLASS_REDEFINITIONS")){
+            if(getClass(B->name) != nullptr && !getFlag("CLASS_REDEFINITIONS")){
                 error("Redefinition of branch "+B->name, true);
                 //TODO delete old implimentation
             }
@@ -286,7 +286,7 @@ void parseClassPre(object * obj){
     }
     //TODO add unimplimented OPs
     addAutoFunctions(obj);
-    currentClass = NULL;
+    currentClass = nullptr;
     pullScope();
     debug("parseClassPre() done");
 }

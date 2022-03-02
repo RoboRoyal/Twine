@@ -1,7 +1,7 @@
 
 /*
 Main file for handling command line inputs
-Handls calls to lexer, parser, and trans
+Handles calls to lexer, parser, and trans
 */
 
 /*
@@ -20,12 +20,12 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 
 #include <unwind.h>
-#include <cstring>//segfualt
-#include <signal.h>//segfualt
+#include <cstring>//segfault
+#include <csignal>//segfault
 #include <chrono>//high_resolution_clock
 using namespace std::chrono;
 
-string argsForProg = "";      //args that are passed on to the user executing porgram
+string argsForProg;      //args that are passed on to the user executing program
 
 bool benchmarkTime = false;   //time how long each process takes
 bool doneOtherThings = false; //says if the user has done something other than compile a prog
@@ -33,11 +33,11 @@ bool start_interp = false;    //start interpreter after everything
 
 void help(string what = "");                                           //prints help info
 void about();                                                          //unused
-void getFlags(int argc, char** argv);                                  //parses comamnd line args
-void printFuncs();                                                     //prints the functions recieved from parsing
+void getFlags(int argc, char** argv);                                  //parses command line args
+void printFuncs();                                                     //prints the functions received from parsing
 bool compile(const string& fileInName, const string& fileOutName);     //compiles a C++ program using system commands
 bool execute(const string& outName);                                   //executes a given file
-bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, executer chain / linter / formater
+bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, execute chain / linter / formatter
 void freeProg();                                                       //frees memory-TODO
 #if defined(unix) || defined(__unix__)
 #include <execinfo.h> //stack trace
@@ -92,28 +92,28 @@ int main(int argc, char** argv){
     Interp();
     return 0;
   }
-  getFlags(argc, argv);//parse command line args, they get tored in Flags and vecctor<string> inFiles, along with a few globals
-  if(inFiles.size() == 0 && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
+  getFlags(argc, argv);//parse command line args, they get stored in Flags and vector<string> inFiles, along with a few globals
+  if(inFiles.empty() && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
     setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
-  if(inFiles.size() == 0 && doneOtherThings)
+  if(inFiles.empty() == 0 && doneOtherThings)
     return 0;
-  if(cppFileName == ""){
+  if(cppFileName.empty()){
     cppFileName = mainFileName + ".cpp";
   }
-  if(executableFileName == ""){
+  if(executableFileName.empty()){
     executableFileName = mainFileName + ".o";
   }
   try{
     if(!doTheThing())
       return 3;
-  }catch(invalid_argument e){
+  }catch(invalid_argument& e){
     cout<<"Error found in compile/execution: "<<e.what()<<endl;
     return 4;
   }
-  report("recursed: "+to_string(recused), -1);//imjustakid?
+  report("Recursed: "+to_string(recused), -1);//imjustakid?
   return 0;
 }
 
@@ -182,8 +182,8 @@ bool doTheThing(){//TODO
 
 void printFuncs(){
   cout<<"\n Have "<<Prog->functions.size()<<" funks"<<endl;
-  for(vector<Funk *>::iterator i = Prog->functions.begin(); i != Prog->functions.end(); i++){
-    cout<<(*i)->toString()<<endl;
+  for(vector<Funk *>::iterator funk = Prog->functions.begin(); funk != Prog->functions.end(); funk++){
+    cout << (*funk)->toString() << endl;
     cout<<"\n---------------------------------------------\n"<<endl;
   }    
 }
@@ -208,7 +208,7 @@ bool compile(const string& fileInName, const string& fileOutName){
 }
 bool execute(const string& name){
   report("Executing...",0);
-  string command = "";
+  string command;
 #if defined(unix) || defined(__unix__)
   command = string("./");
 #endif
@@ -227,7 +227,7 @@ bool execute(const string& name){
 #endif
     }
   }catch(int e){
-    report("ERROR, exception occured while try to execute code",4);
+    report("ERROR, exception occurred while try to execute code",4);
   }
   //remove .o file?
   //if(removeOFileAfter)
@@ -294,7 +294,7 @@ void getFlags(int argc, char** argv){
 	i++;
 	if(i==argc) break;
 	cppFileName = string(argv[i])+".cpp";
-	if(executableFileName == "")
+	if(executableFileName.empty())
 	  executableFileName = string(argv[i])+".o";
       }else if(flag == "nocomp"){
 	compileProg = false;
@@ -304,7 +304,7 @@ void getFlags(int argc, char** argv){
 	if(i==argc) break;
 	executableFileName = string(argv[i])+".o";
       }else if(flag == "lint" || flag == "l"){
-	compileProg = false;//if youre linting, you dont actually need to run
+	compileProg = false;//if you're linting, you don't actually need to run
 	executeProg = false;
 	lint = true;
 	SAVE_LINE_COMMENTS = true;//need to track comments
@@ -333,7 +333,7 @@ void getFlags(int argc, char** argv){
       }else if(flag == "setall"){
 	setAllLintFlags();
 	//set parser flags
-      }else if(flag == "set"){//TODO doent work right
+      }else if(flag == "set"){//TODO doesn't work right
 	bool foundOne;
 	do{
 	  foundOne = false;
@@ -343,7 +343,7 @@ void getFlags(int argc, char** argv){
 	  if(foundOne){
 	    if(i+1 != argc)
 	      try{
-		int value = stoi(argv[i+1]);//throws if i+1 isnt a number
+		int value = stoi(argv[i+1]);//throws if i+1 isn't a number
 		foundOne = setLintFlag(argv[i],value);//wont happen if stoi throws error
 		i++;
 	      }catch(const invalid_argument& e){
@@ -379,7 +379,7 @@ void getFlags(int argc, char** argv){
       }else if(flag == "file" || flag == "f"){
 	i++;
 	if(i==argc) break;
-        inFiles.push_back(string(argv[i]));
+        inFiles.emplace_back(string(argv[i]));
       }else if(resolveFlag(flag)){
       //Do nothing
       }else{
@@ -395,7 +395,7 @@ void getFlags(int argc, char** argv){
     }
   }
   //get path to main file
-  if(inFiles.size() != 0){
+  if(not inFiles.empty()){
     int found = 0;
     found = inFiles.front().find_last_of("/\\");//first file in is 'main' file
     if(found != -1)
@@ -442,7 +442,7 @@ void help(string what){
       cout<<interpFunctions[i].toString()<<"\n";
     return;
   }else if(what == "symbols"){//list data types and predefined vars
-    cout<<"Pre-defined varriables:"<<endl;
+    cout<<"Pre-defined variables:"<<endl;
     for(int i = 0;i<sizeof(builtInValues)/sizeof(builtInValues[1]);i++)
       cout<<builtInValues[i].toString()<<"\n";
     cout<<"\nData types: \n";
@@ -451,8 +451,8 @@ void help(string what){
     return;
     
   }else if(what == "compileflags" || what == "compilerflags" || what == "flags"){//list compiler flags
-    cout<<"To set flags use 'set' follwed by the flags to enable"<<endl;
-    cout<<"To unset flags use 'unset' follwed by the flags to disable\n"<<endl;
+    cout<<"To set flags use 'set' followed by the flags to enable"<<endl;
+    cout<<"To unset flags use 'unset' followed by the flags to disable\n"<<endl;
     for(unsigned i = 0;i<sizeof(compileFlags)/sizeof(compileFlags[1]);i++)
       cout<<compileFlags[i].toString()<<"\n";
     return;
@@ -480,7 +480,7 @@ void help(string what){
     cout<<RESERVED[(sizeof RESERVED/sizeof RESERVED[0])-1]<<"\n";
     return;
   }
-  for(unsigned i = 0;i<sizeof(builtInFunctions)/sizeof(builtInFunctions[1]);i++){//search built in functions
+  for(unsigned i = 0;i<sizeof(builtInFunctions)/sizeof(builtInFunctions[1]);i++){//search built-in functions
     if(toLower(builtInFunctions[i].name) == what){
       cout<<builtInFunctions[i].toString()<<"\n";
       return;
@@ -565,7 +565,7 @@ void segfaultHandler(int signal, siginfo_t *si, void *arg){
 }
 #else
 void segfaultHandler(int signal, void * si, void *arg){
-    cout<<"Segfault caused abort; signal "<<signal<<endl;
+    cout<<"Segfault caused abort; signal: "<<signal<<", location: "<<si<<endl;
     printStack(0,1);
     exit(signal);
 }

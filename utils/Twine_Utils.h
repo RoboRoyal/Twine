@@ -62,7 +62,7 @@ bool readFile(const char* fileName,string* data){
     string line = "";
     inFile.open(fileName);
     if (!inFile) {
-        report("Unable to open file: "+string(fileName),4);
+        report("Unable to open file for reading: "+string(fileName),4);
         //if(FORCE){*data+='\n'; return true;}//poor
         return false;
     }else{
@@ -75,7 +75,7 @@ bool readFile(const char* fileName,string* data){
         *data = *data + '\n';
         inFile.close();
     }
-    report("Succsess reading file: "+string(fileName),-1);
+    report("Success reading file: "+string(fileName),-1);
     return true;
 }
 
@@ -83,7 +83,7 @@ bool writeFile(const char* fileName, string* text){
     ofstream outFile;
     outFile.open(fileName);
     if(!outFile){
-        report("Unable to open file: "+string(fileName),4);
+        report("Unable to open file for writing: "+string(fileName),4);
         return false;
     }else{
         report("Writing file: "+string(fileName),-1);
@@ -96,7 +96,7 @@ bool appendFile(const char* fileName, string* text){
     ofstream outFile;
     outFile.open(fileName, ios_base::app);
     if(!outFile){
-        report("Unable to open file: "+string(fileName),4);
+        report("Unable to open file for appending: "+string(fileName),4);
         return false;
     }else{
         report("Opening file: "+string(fileName),-1);
@@ -128,10 +128,10 @@ bool strEql(const string& one, const string& two){
 }
 
 vector<string> split(string str, string sep){
-    char* cstr=const_cast<char*>(str.c_str());
+    char* c_str=const_cast<char*>(str.c_str());
     char* current;
     vector<std::string> arr;
-    current=strtok(cstr,sep.c_str());
+    current=strtok(c_str, sep.c_str());
     while(current != NULL){
         arr.push_back(current);
         current=strtok(NULL, sep.c_str());

@@ -22,24 +22,24 @@ string type(const myType& a) {
   return typeid(a).name();
 }
 template <typename T> string type(const vector<T>& c){
-  if(c.size())
+  if(not c.empty())
     return string("Vector<")+type(c[0])+">";
   return string("Vector<")+typeid(T).name()+">";//it would probably be better to be consistent
 }
 
 template <typename T> string type(const T c[]){
-   if(c.size())
+   if(sizeof(c))//is this needed?
      return string("Array<")+type(c[0])+">";
   return string("Array<")+typeid(T).name()+">";
 }
 
 template <typename T, size_t N> string type(const array<T,N>& c){
-  if(c.size())
+  if(not c.empty())
     return string("Array<")+type(c[0])+","+to_string(N)+">";
   return string("Array<")+typeid(T).name()+">";
 }
 
-//if there ever was a standard, any new class should impliment string type(const T&) of its onw type
+//if there ever was a standard, any new class should implement string type(const T&) of its onw type
 
 //template<class T>
 //string type(const Channel<T>& c){return string("Channel::"+type(T));}
@@ -52,7 +52,7 @@ unsigned long sizeOf(const __ANY__& a){
 }
 
 template <class myType>
-inline unsigned long sizeOf(const myType& a){// impliments as sizeof keyword
+inline unsigned long sizeOf(const myType& a){// implements as sizeof keyword
   return sizeof(a);//could this be done with #define sizeof( sizeOf( ?
 }
 //#define sizeOf( sizeof(

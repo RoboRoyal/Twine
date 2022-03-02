@@ -18,7 +18,6 @@ vector<TokenData> * tokens;
 //simple non-parser formatter
 void Format(vector<TokenData> * t){
   tokens = t;
-  
   out = "";
   int expectIndent = 0;
   bool expectNewline = false;

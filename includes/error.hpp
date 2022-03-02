@@ -147,32 +147,39 @@ void segFaultHandler(int signal, siginfo_t *si, void *arg){
 
 
 class baseException : public std::exception{
-  const char * file;
-  const int line;
-  const char * function;
-  const vector<string> stack;
-  const string msg;
-  
+    const char * file;
+    const int line;
+    const char * function;
+    const vector<string> stack;
+    const string msg;
+
 public:
-  baseException(const string msg_, const char* file_, int line_, const char* func_) : msg(msg_),//set base class?
-										     line (line_),
-										     file (file_),
-										     function (func_),
-										     stack (getStack())
-  {
-    //this->stack = getStack();
-  }
+    baseException(const string msg_, const char* file_, int line_, const char* func_) : msg(msg_),//set base class?
+                                                                                        line (line_),
+                                                                                        file (file_),
+                                                                                        function (func_),
+                                                                                        stack (getStack())
+    {
+        //this->stack = getStack();
+    }
 
   void printStack(){
     for(int i = 0; i < stack.size(); i++){
       cout<<this->stack[i]<<endl;
     }
   }
-    const char * what () const throw (){
-        string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " + to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
-        for(int i = 1; i < stack.size() - 2; i++)
-        ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack[i] + "\n";
-        return ret.c_str();
+    const char* what () const throw () {
+        string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " +
+                     to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
+        if (stack.size() > 2) {
+            for (int i = 1; i < stack.size() - 2; i++)
+                ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack.at(i) + "\n";
+        }else{
+            //TODO check if on windows
+            ret += "Could not get stack";
+        }
+        string* c_ret = new string(ret);
+        return c_ret->c_str();
     }
 };
   
