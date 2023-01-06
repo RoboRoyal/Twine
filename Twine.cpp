@@ -39,7 +39,7 @@ bool compile(const string& fileInName, const string& fileOutName);     //compile
 bool execute(const string& outName);                                   //executes a given file
 bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, execute chain / linter / formatter
 void freeProg();                                                       //frees memory-TODO
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__)                                 //stack trace in linux
 #include <execinfo.h> //stack trace
 void segfaultHandler(int signal, siginfo_t *si, void *arg);
 #endif
@@ -48,9 +48,6 @@ void handler(int sig);
 
 
 int main(int argc, char** argv){
-  //testThing();
-  //exit(5);
-
 
   if(true){
 
@@ -59,7 +56,7 @@ int main(int argc, char** argv){
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
 
-#if defined(__unix__)
+#if defined(__unix__) //set up segfault handler/stack trace on linux
     struct sigaction sa;
     memset(&sa, 0, sizeof(struct sigaction));
     sigemptyset(&sa.sa_mask);
@@ -71,7 +68,6 @@ int main(int argc, char** argv){
   
   usingPreCompiledHeaders = false;//TODO for now....
 #ifndef TWINE_INSTALL_BUILD
-  //cout<<"Term: "<<getenv("TERM")<<endl;
   reportingLevel = -2;
   INSTALL_PATH = "";
   removeCPPFileAfter = false;
@@ -87,25 +83,29 @@ int main(int argc, char** argv){
   usingClang = true;
 #endif
 
-  if(argc == 1){
+  if(argc == 1){ //if there are no arguments, enter interpreter mode
     setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
+
   getFlags(argc, argv);//parse command line args, they get stored in Flags and vector<string> inFiles, along with a few globals
   if(inFiles.empty() && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
     setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
-  if(inFiles.empty() == 0 && doneOtherThings)
+  if(inFiles.empty() == 0 && doneOtherThings)//if we did something )getVersion, about etc) and there is nothing to compile, exit
     return 0;
-  if(cppFileName.empty()){
+
+  //if we reach this point it means we have something to compile
+  if(cppFileName.empty()){//generate a C++ file name if one was not given
     cppFileName = mainFileName + ".cpp";
   }
-  if(executableFileName.empty()){
+  if(executableFileName.empty()){//generate an output file name if one was not given
     executableFileName = mainFileName + ".o";
   }
+
   try{
     if(!doTheThing())
       return 3;
@@ -235,9 +235,6 @@ bool execute(const string& name){
   return false;
 }
 
-bool stringIsTrue(const string& str){
-  return (str == "true" || str == "t" || str == "1");
-}
 void getFlags(int argc, char** argv){
   for(int i = 1; i < argc; i++){
     string OGarg = string(argv[i]);
@@ -573,3 +570,6 @@ void segfaultHandler(int signal, void * si, void *arg){
 #endif
 
 void __finish__(){}
+
+//function that takes a name and welcomes the user
+

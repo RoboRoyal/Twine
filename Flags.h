@@ -15,7 +15,7 @@ using namespace std;
 
 //Global Flags
 const string TWINE_VERSION = "0.1";
-const unsigned TWINE_VERSION_INT = 2;//is the exit stauts when asking for integer version
+const unsigned TWINE_VERSION_INT = 2;//is the exit status when asking for integer version
 string INSTALL_PATH = "/etc/twine/src/";
 int reportingLevel = 2;//what data should be reported to user: -2 = debug, 0=info, 2 = warnings, 4 = errors
 bool FORCE = false;//attempt fo fix mistakes and force to run
@@ -113,30 +113,30 @@ Flag compileFlags[] = {
 		       //should be these in a different list?
 		       //these are used internal to the lex-parse-trans process
 		       /*Parser*/
-		       {"DEFAULT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
+		       {"DEFAULT_RETURN", true, "Adds a false/0 default return value to functions with a return type but no explicit return statement"},
 		       {"CLASS_REDEFINITIONS", false,"Allows redefinitions of classes"},//redef or addition?
 		       {"FUNCTION_REDEFINITION", true,"Allows redefinition of fucntions"},
 		       {"WARNINGS_ARE_ERRORS", false, "Turns all warnings into errors"},
 		       {"IGNORE_ALL_WARNING", false, "Ignores all warnings thrown"},
 		       {"EXIT_ON_ERROR", false, "Exits parsing on first error"},
 		       {"TRY_TRANS", false, "Try to output a .cpp file even if there were some error"},
-		       {"TRY_COMPILE", false, "Try to compile in C++ even if there were some error"}, //not implimented
+		       {"TRY_COMPILE", false, "Try to compile in C++ even if there were some error"}, //not implemented
 		       {"__TWINE__", true, "Should always be enabled. Used to signal to included files that they are being used in a twine program"},
 };
 Flag parserFlags[] = {
-		      {"DEFAULT_RETURN", true, "Adds a falsey/0 defualt return value to functions with a return type but no explicit return statement"},
+		      {"DEFAULT_RETURN", true, "Adds a falsey/0 default return value to functions with a return type but no explicit return statement"},
 		      {"LOCAL_VAR_REDEFINITION", false, "Allows for the redefinition of local vars. (ex. int x=0 string x=\"str\")"},
 		      {"VAR_REDEFINITION", true, "Allows redefinitions of vars from higher scopes. (ex. int x=0 {string x=\"str\"})"},
-		      {"AUTO_FUNCTIONS", true, "Adds in defualt functions for classes"},
+		      {"AUTO_FUNCTIONS", true, "Adds in default functions for classes"},
 		      {"AUTO_TO_STRING", true, "Adds in a toString function for classes without one already"},
 		      {"AUTO_TO_STRING_STATIC", false, "Adds a static toString function for classes without one already"},
 
 		      //warnings
-		      {"IMPLICIT_CASTS_ON_OBJECTS", true, "Throws a wrning if you implicitly cast an object to a number or string"},
+		      {"IMPLICIT_CASTS_ON_OBJECTS", true, "Throws a warning if you implicitly cast an object to a number or string"},
 };
 
 Flag formaterFlags[] = {
-			{"FIX_INDENTATION", true, "Ensures indentation in accordnce with { }"},//
+			{"FIX_INDENTATION", true, "Ensures indentation in accordance with { }"},//
 			{"FIX_BLOCK_NEWLINES", true, "Ensures needed new lines after {"},//
 			{"FIX_CLOSING_BLOCK", true, "Ensures a new line after }, except if there is an else/elif"},
 			{"FIX_DOULBE_CLOSING", true, "Ensures new line between two closing braces '}'"},//
@@ -212,35 +212,35 @@ struct lintFlag{
 lintFlag linterFlags[] = {//alternitivly, dont need a bool, just set int to 0 if disabled. Or could use bool as warning/error enable
 			  //TODO make the names better-more consistant
 			  {"CAPITALISE_CONSTANTS", true, 1, "Checks if all constants are in all caps"},//
-			  {"EXCESS_NEW_LINE", true, 3, "Checks for excesive consecutive new lines"},//
-			  {"EXCESS_PARENTHESES", true, 1, "Checks for un-neccisarry usage of ( )"},//
+			  {"EXCESS_NEW_LINE", true, 3, "Checks for excessive consecutive new lines"},//
+			  {"EXCESS_PARENTHESES", true, 1, "Checks for un-necessary usage of ( )"},//
 			  {"EXPRESSION_MAX_COMPLEXITY", true, 20, "The max complexity of any single expression"},//
-			  {"EXPRESSION_MAX_LENGTH", true, 30, "The max number of atoms+OPs a single exprtession can have"},//
+			  {"EXPRESSION_MAX_LENGTH", true, 30, "The max number of atoms+OPs a single expression can have"},//
 			  {"FUNCTION_COMPLEXITY", true, 200, "Maximum complexity of a function"},//
 			  {"FUNCTION_NAME_MAX_LENGTH", true, 30, "Maximum length of function names allowed"},//
-			  {"FUNCTION_NAME_MIN_LENGTH", true, 3, "Minimum length of fuction names allowed"},//
+			  {"FUNCTION_NAME_MIN_LENGTH", true, 3, "Minimum length of function names allowed"},//
 			  {"FUNCTION_NAME_PROPER", true, 3, "Checks if the name of a function is in the proper format (1:a_b vs 2:a_B vs 3:aB)"},//
-			  {"IMPLICIT_CONVERTIONS", true, 1, "Checks for implicit convertions, such as int x = string"},//?
+			  {"IMPLICIT_CONVERSIONS", true, 1, "Checks for implicit conversions, such as int x = string"},//?
 			  {"LINE_MAX_LENGTH", true, 90, "Maximum length of a single line"},//
 			  {"LINE_AFTER_FUNK", true, 1, "Requires a new line after the end of a function"},//
-			  {"MISSING_RETURN_STATMENTS", false, 1, "Checks if functions without void return has a return statment"},//
-			  {"NUM_TO_STRING", true, 1, "Checks for convertions from numbers(int/double/bools) to strings (string s = 123)"},
+			  {"MISSING_RETURN_STATMENTS", false, 1, "Checks if functions without void return has a return statement"},//
+			  {"NUM_TO_STRING", true, 1, "Checks for conversions from numbers(int/double/bools) to strings (string s = 123)"},
 			  {"NUMBER_OF_COMMENTS", true, 8, "How many lines of code you should have per comment"},//
 			  {"NEW_LINE_FOR_BLOCK", true, 1, "Requires a new line at the start of a block({block})"},//
-			  {"NO_SIMILAR_NAMES", false, 1, "Does not allow vars/functions/classes of similar names to avoid confution"},//
+			  {"NO_SIMILAR_NAMES", false, 1, "Does not allow vars/functions/classes of similar names to avoid confusion"},//
 			  {"NO_EMPTY_BLOCKS", false, 1, "Checks for empty blocks"},//
 			  {"PROPER_VAR_NAMES", true, 3, "Checks if name is in proper format (1:a_b vs 2:a_B vs 3:aB)"},//
-			  {"STRING_TO_NUM", true, 1, "Checks for convertions from string to numbers(int/double/bools)"},
+			  {"STRING_TO_NUM", true, 1, "Checks for conversions from string to numbers(int/double/bools)"},
 			  {"SHOW_COMPLEXITIES", false, 1, "Shows breakdown of complexities of every function/class"},//
-			  {"VAR_MAX_LENGTH", true, 20, "Maximum length of varriables allowed"},//
-			  {"VAR_MIN_LENGTH", true, 3, "Minimum length of varriables allowed"},//
+			  {"VAR_MAX_LENGTH", true, 20, "Maximum length of variable name allowed"},//
+			  {"VAR_MIN_LENGTH", true, 3, "Minimum length of variable name allowed"},//
 			  {"VAR_TYPE_DEFINED", false, 1, "Makes all vars must have type"},//
 			  
-			  {"NO_MISSING_RETURNS", true, 1, "Requires every non-void function to have a return statment as the last line"},
+			  {"NO_MISSING_RETURNS", true, 1, "Requires every non-void function to have a return statement as the last line"},
 			  {"NEW_LINE_AFTER_BLOCK", true, 1, "Requires a new line after }"},
 			  {"ONE_LINE_PER_LINE", false, 1, "Requires each parsable line to be on its own line"},
 			  {"MAX_COMPLEX_BASE", true, 3, "Max complexity of a base of class call ie. (a+b+c).type()"},
-			  {"MAX_SEQUENTIAL_CALLS", false, 3, "Number of class calles at one time ie. a.b.c()"},
+			  {"MAX_SEQUENTIAL_CALLS", false, 3, "Number of class calls at one time ie. a.b.c()"},
 			  {"BLOCK_INDENTATION", true, 1, "Match indentation level of blocks {}"},
 			  
 			  {"OBJECT_MAX_FUNCTIONS", false, 20, "Maximum number of functions allowed for one object(or class)"},//
@@ -269,7 +269,7 @@ int getLintFlag(string flagName){
 }
 
 //enables or sets value of linter flag
-bool setLintFlag(string flagName, int num, bool enable){
+bool setLintFlag(const string flagName, int num, bool enable){
   //TODO set flagName to upper
   for(short i = 0; i != sizeof linterFlags / sizeof linterFlags[0];i++){
     if(flagName == linterFlags[i].name){
@@ -287,7 +287,7 @@ bool setLintFlag(string flagName, int num, bool enable){
 }
 
 
-bool setLintFlag(string flagName, bool enable = true){
+bool setLintFlag(const string flagName, bool enable = true){
   //TODO set flagName to upper
   for(short i = 0; i != sizeof linterFlags / sizeof linterFlags[0];i++){
     if(flagName == linterFlags[i].name){  
@@ -328,7 +328,7 @@ options commandLineOptions[] {//TODO order, finish, etc..
 					  {"outFileName", "o", "string file", "Output compiled file name"},
 					    {"lint", "l", "none", "Lints the file, checking for correct coding standards"},
 					      {"clang", "none", "none", "Compiles using clang"},
-						{"benchmark", "none", "none", "Times the lexing, parsing and transcompiling time"},
+						{"benchmark", "none", "none", "Times the lexing, parsing and trans-compiling time"},
 						  {"format", "none", "none", "Formats the input file"},
 						    {"set", "s", "string flag, int/bool value", "Sets flag to value, or just enables it if no value is given"},
 						      {"unset", "u", "string flag", "Sets flag to false"},

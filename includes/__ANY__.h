@@ -43,7 +43,7 @@ public:
     _S = * string
     _V = * vector<__ANY__> (as list)
     ------------------------------------
-    NT = no type (defualt constructor)
+    NT = no type (default constructor)
     BT = bad type (has been derefrenced)
     ------------------------------------
     Possible future

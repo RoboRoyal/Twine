@@ -60,7 +60,7 @@ void addEquals(object * obj);
 void addNotEquals(object * obj);
 void addString(object * obj);
 void addStaticString(object * obj);
-void addDefualtConstructor(object * obj);
+void addDefaultConstructor(object * obj);
 
 void parseClassDec(object * obj);
 void parseClassPre(object * obj);

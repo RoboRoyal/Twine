@@ -516,7 +516,7 @@ __ANY__ interpExpression(expression3 * exp){//doesnt do ++ or --
 __ANY__ interpExpression(const expression2 * exp){
   //usedAssign = false;
   __ANY__ tmp = interpExpressionHelper(exp);
-  cout<<usedAssign <<" "<<implicitPrint<<endl;
+  report("Used assign: " + to_string(usedAssign) + " implicitPrint: " + to_string(implicitPrint), -2);
   if(!usedAssign && implicitPrint)
     print(tmp);
   return tmp;

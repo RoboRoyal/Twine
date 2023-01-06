@@ -94,18 +94,25 @@ expression3 * parseList(const vector<unsigned long>& lst, const string& type, un
     return exp;
 }
 
-//dummy is called when an unimplimented feature is used
+//dummy is called when an unimplemented feature is used
 bool dummy(){return true;}
 
-//function called to parse tokens. Sets up scopes, global varriables directs prescam, then actual scan
+/**
+ * Entry into parse. Sets up scopes, global variables directs pre-scan, then actual scan
+ * @param tokens Vector of tokens from lexing original text
+ * @param varsPassedIn Scope(globals) passed in. Normally blank or vars left over from last interp
+ * @param p Prog being passed in, normally starts empty
+ * @param interpM True = interpret mode, False = compile mode
+ * @return
+ */
 bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p, bool interpM){
     report("Parsing file",0);
 
-    if(interpM && currentParsingFile == "")
+    if(interpM && currentParsingFile == "") //checks if we are in interpreting mode
         currentParsingFile = "Interpreted-CL";
 
     //set global vars
-    interpMode = interpM;
+    interpMode = interpM;//TODO why have redundant var?
     tokenList = tokens;
     currentVars = varsPassedIn;//?????
     localVars = new vector<scope *>;
@@ -120,7 +127,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
     Prog = p;
     currentClass = nullptr;
 
-    setIterators();
+    setIterators(); //sets symb, lastSym, twoSymAgo
 
     //Set up main function
     if(!interpM)
@@ -290,6 +297,8 @@ void parseClassPre(object * obj){
     pullScope();
     debug("parseClassPre() done");
 }
+
+//checks/adds default functions to a class including ==, toString, constructor, etc.
 void addAutoFunctions(object * obj){//TODO check if these are used/needed
     if(!getFlag("AUTO_FUNCTIONS"))
         return;
@@ -309,14 +318,14 @@ void addAutoFunctions(object * obj){//TODO check if these are used/needed
     if(!hasNotEqual)
         addNotEquals(obj);
     if(!hasDefualtConstructor && false)//TODO
-        addDefualtConstructor(obj);
+        addDefaultConstructor(obj);
     if(!hasString && getFlag("AUTO_TO_STRING")){
         addString(obj);
         if(getFlag("AUTO_TO_STRING_STATIC"))
             addStaticString(obj);
     }
 }
-void addDefualtConstructor(object * obj){
+void addDefaultConstructor(object * obj){
     Funk * F = new Funk;
     F->returnType = var("");
     F->name = obj->name;
@@ -327,18 +336,24 @@ void addDefualtConstructor(object * obj){
     obj->memberFunks.push_back(F);
 }
 void addEquals(object * obj){//used to auto generate == operator in a class
+    //sets up two operator== functions
+    //one takes the object directly
+    //the other takes an __ANY__ as the object
 
-    Funk * F = new Funk;
+    //this one is for the object itself
+    Funk * F = new Funk;//set up the function def
     F->constant = true;
     F->returnType = var("bool");
     F->name = "operator==";
 
-    var a = var();
+    var a = var();//set up parameter to take const ref of object
     a.type = obj->name;
     a.constant = true;
     a.reference = true;
     a.name = "ot";
     F->parameters.push_back(a);
+
+    //set up C++ code inside to check is everything is equal
     parseNode * p = new parseNode;
     p->type = "C++";
     if(obj->extends != "Object" && !obj->isBranch)
@@ -353,6 +368,7 @@ void addEquals(object * obj){//used to auto generate == operator in a class
     F->funkBlock->Lines.push_back(p);
     obj->memberFunks.push_back(F);
 
+    //this is for operator== that take __ANY__ as a param
     Funk * G = new Funk;
     G->constant = true;
     G->returnType = var("bool");
@@ -371,7 +387,7 @@ void addEquals(object * obj){//used to auto generate == operator in a class
     G->funkBlock->Lines.push_back(l);
     obj->memberFunks.push_back(G);
 }
-void addNotEquals(object * obj){
+void addNotEquals(object * obj){//TODO so it can take __ANY__?
 
     Funk * F = new Funk;
     F->constant = true;
@@ -399,6 +415,11 @@ void addNotEquals(object * obj){
     obj->memberFunks.push_back(F);
 }
 
+/**
+ * Adds a "toString" function to a class if none is provided.
+ * Prints out all parameters/values in class
+ * @param obj Class to add function to
+ */
 void addString(object * obj){
 
     Funk * F = new Funk;
@@ -515,6 +536,11 @@ void parseClass(object * obj){//TODO is it class or object?
     debug("parseClass() done");
 }
 
+/**
+ * Accepts a function and tests if there is a return as the last line(TODO check if all valid paths through function give a return)
+ * If no return is found, and DEFAULT_RETURN is set, adds a return(TODO make it return last valid value?)
+ * @param F Function to check return of.
+ */
 void checkReturn(Funk * F){
     //TODO add automatic return of last defined var?
     /*
@@ -531,7 +557,8 @@ void checkReturn(Funk * F){
     }
 
     if(getFlag("DEFAULT_RETURN") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
-        //check las lines for implicet return?
+        //check last line for implicit return?
+
         parseNode * newReturn = new parseNode();
         expression3 * returnExp = new expression3();
         atom * returnAtom = new atom();
@@ -540,7 +567,7 @@ void checkReturn(Funk * F){
         if(F->returnType.type == "string"){
             returnAtom ->helper = var("string");
             returnAtom->literalValue = new string("\"\"");
-        }else{
+        }else{//default to return 0
             returnAtom->helper = var("num");
             returnAtom->literalValue = new string("0");
         }
@@ -551,7 +578,10 @@ void checkReturn(Funk * F){
     //debug("checkReturn() done");
 }
 
-
+/**
+ * Main parse loop. Taking
+ *
+ */
 void parseTop(){
     debug("parseTop()");
     //TODO have to do scopes
@@ -574,7 +604,7 @@ void parseTop(){
             branch B = branch();
             parseBranchDec(&B);//get name of class
             parseBranch((branch *)getClass(B.name));//get class and parse it
-        }else{
+        }else{//TODO parse line?
             parseNode * me = new parseNode();
             currentFunk = Prog->functions.front();
             parseLine(me);

@@ -11,13 +11,13 @@
 
 /*
 
-This file will help the Lexer and possibly parseer lint a Twine file
+This file will help the Lexer and possibly parser lint a Twine file
 Things to check:
 
 -indentation
 -excess ( )
 -names of vars, functions, classes (length, repeats, a_b or aB etc..)
--use of implicite convertions (int x = __ANY__)
+-use of implicit conversions (int x = __ANY__)
 -funk/method names
 -length/complexity of methods
 -length of lines
@@ -32,7 +32,7 @@ int totalComments = 1;
 int totalLines = 1;
 int concecutiveNewLines = 0;
 int targetIndent = 0;
-struct namedThing{//used to track if name or similar name previusly used
+struct namedThing{//used to track if name or similar name previously used
   string name;
   string type;//func, var, class
   int lineUsed;
@@ -94,7 +94,7 @@ void checkFunk(Funk * F, bool checkReturn = true){
   }
   if(checkReturn && getLintFlag("MISSING_RETURN_STATMENTS") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
     //lint
-    lintReport("Function '"+F->name+"' has no return statment yet has return type of "+F->returnType.type,3);//TODO doesnt work with constructors
+    lintReport("Function '"+F->name+"' has no return statement yet has return type of "+F->returnType.type,3);//TODO doesnt work with constructors
   }
 }
 void checkFunkName(Funk * F){
@@ -108,8 +108,8 @@ void checkFunkName(Funk * F){
   }
   if(getLintFlag("FUNCTION_NAME_PROPER")){//TODO line number is wrong
     //lint
-    if(getLintFlag("FUNCTION_NAME_PROPER") == 3 && !regex_match(F->name, regex("^[a-z0-9]+([A-Z0-9]+[a-z0-9]*)*$"))){//check for aB
-      lintReport("Function '"+F->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
+    if(getLintFlag("FUNCTION_NAME_PROPER") == 3 && !regex_match(F->name, regex("^[a-z][a-z0-9=+\\-%!@]*([A-Z][a-z0-9=+\\-%!@]*)*$"))){//check for aB
+      lintReport("Function '"+F->name+"' has incorrectly formatted name(form is aB aka camel case)", 1);
     }
     if(getLintFlag("FUNCTION_NAME_PROPER") == 1 && !regex_match(F->name, regex("^([a-z0-9]+(_[a-z0-9]+)*)+$"))){//check for a_b
       lintReport("Function '"+F->name+"' has incorrectly formatted name(form is a_b aka stringing words)", 1);
@@ -137,13 +137,13 @@ void checkClassName(object * obj){
   }
   if(getLintFlag("OBJECT_NAME_PROPER")){
     if(getLintFlag("OBJECT_NAME_PROPER") == 3 && !regex_match(obj->name, regex("^[a-z0-9]+([A-Z0-9]+[a-z0-9]*)*$"))){//check for aB
-      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
+      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka camel case)", 1);
     }
     if(getLintFlag("OBJECT_NAME_PROPER") == 1 && !regex_match(obj->name, regex("^([a-z0-9]+(_[a-z0-9]+)*)+$"))){//check for a_b
-      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
+      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka camel case)", 1);
     }
     if(getLintFlag("OBJECT_NAME_PROPER") == 2 && !regex_match(obj->name, regex("^([a-z0-9])+(_[A-Z0-9]+[a-z0-9]+)*$"))){//check for a_B
-      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
+      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka camel case)", 1);
     }    
   }
   if(getLintFlag("NO_SIMILAR_NAMES")){//checks if me and mE are bing used, this can be confusing
@@ -172,7 +172,7 @@ void checkObject(object * obj){
       lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
     }
     if(getLintFlag("OBJECT_NAME_PROPER") == 1 && !regex_match(obj->name, regex("^([a-z0-9]+(_[a-z0-9]+)*)+$"))){//check for a_b
-      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is a_b aka python ripp-off)", 1);
+      lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is a_b aka python rip-off)", 1);
     }
     if(getLintFlag("OBJECT_NAME_PROPER") == 2 && !regex_match(obj->name, regex("^([a-z0-9])+(_[A-Z0-9]+[a-z0-9]+)*$"))){//check for a_B
       lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is a_B aka why you do it like that?)", 1);
@@ -199,7 +199,7 @@ void checkConvertion(string targetType, string resolvingType){//TODO
 	lintReport("Implicit convertion from "+convertedType(resolvingType)+" to "+convertedType(targetType), 1);
     }else if(targetType != resolvingType){
       if(getLintFlag("IMPLICIT_CONVERTIONS") == 1)//types dont match, very strict(no implicit calls from int to double)
-	lintReport("(light) Implicit convertion from "+resolvingType+" to "+targetType, 1);
+	lintReport("(light) Implicit conversion from "+resolvingType+" to "+targetType, 1);
     }
   }
 }
@@ -223,11 +223,11 @@ void checkVarName(string varName, bool isConstant = false){
 	
       }else{
 	//lint
-	lintReport("Var '"+varName+"' is constant so should have fully cappitalized name, but is, in fact, lowercase",1);
+	lintReport("Var '"+varName+"' is constant so should have fully capitalized name",1);
       }
     }else{
       if(getLintFlag("PROPER_VAR_NAMES") == 3 && !regex_match(varName, regex("^[a-z0-9]+([A-Z0-9]+[a-z0-9]*)*$"))){//check for aB
-	lintReport("Var '"+varName+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
+	lintReport("Var '"+varName+"' has incorrectly formatted name(form is aB aka camel case)", 1);
       }
       if(getLintFlag("PROPER_VAR_NAMES") == 1 && !regex_match(varName, regex("^([a-z0-9]+(_[a-z0-9]+)*)+$"))){//check for a_b
 	lintReport("Var '"+varName+"' has incorrectly formatted name(form is a_b aka stringing words)", 1);
@@ -258,7 +258,7 @@ void checkLine(vector<TokenData> line){//checks if the length of the line is too
 }
 
 /*
-Checks for max complexity of statment, number of bigAtoms used, and unneccisary use of ( )
+Checks for max complexity of statement, number of bigAtoms used, and unnecessary use of ( )
 */
 void checkExpression(expression3 * exp){
   if(getLintFlag("EXPRESSION_MAX_COMPLEXITY") && getLintFlag("EXPRESSION_MAX_COMPLEXITY") < exp->complexity){
@@ -285,7 +285,7 @@ void checkProg(prog * P){
 
 double lintScore(){//lines is total number of lines in origonal file
   if(totalLines == 0) return 1.0; //empty program
-  double rawScore = ((double)totalLines-lostScore)/totalLines;//between (hopfully 0) and 1
+  double rawScore = ((double)totalLines-lostScore)/totalLines;//between (hopefully 0) and 1
   return(rawScore)*10;
 }
 

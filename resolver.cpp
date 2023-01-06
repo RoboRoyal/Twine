@@ -19,7 +19,7 @@ bool isObj(const string& name){
     return true;
 }
 
-/*Checks warning/eror if a cast 'from' to 'targetType' is allowed.
+/*Checks warning/error if a cast 'from' to 'targetType' is allowed.
 The return value can be ignored, it is only used to track/throw warning and errors*/
 bool checkCast(const string& from, const string& targetType, bool output = true){
     if(targetType == "string" && convertedType(from) == "num" && from != "bool"){
@@ -42,10 +42,12 @@ bool checkCast(const string& from, const string& targetType, bool output = true)
     return true;
 }
 
-string resolveTypeOfDots(const expression3 * exp){//should return var
+//returns type of first element of exp
+string resolveTypeOfDots(const expression3 * exp){//TODO should return var?
     return exp->bigAtoms->at(0)->a->helper.type;
 }
 
+//converts exp3 to exp 2 in the range given
 expression2 * exp3toexp2Sized(expression3 * expIn, int start, int end){
     expression3 * exp3 = new expression3();
     for(int i = start; i < end; i++){
@@ -58,15 +60,17 @@ expression2 * exp3toexp2Sized(expression3 * expIn, int start, int end){
     return exp2;
 }
 
-
-
+//applies the correct cast to convert given exp2 into the given target type
 void applyCast(expression2 * EXP, string targetType){
-    //cout<<"Applying cast with target type: "<<targetType<<" and current type as: "<<EXP->helper<<endl;
     debug("applyCast(EXP: "+EXP->helper+" to "+targetType+")");
-    if(convertedType(targetType) == convertedType(EXP->helper) || (targetType == "" || targetType == "*")){
+
+    //ignore if types already match or there is no need to cast anything
+    if(convertedType(targetType) == convertedType(EXP->helper) || targetType == "" || targetType == "*"){
         debug("applyCast(EXP) done");
         return;
     }
+
+
     checkCast(EXP->helper, targetType);
     if(targetType == "string" && convertedType(EXP->helper) == "num"){//TODO bool should be different
         //checkCast(EXP->helper,"string");
