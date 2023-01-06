@@ -150,7 +150,7 @@ class baseException : public std::exception{
   const char * file;
   const int line;
   const char * function;
-  const vector<string> stack;
+  vector<string> stack;
   const string msg;
   
 public:
@@ -160,7 +160,7 @@ public:
 										     function (func_),
 										     stack (getStack())
   {
-    //this->stack = getStack();
+    this->stack = getStack();
   }
 
   void printStack(){
@@ -168,12 +168,13 @@ public:
       cout<<this->stack[i]<<endl;
     }
   }
-    const char * what () const throw (){
-        string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " + to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
-        for(int i = 1; i < stack.size() - 2; i++)
-        ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack[i] + "\n";
-        return ret.c_str();
-    }
+  const char * what () const throw (){
+    string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " + to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
+    for(int i = 1; i < stack.size() - 2; i++)
+      ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack[i] + "\n";
+    cout<<ret<<endl;
+    return ret.c_str();
+  }
 };
-  
+
 #endif //_ERROR_H_

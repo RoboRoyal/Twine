@@ -370,7 +370,7 @@ expression2 * resolveAtoms(atom * left, atom * right, string OP){
     //resolveAtom(right);
     //cout<<"Left type: "<<left->type<<" left helper: "<<left->helper<<" left converterd: "<<convertedType(left->helper)<<" ";printAtom(left);
     //cout<<"Right type: "<<right->type<<" right helper: "<<right->helper<<" right converterd: "<<convertedType(right->helper)<<" ";printAtom(right);
-    if(OP != "."){ //&& OP != "[" && OP != "]" ){
+    if(OP != "." && OP != "::"){ //&& OP != "[" && OP != "]" ){
         if(getOP(OP).returnsBool){
             //cout<<"Cast: "<<"bool op"<<endl;
             applyCast(right, left->helper.type);//if its a bool OP(==, <=, etc..) make the right side the same type as left side
@@ -426,8 +426,10 @@ expression2 * resolveAtoms(atom * left, atom * right, string OP){
             }else{
                 cout<<"ERROR!"<<endl;
                 printAtom(left);
+		cout<<OP<<endl;
                 printAtom(right);
-                throw invalid_argument("ERROR in resolveAtoms; right->helper = "+right->helper.toString()+" :: left->helper = "+ left->helper.toString());
+		error("ERROR in resolveAtoms; right->helper = "+right->helper.toString()+" :: left->helper = "+ left->helper.toString(), true);
+                //throw invalid_argument("ERROR in resolveAtoms; right->helper = "+right->helper.toString()+" :: left->helper = "+ left->helper.toString());
             }
         }
     }else{
