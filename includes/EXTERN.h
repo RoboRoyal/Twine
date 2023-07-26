@@ -7,7 +7,10 @@
 #include <atomic>// used for atomic static member vars
 
 //#include <execinfo.h> //for printing stack trace
+#ifndef v_studio_MSVC
 #include <unwind.h>
+#endif //v_studio_MSVC
+
 //#include <stdio.h>
 
 #include <string>//String

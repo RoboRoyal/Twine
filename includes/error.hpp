@@ -2,7 +2,12 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
+#ifdef v_studio_MSVC
+
+#else
 #include <cxxabi.h>
+#endif // !v_studio_MSVC
+
 #include <signal.h>
 
 #if defined (unix) || defined(__unix__)
@@ -17,7 +22,11 @@ string demangleName(const string& mangled){
    int status = 0;
    size_t funcnamesize = 1024;
    char* funcname = (char *)malloc(sizeof(char) * funcnamesize);
-   char* ret = abi::__cxa_demangle( name, funcname,&funcnamesize, &status );
+#ifdef v_studio_MSVC
+   return funcname;
+#else
+   char* ret = abi::__cxa_demangle(name, funcname, &funcnamesize, &status);
+#endif // !v_studio_MSVC
 
    if(*funcname){
      string tmp = funcname;

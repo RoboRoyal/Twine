@@ -83,7 +83,7 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
       line++;
     }else if(C == '/' && lastChar == '/' && !StringLit && !controleLine){//start of single line comment
       if(tokens->size() != 0 && tokens->back().tokenText == "/"){//TODO
-	tokens->erase(tokens->end());
+	    tokens->erase(tokens->end() - 1);
       }
       tok += '/';
       inComment = true;
@@ -91,7 +91,7 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
     }else if(C == '*' && lastChar == '/' && !StringLit){//start of multi line comment
       tok += '/';
       if(!inComment){//only make new comment if not already in one
-	tokens->erase(tokens->end());// prevents "// /*" from being start of multiline comment
+	tokens->erase(tokens->end() - 1);// prevents "// /*" from being start of multiline comment
 	inComment = true;
 	multiComment = true;
       }
@@ -144,7 +144,7 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
         tok = "";
       }else if(charType == CharClassifier::DIGIT && lastChar == '.'){//these two blocks helps with the '.' in doubles
 	if(tok == ""){
-	  tokens->erase(tokens->end());
+	  tokens->erase(tokens->end() - 1);
 	  tok += '.';
 	} 
         tok += C;
@@ -162,7 +162,8 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
 	    for(int x = 0; x<sizeof(OPS2)/sizeof(OPS2[0]);x++){//TODO use master list of OPs? would be slower but would keep everything in one place
 	      if(test == OPS2[x]){
 		tok += lastChar;
-		tokens->erase(tokens->end());//erase last token since it was single OP, it gets replaced by 2 char OP
+		//tokens->erase(tokens->end());//erase last token since it was single OP, it gets replaced by 2 char OP//Adding -1 for WINDOWS for some reason??
+        tokens->erase(tokens->end() - 1);//erase last token since it was single OP, it gets replaced by 2 char OP
 		break;
 	      }
 	    }//end for(x)
@@ -380,7 +381,7 @@ inline bool fileExists(const string& name) {//https://stackoverflow.com/question
 }
 
 void checkControleLine(const string& line, const int lineNumber, vector<TokenData>* tokens){
-  report("Line command: "+line, -2);
+  report("Line command on line " + to_string(lineNumber) + " : " + line, -2);
   auto arr = split(line, " ");
   if(arr.size() < 2){
     report("WARNING:Unrecognised command(1): "+line, 2);

@@ -19,7 +19,7 @@ using namespace std;
 class TokenData{
 public:  
   enum Type{
-	    WHITESPACE,//used for lint
+	    WHITESPACE,//used for lintProg
 	    LINE_END,//not need/not used
 	    IDENT,
 	    LITERAL,

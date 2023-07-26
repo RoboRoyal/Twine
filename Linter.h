@@ -11,7 +11,7 @@
 
 /*
 
-This file will help the Lexer and possibly parser lint a Twine file
+This file will help the Lexer and possibly parser lintProg a Twine file
 Things to check:
 
 -indentation
@@ -77,37 +77,37 @@ void checkName(string N, string T){
 
 void checkBlock(bool newLine){//doesnt really check block
   if(getLintFlag("NEW_LINE_FOR_BLOCK") && !newLine){
-    //lint
+    //lintProg
     lintReport("Missing new line at start of block",1);
   }
 }
 void checkEmpty(){
   if(getLintFlag("NO_EMPTY_BLOCKS")){
-    //lint
+    //lintProg
     lintReport("Empty block",1);
   }
 }
 void checkFunk(Funk * F, bool checkReturn = true){
   if(getLintFlag("FUNCTION_COMPLEXITY") && F->complexity.total() > getLintFlag("FUNCTION_COMPLEXITY")){
-    //lint
+    //lintProg
     lintReport("Function '"+F->name+"' has complexity greater then allowed(complexity of "+to_string((long long)F->complexity.total())+"/"+to_string((long long)getLintFlag("FUNCTION_COMPLEXITY"))+")",2);
   }
   if(checkReturn && getLintFlag("MISSING_RETURN_STATMENTS") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
-    //lint
+    //lintProg
     lintReport("Function '"+F->name+"' has no return statement yet has return type of "+F->returnType.type,3);//TODO doesnt work with constructors
   }
 }
 void checkFunkName(Funk * F){
   if(getLintFlag("FUNCTION_NAME_MAX_LENGTH") && F->name.length() > getLintFlag("FUNCTION_NAME_MAX_LENGTH")){
-    //lint
+    //lintProg
     lintReport("Function '"+F->name+"' has name longer then allowed(length of "+to_string((long long)F->name.length())+"/"+to_string((long long)getLintFlag("FUNCTION_NAME_MAX_LENGTH"))+")",1);
   }
   if(getLintFlag("FUNCTION_NAME_MIN_LENGTH") && F->name.length() < getLintFlag("FUNCTION_NAME_MIN_LENGTH")){
-    //lint
+    //lintProg
     lintReport("Function '"+F->name+"' has name shorter then allowed(length of "+to_string((long long)F->name.length())+"/"+to_string((long long)getLintFlag("FUNCTION_NAME_MIN_LENGTH"))+")",2);
   }
   if(getLintFlag("FUNCTION_NAME_PROPER")){//TODO line number is wrong
-    //lint
+    //lintProg
     if(getLintFlag("FUNCTION_NAME_PROPER") == 3 && !regex_match(F->name, regex("^[a-z][a-z0-9=+\\-%!@]*([A-Z][a-z0-9=+\\-%!@]*)*$"))){//check for aB
       lintReport("Function '"+F->name+"' has incorrectly formatted name(form is aB aka camel case)", 1);
     }
@@ -128,11 +128,11 @@ void checkFunkName(Funk * F){
 */
 void checkClassName(object * obj){
   if(getLintFlag("OBJECT_NAME_LENGTH_MIN") && getLintFlag("OBJECT_NAME_LENGTH_MIN") > obj->name.length()){
-    //lint
+    //lintProg
     lintReport("Object '"+obj->name+"' has name shorter then allowed (length of "+to_string((long long)obj->name.length())+"/"+to_string((long long)getLintFlag("OBJECT_NAME_LENGTH_MIN"))+")",1);
   }
   if(getLintFlag("OBJECT_NAME_LENGTH_MAX") && getLintFlag("OBJECT_NAME_LENGTH_MAX") < obj->name.length()){
-    //lint
+    //lintProg
     lintReport("Object '"+obj->name+"' has name longer then allowed (length of "+to_string((long long)obj->name.length())+"/"+to_string((long long)getLintFlag("OBJECT_NAME_LENGTH_MAN"))+")",1);
   }
   if(getLintFlag("OBJECT_NAME_PROPER")){
@@ -158,16 +158,16 @@ void checkClassName(object * obj){
 void checkObject(object * obj){
   //memberVars memberFunks
   if(getLintFlag("OBJECT_MAX_FUNCTIONS") && getLintFlag("OBJECT_MAX_FUNCTIONS") < obj->memberFunks.size()){
-    //lint
+    //lintProg
     lintReport("Object '"+obj->name+"' has more than allowed number of functions( "+to_string((long long)obj->memberFunks.size())+"/"+to_string((long long)getLintFlag("OBJECT_MAX_FUNCTIONS"))+")",1);
   }
   if(getLintFlag("OBJECT_MAX_VARS") && getLintFlag("OBJECT_MAX_VARS") < obj->memberVars.size()){
-    //lint
+    //lintProg
     lintReport("Object '"+obj->name+"' has more than allowed number of member vars( "+to_string((long long)obj->memberVars.size())+"/"+to_string((long long)getLintFlag("OBJECT_MAX_VARS"))+")",1);
   }
 
   if(getLintFlag("OBJECT_NAME_PROPER")){
-    //lint
+    //lintProg
     if(getLintFlag("OBJECT_NAME_PROPER") == 3 && !regex_match(obj->name, regex("^[a-z0-9]+([A-Z0-9]+[a-z0-9]*)*$"))){//check for aB
       lintReport("Object '"+obj->name+"' has incorrectly formatted name(form is aB aka cammel case)", 1);
     }
@@ -185,7 +185,7 @@ void checkObject(object * obj){
 */
 void checkTypeAllow(string varName, bool typeDefined = true){
   if(typeDefined && getLintFlag("VAR_TYPE_DEFINED"))
-    //lint
+    //lintProg
     lintReport(varName+" was declaired without type being set, implicet type is __ANY__", 1);
 }
 
@@ -205,15 +205,15 @@ void checkConvertion(string targetType, string resolvingType){//TODO
 }
 
 /*
-  Check var length, previusly declaired similar names, and correct format (aB VS a_b VS a_B)
+  Check var length, previusly declaired similar names, and correct formatProg (aB VS a_b VS a_B)
 */
 void checkVarName(string varName, bool isConstant = false){
   if(getLintFlag("VAR_MAX_LENGTH") && getLintFlag("VAR_MAX_LENGTH") < varName.length()){
-    //lint
+    //lintProg
     lintReport("Var '"+varName+"' has name longer then allowed (length of "+to_string((long long)varName.length())+"/"+to_string((long long)getLintFlag("VAR_MAX_LENGTH"))+")",1);
   }
   if(getLintFlag("VAR_MIN_LENGTH") && getLintFlag("VAR_MIN_LENGTH") > varName.length()){
-    //lint
+    //lintProg
     lintReport("Var '"+varName+"' has name shorter then allowed (length of "+to_string((long long)varName.length())+"/"+to_string((long long)getLintFlag("VAR_MIN_LENGTH"))+")",1);
   }
   if(getLintFlag("PROPER_VAR_NAMES")){
@@ -222,7 +222,7 @@ void checkVarName(string varName, bool isConstant = false){
       if(all_of(begin(varName), end(varName), [](char c){ return isupper(c); })){
 	
       }else{
-	//lint
+	//lintProg
 	lintReport("Var '"+varName+"' is constant so should have fully capitalized name",1);
       }
     }else{
@@ -235,7 +235,7 @@ void checkVarName(string varName, bool isConstant = false){
       if(getLintFlag("PROPER_VAR_NAMES") == 2 && !regex_match(varName, regex("^([a-z0-9])+(_[A-Z0-9]+[a-z0-9]+)*$"))){//check for a_B
 	lintReport("Var '"+varName+"' has incorrectly formatted name(form is a_B aka can't make up my mind)", 1);
       }
-      //lint
+      //lintProg
     }
   }
   if(getLintFlag("NO_SIMILAR_NAMES")){
@@ -262,18 +262,18 @@ Checks for max complexity of statement, number of bigAtoms used, and unnecessary
 */
 void checkExpression(expression3 * exp){
   if(getLintFlag("EXPRESSION_MAX_COMPLEXITY") && getLintFlag("EXPRESSION_MAX_COMPLEXITY") < exp->complexity){
-    //lint
+    //lintProg
     lintReport("Expression exceeds max allowed complexity( "+to_string((long long)exp->complexity)+"/"+to_string((long long)getLintFlag("EXPRESSION_MAX_COMPLEXITY"))+")",2);
   }
   if(getLintFlag("EXPRESSION_MAX_LENGTH") && getLintFlag("EXPRESSION_MAX_LENGTH") < exp->bigAtoms->size()){
-    //lint
+    //lintProg
     lintReport("Expression exceeds max length( "+to_string((long long)exp->bigAtoms->size())+"/"+to_string((long long)getLintFlag("EXPRESSION_MAX_LENGTH"))+")",2);
   }
   //check excess ()
   if(getLintFlag("EXCESS_PARENTHESES"))
     for(int i = 0;i<exp->bigAtoms->size();i++)
       if(exp->bigAtoms->at(i)->type == bigAtom::ATOM && exp->bigAtoms->at(i)->a->type == "exp3" && exp->bigAtoms->at(i)->a->exp3->bigAtoms->size() == 1){
-	//lint
+	//lintProg
 	lintReport("Found extra extra parentheses ( )", 1);
     }
 }

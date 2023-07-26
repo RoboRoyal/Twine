@@ -2,7 +2,7 @@
 
 /*
  *4/27/19
- *used to parse CPP/H files
+ *used to parseProg CPP/H files
  *Extracts function names, return types, # of parameters, parameter types, and if they have defualt values
  */
 
@@ -24,8 +24,8 @@ bool checkIfFunc();
 void matchLessSym();
 
 
-//parse var
-//parse type
+//parseProg var
+//parseProg type
 
 vector<TokenData>* getTokenisedFile(const string& fileName){
   //set lexer to right settings
@@ -93,7 +93,7 @@ var * parseCppParameterVar(){
   a->name = lastSym->tokenText;
   if(accept("=")){
   //doesnt need to be anything as long as startingValue != NULL (could just set it to 1?)
-  //need to find end of expression, but i dont want to actually parse a Cpp Expression
+  //need to find end of expression, but i dont want to actually parseProg a Cpp Expression
   //this could be done by looking for a comma, or an end ) of a ;
     //expression3 * tmp = new expression3(); 
     a->startingValue =     parseExpression();//TODO

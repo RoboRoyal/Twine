@@ -138,7 +138,7 @@ class var{
     secondaryType = "";
     arr = vector<unsigned long>();
     name = "";
-    lineDefinedOn -1;
+    lineDefinedOn = -1;
   }
   var(string nm, string tp){
     STATIC = false;

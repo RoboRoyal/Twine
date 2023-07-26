@@ -395,7 +395,7 @@ bool TransFunk(Funk *N, bool regFunk) {
                N->dynamicParamVar + " += va_arg(ap, __ANY__);}\nva_end(ap);}";
     }//add unum support
     if (!TransBlock(N->funkBlock)) {
-        cout << "Could not parse funk" << endl;
+        cout << "Could not parseProg funk" << endl;
         return false;
     }
     out += "\n}\n";

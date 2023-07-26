@@ -8,13 +8,14 @@
 #ifndef TWINE_UTILS_H_
 #define TWINE_UTILS_H_
 
-#include <string.h>
+#include <string>
 #include <cmath>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
 #include <algorithm>
+
 
 #include <sys/stat.h>//fileExists
 

@@ -65,7 +65,7 @@ int executeInterp(const string& data, const bool runMain){
   }
   //need to set parseVars
   if(!ParseTwo(&tokens, &parseVars, Prog, true) || errors){
-    report("Could not parse input, "+to_string((long long) errors) +" error"+(errors == 1?"":"s")+" found", 2);
+    report("Could not parseProg input, "+to_string((long long) errors) +" error"+(errors == 1?"":"s")+" found", 2);
     errors = 0;//reset errors
     cleanUp(Prog);
     return false;
@@ -374,7 +374,7 @@ __ANY__ interpFunkCall(funkCall * fc){
   }else if(fc->funkName == "max"){
     return max(interpExpression(fc->parameters.at(0)));
   }else if(fc->funkName == "randInt"){
-    return randInt(interpExpression(fc->parameters.at(0)).toNum(),interpExpression(fc->parameters.at(1)).toNum());//TODO how to handle funs withdefualt params? make parse add in defualts?
+    return randInt(interpExpression(fc->parameters.at(0)).toNum(),interpExpression(fc->parameters.at(1)).toNum());//TODO how to handle funs withdefualt params? make parseProg add in defualts?
   }else if(fc->funkName == "randDouble"){
     return randDouble(interpExpression(fc->parameters.at(0)).toNum(),interpExpression(fc->parameters.at(1)).toNum());
   }else if(fc->funkName == "randStr"){
@@ -411,7 +411,7 @@ __ANY__ interpFunkCall(funkCall * fc){
     return toDouble(interpExpression(fc->parameters.at(0)));
     //list
   }else if(fc->funkName == "list"){
-    return list(interpExpression(fc->parameters.at(0)));
+    return TW_list((__ANY__) interpExpression(fc->parameters.at(0)));
   }else if(fc->funkName == "listVars"){
     vars.peekScope();
   }else if(fc->funkName == "dropFunction"){
@@ -474,7 +474,7 @@ __ANY__ interpExpression(expression3 * exp){//doesnt do ++ or --
      }
    }
 
-   if(exp->cast == "list"){//parse List
+   if(exp->cast == "list"){//parseProg List
      vector<__ANY__> ret = vector<__ANY__>();
      for(unsigned i = 0; i<exp->bigAtoms->size(); i++){//loop through list, i=0 is just '{'
        if(i%2 == 1){//do I need checks? should be formatted right from parser

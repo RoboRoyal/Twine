@@ -38,7 +38,7 @@ bool checkCast(const string& from, const string& targetType, bool output = true)
         }
     }else if(!builtInType(from) && from != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
         warn("Implicit cast from type '"+from+"' to type "+targetType);
-    //lint?
+    //lintProg?
     return true;
 }
 
@@ -186,7 +186,7 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
 
     //printExp(expIn, start, end);
 
-    //parse trivial cases
+    //parseProg trivial cases
     if(end - start == 1){
         //cout<<"Get trivial: size of 1"<<endl;
         if(expIn->bigAtoms->at(start)->type == bigAtom::ATOM){
@@ -572,7 +572,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
  /*
         if accept dot,
         make new exp
-        do while(accept dot){mini exp parse of dots}
+        do while(accept dot){mini exp parseProg of dots}
         set type of EXP to expected type
        */
 
@@ -590,7 +590,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
         EXP->bigAtoms->push_back(bDot);
         do{
           bigAtom * nAtom = new bigAtom();nAtom->type = bigAtom::OP; nAtom->op = lastSym->tokenText; expDot->bigAtoms->push_back(nAtom);
-          //parse dot
+          //parseProg dot
           //string type = getType(twoSymbAgo->tokenText);
           if(accept("(")){
             if(getFunk(lastSym->tokenText, beingCalledOn) == NULL){
@@ -604,7 +604,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
               parseFunkCall(tmp->fCall, twoSymbAgo->tokenText);//TODO
             }
           }else{
-            //parse class var
+            //parseProg class var
             if(getMemberVar(expDot->bigAtoms->at(expDot->bigAtoms->size() -1)->a->helper, lastSym->tokenText) != NULL){
               //youre good?
               atom * tmp = new atom;
@@ -616,7 +616,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
 /*            }
           }
         }while(accept("."));
-      }//end parse dot
+      }//end parseProg dot
 
 
 
@@ -627,7 +627,7 @@ if(accept(TokenData::IDENT)){
        cout<<"Tmp is: "<<tmp<<endl;
        if(tmp != NULL){
        //if(isCallable(lastSym->tokenText)){
-         //parse function call
+         //parseProg function call
          a->type = "funkCall";
          funkCall * FC = new funkCall();
          a->fCall = FC;

@@ -36,11 +36,11 @@ bool SAVE_WHITESPACE = false;
 bool SCRUB = false;
 
 //Driver Flags
-bool parse = true;
+bool parseProg = true;
 bool compileProg = true;
 bool executeProg = true;
-bool lint = false;
-bool format = false;
+bool lintProg = false;
+bool formatProg = false;
 bool removeCPPFileAfter = true;
 bool usingPreCompiledHeaders = true;
 
@@ -111,7 +111,7 @@ Flag compileFlags[] = {
 		       {"TWINE_SAFE", true, "Adds safty measures to seg fault conditions"},
 		       
 		       //should be these in a different list?
-		       //these are used internal to the lex-parse-trans process
+		       //these are used internal to the lex-parseProg-trans process
 		       /*Parser*/
 		       {"DEFAULT_RETURN", true, "Adds a false/0 default return value to functions with a return type but no explicit return statement"},
 		       {"CLASS_REDEFINITIONS", false,"Allows redefinitions of classes"},//redef or addition?
@@ -219,7 +219,7 @@ lintFlag linterFlags[] = {//alternitivly, dont need a bool, just set int to 0 if
 			  {"FUNCTION_COMPLEXITY", true, 200, "Maximum complexity of a function"},//
 			  {"FUNCTION_NAME_MAX_LENGTH", true, 30, "Maximum length of function names allowed"},//
 			  {"FUNCTION_NAME_MIN_LENGTH", true, 3, "Minimum length of function names allowed"},//
-			  {"FUNCTION_NAME_PROPER", true, 3, "Checks if the name of a function is in the proper format (1:a_b vs 2:a_B vs 3:aB)"},//
+			  {"FUNCTION_NAME_PROPER", true, 3, "Checks if the name of a function is in the proper formatProg (1:a_b vs 2:a_B vs 3:aB)"},//
 			  {"IMPLICIT_CONVERSIONS", true, 1, "Checks for implicit conversions, such as int x = string"},//?
 			  {"LINE_MAX_LENGTH", true, 90, "Maximum length of a single line"},//
 			  {"LINE_AFTER_FUNK", true, 1, "Requires a new line after the end of a function"},//
@@ -229,7 +229,7 @@ lintFlag linterFlags[] = {//alternitivly, dont need a bool, just set int to 0 if
 			  {"NEW_LINE_FOR_BLOCK", true, 1, "Requires a new line at the start of a block({block})"},//
 			  {"NO_SIMILAR_NAMES", false, 1, "Does not allow vars/functions/classes of similar names to avoid confusion"},//
 			  {"NO_EMPTY_BLOCKS", false, 1, "Checks for empty blocks"},//
-			  {"PROPER_VAR_NAMES", true, 3, "Checks if name is in proper format (1:a_b vs 2:a_B vs 3:aB)"},//
+			  {"PROPER_VAR_NAMES", true, 3, "Checks if name is in proper formatProg (1:a_b vs 2:a_B vs 3:aB)"},//
 			  {"STRING_TO_NUM", true, 1, "Checks for conversions from string to numbers(int/double/bools)"},
 			  {"SHOW_COMPLEXITIES", false, 1, "Shows breakdown of complexities of every function/class"},//
 			  {"VAR_MAX_LENGTH", true, 20, "Maximum length of variable name allowed"},//
@@ -326,10 +326,10 @@ options commandLineOptions[] {//TODO order, finish, etc..
 				      {"execute", "x", "bool execute=false", "Enable/disables execution of passed in file"},
 					{"cppFileName", "c", "string file", "Output cpp file name"},
 					  {"outFileName", "o", "string file", "Output compiled file name"},
-					    {"lint", "l", "none", "Lints the file, checking for correct coding standards"},
+					    {"lintProg", "l", "none", "Lints the file, checking for correct coding standards"},
 					      {"clang", "none", "none", "Compiles using clang"},
 						{"benchmark", "none", "none", "Times the lexing, parsing and trans-compiling time"},
-						  {"format", "none", "none", "Formats the input file"},
+						  {"formatProg", "none", "none", "Formats the input file"},
 						    {"set", "s", "string flag, int/bool value", "Sets flag to value, or just enables it if no value is given"},
 						      {"unset", "u", "string flag", "Sets flag to false"},
 							{"args", "none", "* args", "Passes the rest of the arguments to the program"},
