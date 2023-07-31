@@ -1,13 +1,10 @@
 
 
-func me(){
-print("Hello")
-throw("I am unhappy")
+a = 1
+
+func f(){
+a+=1
+return a
 }
 
-func you(){
-print("Hi!")
-me()
-}
-
-you()
+print(a+f())
