@@ -19,7 +19,7 @@ bool isObj(const string& name){
     return true;
 }
 
-/*Checks warning/eror if a cast 'from' to 'targetType' is allowed.
+/*Checks warning/error if a cast 'from' to 'targetType' is allowed.
 The return value can be ignored, it is only used to track/throw warning and errors*/
 bool checkCast(const string& from, const string& targetType, bool output = true){
     if(targetType == "string" && convertedType(from) == "num" && from != "bool"){
@@ -38,14 +38,16 @@ bool checkCast(const string& from, const string& targetType, bool output = true)
         }
     }else if(!builtInType(from) && from != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
         warn("Implicit cast from type '"+from+"' to type "+targetType);
-    //lint?
+    //lintProg?
     return true;
 }
 
-string resolveTypeOfDots(const expression3 * exp){//should return var
+//returns type of first element of exp
+string resolveTypeOfDots(const expression3 * exp){//TODO should return var?
     return exp->bigAtoms->at(0)->a->helper.type;
 }
 
+//converts exp3 to exp 2 in the range given
 expression2 * exp3toexp2Sized(expression3 * expIn, int start, int end){
     expression3 * exp3 = new expression3();
     for(int i = start; i < end; i++){
@@ -58,15 +60,17 @@ expression2 * exp3toexp2Sized(expression3 * expIn, int start, int end){
     return exp2;
 }
 
-
-
+//applies the correct cast to convert given exp2 into the given target type
 void applyCast(expression2 * EXP, string targetType){
-    //cout<<"Applying cast with target type: "<<targetType<<" and current type as: "<<EXP->helper<<endl;
     debug("applyCast(EXP: "+EXP->helper+" to "+targetType+")");
-    if(convertedType(targetType) == convertedType(EXP->helper) || (targetType == "" || targetType == "*")){
+
+    //ignore if types already match or there is no need to cast anything
+    if(convertedType(targetType) == convertedType(EXP->helper) || targetType == "" || targetType == "*"){
         debug("applyCast(EXP) done");
         return;
     }
+
+
     checkCast(EXP->helper, targetType);
     if(targetType == "string" && convertedType(EXP->helper) == "num"){//TODO bool should be different
         //checkCast(EXP->helper,"string");
@@ -182,7 +186,7 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
 
     //printExp(expIn, start, end);
 
-    //parse trivial cases
+    //parseProg trivial cases
     if(end - start == 1){
         //cout<<"Get trivial: size of 1"<<endl;
         if(expIn->bigAtoms->at(start)->type == bigAtom::ATOM){
@@ -220,7 +224,8 @@ expression2 * resolveExpressionHelper(expression3 * expIn, string targetType, co
 
         //get *LOWEST* priority OP position
         int position = -1, highestPriority = 999, dots = 0;
-        for(int i = start; i < end/*expIn->bigAtoms->size()*/; i++){
+        for(int i = end - 1; i >= start/*expIn->bigAtoms->size()*/; i--){
+        //for(int i = start; i < end/*expIn->bigAtoms->size()*/; i++){
             if(expIn->bigAtoms->at(i)->type == bigAtom::OP && getOP(expIn->bigAtoms->at(i)->op).priority < highestPriority){//>= to go right to left
                 if(expIn->bigAtoms->at(i)->op == "."){
                     dots++;
@@ -569,7 +574,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
  /*
         if accept dot,
         make new exp
-        do while(accept dot){mini exp parse of dots}
+        do while(accept dot){mini exp parseProg of dots}
         set type of EXP to expected type
        */
 
@@ -587,7 +592,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
         EXP->bigAtoms->push_back(bDot);
         do{
           bigAtom * nAtom = new bigAtom();nAtom->type = bigAtom::OP; nAtom->op = lastSym->tokenText; expDot->bigAtoms->push_back(nAtom);
-          //parse dot
+          //parseProg dot
           //string type = getType(twoSymbAgo->tokenText);
           if(accept("(")){
             if(getFunk(lastSym->tokenText, beingCalledOn) == NULL){
@@ -601,7 +606,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
               parseFunkCall(tmp->fCall, twoSymbAgo->tokenText);//TODO
             }
           }else{
-            //parse class var
+            //parseProg class var
             if(getMemberVar(expDot->bigAtoms->at(expDot->bigAtoms->size() -1)->a->helper, lastSym->tokenText) != NULL){
               //youre good?
               atom * tmp = new atom;
@@ -613,7 +618,7 @@ void parseAtom(atom * a,string base, bool baseStatic){
 /*            }
           }
         }while(accept("."));
-      }//end parse dot
+      }//end parseProg dot
 
 
 
@@ -624,7 +629,7 @@ if(accept(TokenData::IDENT)){
        cout<<"Tmp is: "<<tmp<<endl;
        if(tmp != NULL){
        //if(isCallable(lastSym->tokenText)){
-         //parse function call
+         //parseProg function call
          a->type = "funkCall";
          funkCall * FC = new funkCall();
          a->fCall = FC;

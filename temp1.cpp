@@ -81,4 +81,4 @@ int main(int argc, char *argv[]){
   return  returnStat;
 }
 #define MAX_T 8
-//user function decloraions here
+//user function declarations here

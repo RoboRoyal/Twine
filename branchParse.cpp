@@ -8,7 +8,7 @@ void addBranchCaller(branch * B);
 void parseBranchDec(branch * B){
   debug("parseBranchDec()");
   B->isBranch = true;
-  if(acceptType()){//change to parse var; take tpye/arr, name = branch name
+  if(acceptType()){//change to parseProg var; take tpye/arr, name = branch name
     B->type = lastSym->tokenText;
   }else{
     B->type = "__ANY__";
@@ -32,13 +32,13 @@ void parseBranchDec(branch * B){
         a.type = lastSym->tokenText;//TODO acceptType vs valueType?
       }else{
         a.type = "__ANY__";
-        if(lint && currentLineOn) checkTypeAllow(a.name);//check for currentLineOn so it only prints lint msg durring normal parsing, not durring pre-scan
+        if(lintProg && currentLineOn) checkTypeAllow(a.name);//check for currentLineOn so it only prints lintProg msg durring normal parsing, not durring pre-scan
 	}*/
       expect(TokenData::IDENT);//should be name of var
       a.name = lastSym->tokenText;
       if(currentLineOn){//add var to scope if not in pre-scan
         setVar(a);
-        if(lint) checkVarName(a.name);
+        if(lintProg) checkVarName(a.name);
       }
       if(accept("="))
         a.startingValue = parseExpression(a.type);

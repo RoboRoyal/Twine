@@ -1,13 +1,16 @@
 
 /*
 Main file for handling command line inputs
-Handls calls to lexer, parser, and trans
+Handles calls to lexer, parser, and trans
 */
 
 /*
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 */
+
+#define v_studio_MSVC
+
 #include "utils/Twine_Utils.h"
 #include "Lexer.cpp"
 #include "2Parser.cpp"
@@ -15,17 +18,18 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 #include "Interp.cpp"
 #include "Formater.cpp"
 #include "resolver.cpp"
+#include "Flags.h"
 //#include "trial.cpp"
 //#include "testBench.cpp"
 
 
-#include <unwind.h>
-#include <cstring>//segfualt
-#include <signal.h>//segfualt
+//#include <unwind.h>
+#include <cstring>//segfault
+#include <csignal>//segfault
 #include <chrono>//high_resolution_clock
 using namespace std::chrono;
 
-string argsForProg = "";      //args that are passed on to the user executing porgram
+string argsForProg;      //args that are passed on to the user executing program
 
 bool benchmarkTime = false;   //time how long each process takes
 bool doneOtherThings = false; //says if the user has done something other than compile a prog
@@ -33,13 +37,13 @@ bool start_interp = false;    //start interpreter after everything
 
 void help(string what = "");                                           //prints help info
 void about();                                                          //unused
-void getFlags(int argc, char** argv);                                  //parses comamnd line args
-void printFuncs();                                                     //prints the functions recieved from parsing
+void getFlags(int argc, char** argv);                                  //parses command line args
+void printFuncs();                                                     //prints the functions received from parsing
 bool compile(const string& fileInName, const string& fileOutName);     //compiles a C++ program using system commands
 bool execute(const string& outName);                                   //executes a given file
-bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, executer chain / linter / formater
+bool doTheThing();                                                     //calls lexer, parser, transCompiler, compiler, execute chain / linter / formatter
 void freeProg();                                                       //frees memory-TODO
-#if defined(unix) || defined(__unix__)
+#if defined(unix) || defined(__unix__)                                 //stack trace in linux
 #include <execinfo.h> //stack trace
 void segfaultHandler(int signal, siginfo_t *si, void *arg);
 #endif
@@ -48,9 +52,6 @@ void handler(int sig);
 
 
 int main(int argc, char** argv){
-  //testThing();
-  //exit(5);
-
 
   if(true){
 
@@ -59,7 +60,7 @@ int main(int argc, char** argv){
     signal(SIGINT, handler);
     signal(SIGTERM, handler);
 
-#if defined(__unix__)
+#if defined(__unix__) //set up segfault handler/stack trace on linux
     struct sigaction sa;
     memset(&sa, 0, sizeof(struct sigaction));
     sigemptyset(&sa.sa_mask);
@@ -71,7 +72,6 @@ int main(int argc, char** argv){
   
   usingPreCompiledHeaders = false;//TODO for now....
 #ifndef TWINE_INSTALL_BUILD
-  //cout<<"Term: "<<getenv("TERM")<<endl;
   reportingLevel = -2;
   INSTALL_PATH = "";
   removeCPPFileAfter = false;
@@ -87,33 +87,37 @@ int main(int argc, char** argv){
   usingClang = true;
 #endif
 
-  if(argc == 1){
+  if(argc == 1){ //if there are no arguments, enter interpreter mode
     setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
-  getFlags(argc, argv);//parse command line args, they get tored in Flags and vecctor<string> inFiles, along with a few globals
-  if(inFiles.size() == 0 && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
+
+  getFlags(argc, argv);//parseProg command line args, they get stored in Flags and vector<string> inFiles, along with a few globals
+  if(inFiles.empty() && !doneOtherThings){//if no files or flags to do something set, go to interpreting mode
     setFlag("DEFAULT_RETURN", false);
     Interp();
     return 0;
   }
-  if(inFiles.size() == 0 && doneOtherThings)
+  if(inFiles.empty() == 0 && doneOtherThings)//if we did something )getVersion, about etc) and there is nothing to compile, exit
     return 0;
-  if(cppFileName == ""){
+
+  //if we reach this point it means we have something to compile
+  if(cppFileName.empty()){//generate a C++ file name if one was not given
     cppFileName = mainFileName + ".cpp";
   }
-  if(executableFileName == ""){
+  if(executableFileName.empty()){//generate an output file name if one was not given
     executableFileName = mainFileName + ".o";
   }
+
   try{
     if(!doTheThing())
       return 3;
-  }catch(invalid_argument e){
+  }catch(invalid_argument& e){
     cout<<"Error found in compile/execution: "<<e.what()<<endl;
     return 4;
   }
-  report("recursed: "+to_string(recused), -1);//imjustakid?
+  report("Recursed: "+to_string(recused), -1);//imjustakid?
   return 0;
 }
 
@@ -142,15 +146,15 @@ bool doTheThing(){//TODO
     report("\n\n--------------------------\n\n",-1);
   }
   t1 = high_resolution_clock::now();//time to finish read/lex
-  if(format){
+  if(formatProg){
     Format(&tokens);
     writeFile(cppFileName.c_str(),&out);
   }
-  if(parse && (!ParseTwo(&tokens) && !getFlag("TRY_TRANS"))) return false;//parse tokens here
-  if(parse) try{ cleanUp(); clearLexertokens(&tokens);}catch(exception e){report(string("Cleanup failed: ")+e.what(), -2);}//TODO fix cleanup
+  if(parseProg && (!ParseTwo(&tokens) && !getFlag("TRY_TRANS"))) return false;//parseProg tokens here
+  if(parseProg) try{ cleanUp(); clearLexertokens(&tokens);}catch(exception e){report(string("Cleanup failed: ") + e.what(), -2);}//TODO fix cleanup
   if(benchmarkTime){duration<double> time_span = duration_cast<microseconds>( high_resolution_clock::now() - t1 );
-    report("Time to parse(2): "+to_string((long double) time_span.count()), 2);}
-  if(parse && reportingLevel < 0) printFuncs();
+    report("Time to parseProg(2): "+to_string((long double) time_span.count()), 2);}
+  if(parseProg && reportingLevel < 0) printFuncs();
   t1 = high_resolution_clock::now();
 
 
@@ -182,8 +186,8 @@ bool doTheThing(){//TODO
 
 void printFuncs(){
   cout<<"\n Have "<<Prog->functions.size()<<" funks"<<endl;
-  for(vector<Funk *>::iterator i = Prog->functions.begin(); i != Prog->functions.end(); i++){
-    cout<<(*i)->toString()<<endl;
+  for(vector<Funk *>::iterator funk = Prog->functions.begin(); funk != Prog->functions.end(); funk++){
+    cout << (*funk)->toString() << endl;
     cout<<"\n---------------------------------------------\n"<<endl;
   }    
 }
@@ -208,7 +212,7 @@ bool compile(const string& fileInName, const string& fileOutName){
 }
 bool execute(const string& name){
   report("Executing...",0);
-  string command = "";
+  string command;
 #if defined(unix) || defined(__unix__)
   command = string("./");
 #endif
@@ -227,7 +231,7 @@ bool execute(const string& name){
 #endif
     }
   }catch(int e){
-    report("ERROR, exception occured while try to execute code",4);
+    report("ERROR, exception occurred while try to execute code",4);
   }
   //remove .o file?
   //if(removeOFileAfter)
@@ -235,173 +239,202 @@ bool execute(const string& name){
   return false;
 }
 
-bool stringIsTrue(const string& str){
-  return (str == "true" || str == "t" || str == "1");
-}
-void getFlags(int argc, char** argv){
-  for(int i = 1; i < argc; i++){
-    string OGarg = string(argv[i]);
-    string arg = toLower(string(argv[i]));
-    if(arg[0] == '-'){
-      string flag=arg.substr(1, string::npos);
-      if(flag == "force"){
-	report("setting force",-2);
-	FORCE = true;
-      }else if(flag == "h" || flag == "help"){
-	++i;
-	if(i==argc){help();  break;}
-	help(argv[i]);
-      }else if(flag == "install_path"){
-	i++;
-        if(i==argc) throw invalid_argument("INSTALL_PATH flag given without path given");
-	INSTALL_PATH = argv[i];
-      }else if(flag == "about"){
-	about();
-      }else if(flag == "interp"){//should just run when no parameters are passed?
-	doneOtherThings = true;
-	setFlag("DEFAULT_RETURN", false);
-	Interp();
-	//might need to re-add prog?
-      }else if(flag == "d" || flag == "debug"){
-	report("In debug mode",-2);
-	reportingLevel = -2;
-      }else if(flag == "rl" || flag == "reportinglevel"){
-	i++;
-	if(i==argc) break;
-	try{
-	  reportingLevel = stoi(argv[i]);
-	}catch(const invalid_argument& e){
-	  cout<<"No number for reporting level flag given"<<endl;
-	  i--;
+void getFlags(int argc, char** argv) {
+	for (int i = 1; i < argc; i++) {
+		string OGarg = string(argv[i]);
+		string arg = toLower(string(argv[i]));
+		if (arg[0] == '-') {
+			string flag = arg.substr(1, string::npos);
+			if (flag == "force") {
+				report("setting force", -2);
+				FORCE = true;
+			}
+			else if (flag == "h" || flag == "help") {
+				++i;
+				if (i == argc) { help();  break; }
+				help(argv[i]);
+			}
+			else if (flag == "install_path") {
+				i++;
+				if (i == argc) throw invalid_argument("INSTALL_PATH flag given without path given");
+				INSTALL_PATH = argv[i];
+				report("setting INSTALL_PATH", -2);
+				report("Install path: " + INSTALL_PATH, -2);
+			}
+			else if (flag == "about") {
+				about();
+			}
+			else if (flag == "interp") {//should just run when no parameters are passed?
+				doneOtherThings = true;
+				setFlag("DEFAULT_RETURN", false);
+				Interp();
+				//might need to re-add prog?
+			}
+			else if (flag == "d" || flag == "debug") {
+				report("In debug mode", -2);
+				reportingLevel = -2;
+			}
+			else if (flag == "rl" || flag == "reportinglevel") {
+				i++;
+				if (i == argc) break;
+				try {
+					reportingLevel = stoi(argv[i]);
+				}
+				catch (const invalid_argument& e) {
+					cout << "No number for reporting level flag given" << endl;
+					i--;
+				}
+			}
+			else if (flag == "usingPreCompiledHeaders") {
+				i++;
+				if (i == argc) break;
+				string tmp = string(argv[i]);
+				usingPreCompiledHeaders = (tmp == "true" || tmp == "t" || tmp == "1");
+			}
+			else if (flag == "q" || flag == "quiet") {
+				reportingLevel = 122;
+			}
+			else if (flag == "x" || flag == "execute") {
+				executeProg = false;
+				i++;
+				if (i == argc) break;
+				if (!(string(argv[i]) == "true" || string(argv[i]) == "false")) {//check if they are setting it to true or false, or if they just passed in execute
+					i--;
+					continue;
+				}
+				executeProg = string(argv[i]) == "true";
+			}
+			else if (flag == "c" || flag == "cppFileName") {
+				i++;
+				if (i == argc) break;
+				cppFileName = string(argv[i]) + ".cpp";
+				if (executableFileName.empty())
+					executableFileName = string(argv[i]) + ".o";
+			}
+			else if (flag == "nocomp") {
+				compileProg = false;
+			}
+			else if (flag == "o" || flag == "outFileName") {
+				compileProg = true;
+				i++;
+				if (i == argc) break;
+				executableFileName = string(argv[i]) + ".o";
+			}
+			else if (flag == "lintProg" || flag == "l") {
+				compileProg = false;//if you're linting, you don't actually need to run
+				executeProg = false;
+				lintProg = true;
+				SAVE_LINE_COMMENTS = true;//need to track comments
+				SAVE_BLOCK_COMMENTS = true;
+				SAVE_WHITESPACE = true;
+				setFlag("AUTO_FUNCTIONS", false);
+			}
+			else if (flag == "clang") {
+				usingClang = true;
+			}
+			else if (flag == "gcc") {
+				usingClang = false;
+			}
+			else if (flag == "b" || flag == "benchmark") {
+				benchmarkTime = true;
+			}
+			else if (flag == "formatProg") {
+				formatProg = true;
+				parseProg = false;
+				compileProg = false;
+				executeProg = false;
+				SAVE_LINE_COMMENTS = true;
+				SAVE_BLOCK_COMMENTS = true;
+				SAVE_WHITESPACE = true;
+			}
+			else if (flag == "version") {
+				cout << TWINE_VERSION << endl;
+				doneOtherThings = true;
+			}
+			else if (flag == "intversion") {
+				exit(TWINE_VERSION_INT);//returns the version so its easy to progamatically get the version
+			}
+			else if (flag == "setall") {
+				setAllLintFlags();
+				//set parser flags
+			}
+			else if (flag == "set") {//TODO doesn't work right
+				bool foundOne;
+				do {
+					foundOne = false;
+					i++;
+					if (i == argc) break;
+					foundOne = setFlag(argv[i], true);
+					if (foundOne) {
+						if (i + 1 != argc)
+							try {
+							int value = stoi(argv[i + 1]);//throws if i+1 isn't a number
+							foundOne = setLintFlag(argv[i], value);//wont happen if stoi throws error
+							i++;
+						}
+						catch (const invalid_argument& e) {
+							foundOne = setLintFlag(argv[i]);
+						}
+					}
+				} while (foundOne);
+			}
+			else if (flag == "unset") {//unset parser flags or linter flag
+				bool foundOne;
+				do {
+					foundOne = false;
+					i++;
+					if (i == argc) break;
+					/*for(int j = 0;j<sizeof(compileFlags)/sizeof(compileFlags[0]);j++){
+					  if(argv[i] == compileFlags[j].name){
+						compileFlags[j].enabled = false;
+						foundOne = true;
+					  }
+				  }*/
+					foundOne = setFlag(argv[i], false);
+					//TODO linter flags
+					if (!foundOne)
+						foundOne = setLintFlag(argv[i], false);
+					if (!foundOne) {
+						cout << "Couldn't find flag: " << argv[i] << endl;
+					}
+				} while (foundOne);
+				i--;
+			}
+			else if (flag == "args") {
+				for (i++; i < argc; i++) {
+					argsForProg += string(argv[i]) + ' ';
+				}
+			}
+			else if (flag == "file" || flag == "f") {
+				i++;
+				if (i == argc) break;
+				inFiles.emplace_back(string(argv[i]));
+			}
+			else if (resolveFlag(flag)) {
+				//Do nothing
+			}
+			else {
+				report("Invalid flag in main: " + flag, 2);
+				report("use -help for usage", 2);
+			}
+		}
+		else {
+			//add file to compile list
+			//Could add some check if it was supposed to be an argument as well
+			if (arg.size() > 3 && arg.substr(arg.size() - 3, arg.size()) == ".tw")
+				inFiles.push_back(OGarg);
+			else
+				argsForProg += '\'' + OGarg + "' ";
+		}
 	}
-      }else if(flag == "usingPreCompiledHeaders"){
-	i++;
-        if(i==argc) break;
-	string tmp = string(argv[i]);
-	usingPreCompiledHeaders = (tmp == "true" || tmp == "t" || tmp == "1");
-      }else if(flag == "q" || flag == "quiet"){
-	reportingLevel = 122;
-      }else if(flag == "x" || flag == "execute"){
-	executeProg = false;
-	i++;
-	if(i==argc) break;
-	if(!(string(argv[i]) == "true" || string(argv[i]) == "false")){//check if they are setting it to true or false, or if they just passed in execute
-	  i--;
-	  continue;
+	//get path to main file
+	if (not inFiles.empty()) {
+		int found = 0;
+		found = inFiles.front().find_last_of("/\\");//first file in is 'main' file
+		if (found != -1)
+			pathToFile = inFiles.front().substr(0, found);//used to get includes to file
+		mainFileName = inFiles.front().substr(found + 1);
 	}
-	executeProg = string(argv[i]) == "true";
-      }else if(flag == "c" || flag == "cppFileName"){
-	i++;
-	if(i==argc) break;
-	cppFileName = string(argv[i])+".cpp";
-	if(executableFileName == "")
-	  executableFileName = string(argv[i])+".o";
-      }else if(flag == "nocomp"){
-	compileProg = false;
-      }else if(flag == "o" || flag == "outFileName"){
-	compileProg = true;
-	i++;
-	if(i==argc) break;
-	executableFileName = string(argv[i])+".o";
-      }else if(flag == "lint" || flag == "l"){
-	compileProg = false;//if youre linting, you dont actually need to run
-	executeProg = false;
-	lint = true;
-	SAVE_LINE_COMMENTS = true;//need to track comments
-	SAVE_BLOCK_COMMENTS = true;
-	SAVE_WHITESPACE = true;
-	setFlag("AUTO_FUNCTIONS", false);
-      }else if(flag == "clang"){
-	usingClang = true;
-      }else if(flag == "gcc"){
-	usingClang = false;
-      }else if(flag == "b" || flag == "benchmark"){
-	benchmarkTime = true;
-      }else if(flag == "format"){
-	format = true;
-	parse = false;
-	compileProg = false;
-        executeProg = false;
-	SAVE_LINE_COMMENTS = true;
-        SAVE_BLOCK_COMMENTS = true;
-        SAVE_WHITESPACE = true;
-      }else if(flag == "version"){
-	cout<<TWINE_VERSION<<endl;
-	doneOtherThings = true;
-      }else if(flag == "intversion"){
-	exit(TWINE_VERSION_INT);//returns the version so its easy to progamatically get the version
-      }else if(flag == "setall"){
-	setAllLintFlags();
-	//set parser flags
-      }else if(flag == "set"){//TODO doent work right
-	bool foundOne;
-	do{
-	  foundOne = false;
-	  i++;
-	  if(i==argc) break;
-	  foundOne = setFlag(argv[i], true);
-	  if(foundOne){
-	    if(i+1 != argc)
-	      try{
-		int value = stoi(argv[i+1]);//throws if i+1 isnt a number
-		foundOne = setLintFlag(argv[i],value);//wont happen if stoi throws error
-		i++;
-	      }catch(const invalid_argument& e){
-		foundOne = setLintFlag(argv[i]);
-	      }
-	  }
-	}while(foundOne);
-      }else if(flag == "unset"){//unset parser flags or linter flag
-	bool foundOne;
-        do{
-	  foundOne = false;
-          i++;
-          if(i==argc) break;
-          /*for(int j = 0;j<sizeof(compileFlags)/sizeof(compileFlags[0]);j++){
-            if(argv[i] == compileFlags[j].name){
-              compileFlags[j].enabled = false;
-              foundOne = true;
-            }
-	    }*/
-	  foundOne = setFlag(argv[i], false);
-	  //TODO linter flags
-	  if(!foundOne)
-	    foundOne = setLintFlag(argv[i], false);
-	  if(!foundOne){
-	    cout<<"Couldn't find flag: "<<argv[i]<<endl;
-	  }
-        }while(foundOne);
-	i--;
-      }else if(flag == "args"){
-	for(i++; i < argc; i++){
-	  argsForProg += string(argv[i]) + ' ';
-	}
-      }else if(flag == "file" || flag == "f"){
-	i++;
-	if(i==argc) break;
-        inFiles.push_back(string(argv[i]));
-      }else if(resolveFlag(flag)){
-      //Do nothing
-      }else{
-	report("Invalid flag in main: "+flag, 2);
-	report("use -help for usage", 2);
-      }
-    }else{      
-      //add file to compile list
-      if(arg.size() > 3 && arg.substr(arg.size()-3, arg.size()) == ".tw")
-	inFiles.push_back(OGarg);
-      else
-	argsForProg += '\'' + OGarg+"' ";
-    }
-  }
-  //get path to main file
-  if(inFiles.size() != 0){
-    int found = 0;
-    found = inFiles.front().find_last_of("/\\");//first file in is 'main' file
-    if(found != -1)
-      pathToFile = inFiles.front().substr(0,found);//used to get includes to file
-    mainFileName = inFiles.front().substr(found+1);
-  }
 }
 void help(string what){
   string ogWhat = what;
@@ -410,7 +443,7 @@ void help(string what){
   doneOtherThings = true;
   if(what == ""){
     cout<<"To compile and execute a program, pass the file name to this program:   ./twine FILE_NAME [OPTIONS]"<<endl;
-    cout<<"You can also lint a file by using the -lint flag:                       ./twine FILE_NAME -lint"<<endl;
+    cout<<"You can also lintProg a file by using the -lintProg flag:                       ./twine FILE_NAME -lintProg"<<endl;
     cout<<"To enter the interpreter, pass the -interp flag:                        ./twine -interp"<<endl;
     cout<<endl;
     cout<<"To find out more about a built in function, symbol, or flag, enter it after -help"<<endl;
@@ -420,7 +453,7 @@ void help(string what){
     cout<<"To get a list of built in symbols, try:           ./twine -help symbols"<<endl;
     cout<<"To get a list of built in compiler options, try:  ./twine -help compileFlags"<<endl;
     cout<<"To get a list of built in classes, try:           ./twine -help nameSpaces"<<endl;
-    cout<<"To get help about how to use the linter, try:     ./twine -help lint"<<endl;
+    cout<<"To get help about how to use the linter, try:     ./twine -help lintProg"<<endl;
     cout<<"\nTo get an idea of the twine, look at the tutorials and examples in their respective directors"<<endl;
     cout<<endl;
     cout<<"To set a compiler flag, use the set keyword"<<endl;
@@ -442,7 +475,7 @@ void help(string what){
       cout<<interpFunctions[i].toString()<<"\n";
     return;
   }else if(what == "symbols"){//list data types and predefined vars
-    cout<<"Pre-defined varriables:"<<endl;
+    cout<<"Pre-defined variables:"<<endl;
     for(int i = 0;i<sizeof(builtInValues)/sizeof(builtInValues[1]);i++)
       cout<<builtInValues[i].toString()<<"\n";
     cout<<"\nData types: \n";
@@ -451,8 +484,8 @@ void help(string what){
     return;
     
   }else if(what == "compileflags" || what == "compilerflags" || what == "flags"){//list compiler flags
-    cout<<"To set flags use 'set' follwed by the flags to enable"<<endl;
-    cout<<"To unset flags use 'unset' follwed by the flags to disable\n"<<endl;
+    cout<<"To set flags use 'set' followed by the flags to enable"<<endl;
+    cout<<"To unset flags use 'unset' followed by the flags to disable\n"<<endl;
     for(unsigned i = 0;i<sizeof(compileFlags)/sizeof(compileFlags[1]);i++)
       cout<<compileFlags[i].toString()<<"\n";
     return;
@@ -480,7 +513,7 @@ void help(string what){
     cout<<RESERVED[(sizeof RESERVED/sizeof RESERVED[0])-1]<<"\n";
     return;
   }
-  for(unsigned i = 0;i<sizeof(builtInFunctions)/sizeof(builtInFunctions[1]);i++){//search built in functions
+  for(unsigned i = 0;i<sizeof(builtInFunctions)/sizeof(builtInFunctions[1]);i++){//search built-in functions
     if(toLower(builtInFunctions[i].name) == what){
       cout<<builtInFunctions[i].toString()<<"\n";
       return;
@@ -506,8 +539,8 @@ void help(string what){
       return;
     }
   }
-  if(what == "lint"){
-    cout<<"Use -lint to enable the Twine linter";
+  if(what == "lintProg"){
+    cout<<"Use -lintProg to enable the Twine linter";
     cout<<"This will look through a file you provide and search for adhearing to coding standards\n";
     cout<<"You can change what you want the linter to look for, and parameters for them using -set FLAG [value] and -unset FLAG [value]\n";
     cout<<"The flags are: \n";
@@ -517,10 +550,10 @@ void help(string what){
     cout<<endl;
     return;
   }
-  if(what == "format"){
+  if(what == "formatProg"){
     cout<<"Twine has a built in formatter\n";
-    cout<<"Use -format to use\n";
-    cout<<"./twine file.tw -format"<<endl;
+    cout<<"Use -formatProg to use\n";
+    cout<<"./twine file.tw -formatProg"<<endl;
     cout<<"The flags are: \n";
     for(unsigned i = 0; i< sizeof formaterFlags / sizeof formaterFlags[0];i++){
       cout<<formaterFlags[i].toString()<<'\n';
@@ -565,7 +598,7 @@ void segfaultHandler(int signal, siginfo_t *si, void *arg){
 }
 #else
 void segfaultHandler(int signal, void * si, void *arg){
-    cout<<"Segfault caused abort; signal "<<signal<<endl;
+    cout<<"Segfault caused abort; signal: "<<signal<<", location: "<<si<<endl;
     printStack(0,1);
     exit(signal);
 }
@@ -573,3 +606,6 @@ void segfaultHandler(int signal, void * si, void *arg){
 #endif
 
 void __finish__(){}
+
+//function that takes a name and welcomes the user
+

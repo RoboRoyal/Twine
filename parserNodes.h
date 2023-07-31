@@ -138,7 +138,7 @@ class var{
     secondaryType = "";
     arr = vector<unsigned long>();
     name = "";
-    lineDefinedOn -1;
+    lineDefinedOn = -1;
   }
   var(string nm, string tp){
     STATIC = false;
@@ -218,7 +218,7 @@ class var{
     lineDefinedOn = Var->lineDefinedOn;
   }
   //var(string nm,string tp,string sv){name = nm;type = tp;startingValue = sv;priv = false;constant = false;STATIC = false;}
-  ~var();//implimented at bottom --TODO
+  ~var();//implemented at bottom --TODO
   string toString()const{
     string ret = (constant?"cosnt ":"")+type;
     for(unsigned i =0; i < arr.size(); i++){
@@ -329,7 +329,7 @@ public:
   bool constant;
   Block * funkBlock;
   bool STATIC;
-  /*complexity numbers to show how complex a function is, to determen when it should be made into a new thread*/
+  /*complexity numbers to show how complex a function is, to determine when it should be made into a new thread*/
   struct complexity_struct{
     int funcCall=0, loops=0, conditionals=0, exps=0;
     int total()const{return (2+this->funcCall+this->loops+this->conditionals+this->exps);}
@@ -420,7 +420,7 @@ class atom{
   }
   //atom(string a,string b,string c, expression* d){atom();type = a;cast=b;helper=c;exp=d;};
   atom(const atom& a){atom();type=a.type;cast=a.cast;helper=a.helper;VAR = a.VAR;}
-  ~atom();//implimented at bottom
+  ~atom();//implemented at bottom
   
   string toString()const{
     /*string tmpOut = out;
@@ -440,7 +440,7 @@ class atom{
   
 };
 
-class expression{//no longer used, depricated
+class expression{//no longer used, deprecated
  public:
   string type;
   string cast;

@@ -26,23 +26,23 @@ using namespace std;
 
 vector<TokenData> * tokenList;          //list of all tokens provided by Lexer
 vector<TokenData>::iterator sym;        //current symbol
-vector<TokenData>::iterator lastSym;    //previus symbol
+vector<TokenData>::iterator lastSym;    //previous symbol
 vector<TokenData>::iterator twoSymbAgo; //symbol from 2 symbols ago
 int errors = 0;
 int expectedIndents = 0;
 
 
 Funk * currentFunk;
-object * currentClass;//aliteration
-vector<Funk *> TwineFunks = (vector<Funk *>());//This stores built in functions after they are called once
+object * currentClass;//alteration
+vector<Funk *> TwineFunks = (vector<Funk *>());//This stores built-in functions after they are called once
 vector<object *> TwineObjects = vector<object *>();
 vector<TokenData> currentLine = vector<TokenData>();//stores token used to make up current line for debugging
-string currentParsingFile = "";
+string currentParsingFile;
 
 bool hitEnd = false;
 bool currentLineOn = false;
 //resolver
-//able to concatinate atoms
+//able to concatenate atoms
 void addAtoms(bigAtom * root,bigAtom * additive);
 
 //TOP LEVEL//
@@ -60,7 +60,7 @@ void addEquals(object * obj);
 void addNotEquals(object * obj);
 void addString(object * obj);
 void addStaticString(object * obj);
-void addDefualtConstructor(object * obj);
+void addDefaultConstructor(object * obj);
 
 void parseClassDec(object * obj);
 void parseClassPre(object * obj);
@@ -229,7 +229,7 @@ bool isType(){
     if(VARYTPE[i] == sym->tokenText)
       return true;
       }*/
-  for(int i = 0; i < sizeof(nameSpaces)/sizeof(nameSpaces[0]);i++){//dont tell me sizeof isnt a function
+  for(int i = 0; i < sizeof(nameSpaces)/sizeof(nameSpaces[0]);i++){//don't tell me sizeof isn't a function
     if(nameSpaces[i].name == sym->tokenText)
       return true;
   }
@@ -268,14 +268,14 @@ bool isValidExpOP(bool allowAssign = false){
   }
   return false;
 }
-bool isAssignment(const string OP){
+bool isAssignment(const string& OP){
   for(int i = 0; i<sizeof(Operators)/sizeof(Operators[0]);i++){
     if(Operators[i].assignment && Operators[i].OP == OP)
       return true;
   }
   return false;
 }
-bool isBoolOP(string OP){
+bool isBoolOP(const string& OP){
   for(int i = 0; i<sizeof(bool_OPS)/sizeof(bool_OPS[0]);i++)
     if(OP == bool_OPS[i])
       return true;
@@ -287,7 +287,7 @@ bool isBoolOP(){
       return true;
   return false;
 }
-bool isValue(){//TODO: add support for expresstions and negitives
+bool isValue(){//TODO: add support for expressions and negatives
   if(acceptType())
     return true;
 
@@ -365,7 +365,7 @@ bigAtom * exp3ToBigAtom(expression3 * exp){
   return ret;
 }
 
-bigAtom * OPToBigAtom(const string str){
+bigAtom * OPToBigAtom(const string& str){
   bigAtom * ret = new bigAtom();
   ret->type = bigAtom::OP;
   ret->op = str;

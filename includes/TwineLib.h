@@ -152,7 +152,7 @@ template<typename T> vector<T> sort(vector<T> data){
   std::sort(data.begin(), data.end(), _LESS<T>);
   return data;
 }
-__ANY__ list(__ANY__ l){//should use ref
+__ANY__ TW_list(__ANY__ l){//should use ref
   __ANY__ b;
   b.type = "_V";
   b.ptr = new vector<__ANY__>;
@@ -160,7 +160,7 @@ __ANY__ list(__ANY__ l){//should use ref
   ((vector<__ANY__> *)b.ptr)->emplace_back(l);
   return b;
 }
-__ANY__ list(){
+__ANY__ TW_list() {
   __ANY__ b;
   b.type = "_V";
   b.ptr = new vector<__ANY__>;
@@ -299,10 +299,10 @@ double abs(const __ANY__ &x){
   if(x.toNum()<0) return -x.toNum();
   return x.toNum();
 }
-double round(double x){
+/*double round(double x) {
   x+=.5;
   return ((int) x);
-}
+}*/
 bool canOutputColor(){//TODO turn into constant at beginning of compile
     if(!getenv("TERM"))
         return false;
@@ -479,7 +479,7 @@ int randInt(int min = 0, int max = RAND_MAX){
   return (min+rand()%(max-min+1));
 }
 string randStr(int length = 10){//randString?
-  char src[length];
+  char src[10];//TODO
   src[length] = '\0';
   while(--length > -1)
     src[length] = (rand() % 94) + 32;

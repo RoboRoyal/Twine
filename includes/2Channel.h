@@ -4,7 +4,7 @@
 #define __2CHANNEL_H__
 
 
-//Library for channels that allow communcation between threads
+//Library for channels that allow communication between threads
 
 
 //template <class T> class channel;
@@ -54,7 +54,7 @@ public:
     channelLock->lock();
     while(channelQ->empty()){
       channelLock->unlock();
-#ifndef TWINE_QUITE //this may not even neccisarily be an error is a producer is made latter
+#ifndef TWINE_QUITE //this may not even necessarily be an error is a producer is made latter
 #ifdef TWINE_PED
       if(producerNumbers == 0)throw invalid_argument("Trying to read channel when its empty and there are no producers: deadlock");
 #endif //TWINE_PED

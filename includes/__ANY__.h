@@ -34,7 +34,7 @@ public:
   __ANY__ getObjVar(const __ANY__& obj, const string varName);
   __ANY__ getObjVar(const string varName){ return getObjVar(*this, varName);}
   union{void * ptr;bool b;int64_t i; double d;};
-
+    //TODO unsigned ref_counter = 0
   string type;
   /*
     _I = int64_t
@@ -43,7 +43,7 @@ public:
     _S = * string
     _V = * vector<__ANY__> (as list)
     ------------------------------------
-    NT = no type (defualt constructor)
+    NT = no type (default constructor)
     BT = bad type (has been derefrenced)
     ------------------------------------
     Possible future
@@ -52,6 +52,7 @@ public:
   //TODO
   //all throws should be in TWINE_QUIET
   const static int64_t ZERO = 0;
+
   
   ~__ANY__(){
 #ifdef TWINE_DEBUG
@@ -76,8 +77,8 @@ public:
     type = "BT";//bad type now, need this?
   }
   
-  //Defualt constructor
-  __ANY__(){type = "NT";}
+  //Default constructor
+  __ANY__(){type = "NT";ptr = NULL;}
   //Regular constructors
   __ANY__(string tp, int in){type = tp;i = in;}
   __ANY__(int in){type = INT;i = in;}
@@ -260,7 +261,7 @@ public:
       return to_string(d).at(position);
     return this->i;
   }
-  __ANY__& at(int position){//TODO should return refrence
+  __ANY__& at(int position){//TODO should return reference
     if(type == VECTOR){
       return ((vector<__ANY__>*)this->ptr)->at(position);
     }/*
@@ -278,7 +279,7 @@ public:
 #endif //TWINE_WEIRD_CONVERSIONS
     return this->i;
      */
-    throw invalid_argument("Can not 'at' a non vector object, not implimented for type: "+this->getType());
+    throw invalid_argument("Can not 'at' a non vector object, not implemented for type: "+this->getType());
   }
   void append(__ANY__ a){//TODO
     if(this->type == VECTOR){
@@ -322,7 +323,7 @@ public:
       vector<__ANY__>  * newVec = new vector<__ANY__>();
       newVec->reserve(abs((size-start)/step));
       if(step > 0){//go forward
-	for(;start < size; start+=step){//TODO add support for negitive step/start/end
+	for(;start < size; start+=step){//TODO add support for negative step/start/end
 	  newVec->push_back(vec[start]);
 	}
       }else{
@@ -386,7 +387,7 @@ public:
     if(this->type == INT)
       return log10(this->i)+1;//TODO more efficient way?
     if(this->type == DOUBLE)
-      //return to_string(*(double *) this->ptr).size();//TODO efficint?
+      //return to_string(*(double *) this->ptr).size();//TODO efficient?
       return to_string(d).size();
     if(this->type == STRING)
       return((double)(*(string *)ptr).length());
@@ -440,7 +441,7 @@ public:
     }
     return this->type;
   }
-  double toNum(int base = 10) const{//TODO impliment base
+  double toNum(int base = 10) const{//TODO implement base
     if(type == INT){//int
       return((double) i);
     }else if(type == DOUBLE){
@@ -682,7 +683,7 @@ public:
     return b;
   }
   //TODO
-/*string minus numer removes last # of chars, for vectors removes elements    
+/*string minus number removes last # of chars, for vectors removes elements
    */
 /*------------------------------------------------------------------------------------------*/
   __ANY__ operator-(const __ANY__& a)const{//support for string remove substring
@@ -855,10 +856,10 @@ public:
         b.ptr = tmp;
       }else{
       }
-    }else if(this->type == STRING){//strings//TODO negitives should reverse strings and vectors
+    }else if(this->type == STRING){//strings//TODO negatives should reverse strings and vectors
       if(a.type == INT||a.type==DOUBLE||a.type==BOOL){
 	string * tmp = new string();
-	for(int i = 0; i!=(int)a.toNum();i++){//TODO efficency?
+	for(int i = 0; i!=(int)a.toNum();i++){//TODO efficiency?
 	  (*tmp)+=this->toString();
 	}
 	b.type = STRING;
@@ -1036,7 +1037,7 @@ public:
     }
   }
   __ANY__ operator--(int i){
-    //return *this = (*this)-1;//or can it be done more efficently other ways?
+    //return *this = (*this)-1;//or can it be done more efficiently other ways?
     return (*this) = (*this) - __ANY__(1);//TODO
   }
   
@@ -1044,7 +1045,7 @@ public:
     if(this->type == STRING){//remove first char
       //try{((string *)this->ptr)->erase(0,1);}catch(exception e){return *this;}
       if(((string *)this->ptr)->size() == 0)//if string is empty, just return an empty string
-	return *this;//TODO dont know if there is a faster way to do this, or if neccisary 
+	return *this;//TODO dont know if there is a faster way to do this, or if necessary
       ((string *)this->ptr)->erase(0,1);
       return *this;
     }else if(this->type==VECTOR){//remove first element
@@ -1216,7 +1217,7 @@ public:
       return Bytes;
     }
 #ifndef TWINE_QUIET
-    throw invalid_argument(string("Not implimented: toBytes() on type: ")+this->getType());
+    throw invalid_argument(string("Not implemented: toBytes() on type: ")+this->getType());
 #endif //TWINE_QUIET
   }
   unsigned dataSize()const{
@@ -1230,7 +1231,7 @@ public:
       //return sizeof (*(string*) ptr);//or string.size() * sizeof char?
       return (sizeof(char)) * (*(string*) ptr).size();
     if(type == VECTOR){
-      //return sizeof (*(vector<__ANY__>*) prt);//or vecotr.size()*sizeof char or loop through each and sum
+      //return sizeof (*(vector<__ANY__>*) prt);//or vector.size()*sizeof char or loop through each and sum
       int total = 0;
       for(int i = 0;i<(*(vector<__ANY__>*) ptr).size();i++)
 	total+=((*(vector<__ANY__>*)this->ptr))[i].dataSize();

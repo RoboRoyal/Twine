@@ -131,8 +131,8 @@ const singleOP Operators[] = {
         {"!", 20, true, false, true, false, false},//logical not
         {"~", 20, true, false, false, false, false},//bitwise not
 
-        {"++", 15, true, true, false, false, false},//incrament
-        {"--", 15, true, true, false, false, false},//decroment
+        {"++", 99, true, true, false, false, false},//increment
+        {"--", 99, true, true, false, false, false},//decrement
 
         {".", 100, false, false, false, true, false},//member access
         {"[", 10, false, false, false, true, false},

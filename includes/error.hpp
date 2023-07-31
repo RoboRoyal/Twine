@@ -2,7 +2,12 @@
 #ifndef _ERROR_H_
 #define _ERROR_H_
 
+#ifdef v_studio_MSVC
+
+#else
 #include <cxxabi.h>
+#endif // !v_studio_MSVC
+
 #include <signal.h>
 
 #if defined (unix) || defined(__unix__)
@@ -17,7 +22,11 @@ string demangleName(const string& mangled){
    int status = 0;
    size_t funcnamesize = 1024;
    char* funcname = (char *)malloc(sizeof(char) * funcnamesize);
-   char* ret = abi::__cxa_demangle( name, funcname,&funcnamesize, &status );
+#ifdef v_studio_MSVC
+   return funcname;
+#else
+   char* ret = abi::__cxa_demangle(name, funcname, &funcnamesize, &status);
+#endif // !v_studio_MSVC
 
    if(*funcname){
      string tmp = funcname;
@@ -147,6 +156,7 @@ void segFaultHandler(int signal, siginfo_t *si, void *arg){
 
 
 class baseException : public std::exception{
+<<<<<<< HEAD
   const char * file;
   const int line;
   const char * function;
@@ -162,12 +172,30 @@ public:
   {
     this->stack = getStack();
   }
+=======
+    const char * file;
+    const int line;
+    const char * function;
+    const vector<string> stack;
+    const string msg;
+
+public:
+    baseException(const string msg_, const char* file_, int line_, const char* func_) : msg(msg_),//set base class?
+                                                                                        line (line_),
+                                                                                        file (file_),
+                                                                                        function (func_),
+                                                                                        stack (getStack())
+    {
+        //this->stack = getStack();
+    }
+>>>>>>> d97565605e5d1376cbf29aa65363d81cbc09df32
 
   void printStack(){
     for(int i = 0; i < stack.size(); i++){
       cout<<this->stack[i]<<endl;
     }
   }
+<<<<<<< HEAD
   const char * what () const throw (){
     string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " + to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
     for(int i = 1; i < stack.size() - 2; i++)
@@ -175,6 +203,21 @@ public:
     cout<<ret<<endl;
     return ret.c_str();
   }
+=======
+    const char* what () const throw () {
+        string ret = string("User thrown error in function ") + this->function + "(file: " + this->file + "|line: " +
+                     to_string(line) + ")\nError: " + this->msg + "\nStack:\n";
+        if (stack.size() > 2) {
+            for (int i = 1; i < stack.size() - 2; i++)
+                ret += "[" + to_string(stack.size() - 3 - i) + "] " + this->stack.at(i) + "\n";
+        }else{
+            //TODO check if on windows
+            ret += "Could not get stack";
+        }
+        string* c_ret = new string(ret);
+        return c_ret->c_str();
+    }
+>>>>>>> d97565605e5d1376cbf29aa65363d81cbc09df32
 };
 
 #endif //_ERROR_H_

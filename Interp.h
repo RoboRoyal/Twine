@@ -29,8 +29,8 @@ public:
 };
 
 const string versionNumber = "null";
-bool implicitPrint = true;
-bool usedAssign = false;
+bool implicitPrint = true; //if we should print out results when done
+bool usedAssign = false; //if this line had an assignment in it (such as x = 1). If so, will not implicitPrint
 //__ANY__ lastEval = __ANY__();//maybe i will imp?
 
 vector<string> stackTrace;
@@ -81,7 +81,7 @@ void clear(){
 void credits(){cout<<"Taco-time\n"<<endl;}
 
 __ANY__ getStackTraceAsANY(){
-  __ANY__ ret = list();
+  __ANY__ ret = TW_list();
   for(int i = 0; i<stackTrace.size();i++)
     ret.append(stackTrace[i]);
   return ret;

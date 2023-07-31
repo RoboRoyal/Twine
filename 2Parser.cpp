@@ -16,7 +16,7 @@ var parseVar(bool takeName){//takeName = true
         v.type = lastSym->tokenText;
     }else{
         v.type = "__ANY__";
-        if(lint && currentLineOn) checkTypeAllow(v.name);//check for currentLineOn so it only prints lint msg durring normal parsing, not durring pre-scan
+        if(lintProg && currentLineOn) checkTypeAllow(v.name);//check for currentLineOn so it only prints lintProg msg durring normal parsing, not durring pre-scan
     }
     while(accept("[")){
         if(accept(TokenData::NUM)){//defined size //TODO allow constants
@@ -94,23 +94,30 @@ expression3 * parseList(const vector<unsigned long>& lst, const string& type, un
     return exp;
 }
 
-//dummy is called when an unimplimented feature is used
+//dummy is called when an unimplemented feature is used
 bool dummy(){return true;}
 
-//function called to parse tokens. Sets up scopes, global varriables directs prescam, then actual scan
+/**
+ * Entry into parseProg. Sets up scopes, global variables directs pre-scan, then actual scan
+ * @param tokens Vector of tokens from lexing original text
+ * @param varsPassedIn Scope(globals) passed in. Normally blank or vars left over from last interp
+ * @param p Prog being passed in, normally starts empty
+ * @param interpM True = interpret mode, False = compile mode
+ * @return
+ */
 bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p, bool interpM){
     report("Parsing file",0);
 
-    if(interpM && currentParsingFile == "")
+    if(interpM && currentParsingFile == "") //checks if we are in interpreting mode
         currentParsingFile = "Interpreted-CL";
 
     //set global vars
-    interpMode = interpM;
+    interpMode = interpM;//TODO why have redundant var?
     tokenList = tokens;
     currentVars = varsPassedIn;//?????
     localVars = new vector<scope *>;
 
-    if(varsPassedIn != NULL){
+    if(varsPassedIn != nullptr){
         globalVars = varsPassedIn;
     }else{
         globalVars = new scope();
@@ -118,9 +125,9 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
 
     currentLineOn = false;
     Prog = p;
-    currentClass = NULL;
+    currentClass = nullptr;
 
-    setIterators();
+    setIterators(); //sets symb, lastSym, twoSymAgo
 
     //Set up main function
     if(!interpM)
@@ -140,7 +147,7 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
     //set up built in varriables
     initDefualtVars();//--implimented in Scope.h
 
-    //parse file
+    //parseProg file
     try{
         parseTop();
     }catch(const exception& e){
@@ -152,14 +159,14 @@ bool ParseTwo(vector<TokenData>* tokens, /*vars*/scope * varsPassedIn, prog * p,
         //TODO clean up scope and tokens maybe
         dummy();
 
-    //lint last part of file
-    if(lint){
+    //lintProg last part of file
+    if(lintProg){
         checkProg(Prog);
         finalLint();
     }
     if(reportingLevel < -1)
         cout<<Prog->toString();
-    if(varsPassedIn == NULL)//delete vars if we made them
+    if(varsPassedIn == nullptr)//delete vars if we made them
         cleanScopes();
 
     if(numberOfScopes()>1 && !errors)
@@ -179,7 +186,7 @@ bool preScan(){
             Funk * skell = new Funk();
             parseFunkKW(skell);//get name/returntype/parameters
 
-            if(getFunk(skell->name) != NULL){
+            if(getFunk(skell->name) != nullptr){
                 if(getFlag("FUNCTION_REDEFINITION") || interpMode){
                     removeFunk(skell->name);
                     warn("Redefinition of function '"+skell->name+"'");
@@ -195,20 +202,20 @@ bool preScan(){
             parseClassDec(obj);
 
             //check if it is a new class
-            if(getClass(obj->name) != NULL && !getFlag("CLASS_REDEFINITIONS")){
+            if(getClass(obj->name) != nullptr && !getFlag("CLASS_REDEFINITIONS")){
                 error("Redefinition of class "+obj->name, true);
-                //TODO delete old implimentation
+                //TODO delete old implementation
                 removeClass(obj->name);
             }
             //add it to Prog
             Prog->classes.push_back(obj);
 
-            //prescan it go get function defs and member vars
+            //pre-scan it; go get function defs and member vars
             parseClassPre(obj);
         }else if(accept("branch")){
             branch * B = new branch;
             parseBranchDec(B);
-            if(getClass(B->name) != NULL && !getFlag("CLASS_REDEFINITIONS")){
+            if(getClass(B->name) != nullptr && !getFlag("CLASS_REDEFINITIONS")){
                 error("Redefinition of branch "+B->name, true);
                 //TODO delete old implimentation
             }
@@ -251,7 +258,7 @@ void parseClassDec(object * obj){
 //also parses class vars
 //parseClass proper will fill in functions
 
-/*skeleton parse of class, getting member vars and functions*/
+/*skeleton parseProg of class, getting member vars and functions*/
 void parseClassPre(object * obj){
     debug("parseClassPre()");
     expect("{");
@@ -286,10 +293,12 @@ void parseClassPre(object * obj){
     }
     //TODO add unimplimented OPs
     addAutoFunctions(obj);
-    currentClass = NULL;
+    currentClass = nullptr;
     pullScope();
     debug("parseClassPre() done");
 }
+
+//checks/adds default functions to a class including ==, toString, constructor, etc.
 void addAutoFunctions(object * obj){//TODO check if these are used/needed
     if(!getFlag("AUTO_FUNCTIONS"))
         return;
@@ -309,14 +318,14 @@ void addAutoFunctions(object * obj){//TODO check if these are used/needed
     if(!hasNotEqual)
         addNotEquals(obj);
     if(!hasDefualtConstructor && false)//TODO
-        addDefualtConstructor(obj);
+        addDefaultConstructor(obj);
     if(!hasString && getFlag("AUTO_TO_STRING")){
         addString(obj);
         if(getFlag("AUTO_TO_STRING_STATIC"))
             addStaticString(obj);
     }
 }
-void addDefualtConstructor(object * obj){
+void addDefaultConstructor(object * obj){
     Funk * F = new Funk;
     F->returnType = var("");
     F->name = obj->name;
@@ -327,18 +336,24 @@ void addDefualtConstructor(object * obj){
     obj->memberFunks.push_back(F);
 }
 void addEquals(object * obj){//used to auto generate == operator in a class
+    //sets up two operator== functions
+    //one takes the object directly
+    //the other takes an __ANY__ as the object
 
-    Funk * F = new Funk;
+    //this one is for the object itself
+    Funk * F = new Funk;//set up the function def
     F->constant = true;
     F->returnType = var("bool");
     F->name = "operator==";
 
-    var a = var();
+    var a = var();//set up parameter to take const ref of object
     a.type = obj->name;
     a.constant = true;
     a.reference = true;
     a.name = "ot";
     F->parameters.push_back(a);
+
+    //set up C++ code inside to check is everything is equal
     parseNode * p = new parseNode;
     p->type = "C++";
     if(obj->extends != "Object" && !obj->isBranch)
@@ -353,6 +368,7 @@ void addEquals(object * obj){//used to auto generate == operator in a class
     F->funkBlock->Lines.push_back(p);
     obj->memberFunks.push_back(F);
 
+    //this is for operator== that take __ANY__ as a param
     Funk * G = new Funk;
     G->constant = true;
     G->returnType = var("bool");
@@ -371,7 +387,7 @@ void addEquals(object * obj){//used to auto generate == operator in a class
     G->funkBlock->Lines.push_back(l);
     obj->memberFunks.push_back(G);
 }
-void addNotEquals(object * obj){
+void addNotEquals(object * obj){//TODO so it can take __ANY__?
 
     Funk * F = new Funk;
     F->constant = true;
@@ -399,6 +415,11 @@ void addNotEquals(object * obj){
     obj->memberFunks.push_back(F);
 }
 
+/**
+ * Adds a "toString" function to a class if none is provided.
+ * Prints out all parameters/values in class
+ * @param obj Class to add function to
+ */
 void addString(object * obj){
 
     Funk * F = new Funk;
@@ -487,15 +508,15 @@ void parseClass(object * obj){//TODO is it class or object?
         currentLine.clear();
         totalLines++;
         if(accept("func")){
-            //parse func
+            //parseProg func
             Funk tmpF = Funk();
             parseFunkKW(&tmpF);//TODO params are doubled currently
             //TODO add vars to scope?
             //pushScope();
-            parseFunk(getFunk(tmpF.name, obj->name), false);//the false means to not parse FunkKW
+            parseFunk(getFunk(tmpF.name, obj->name), false);//the false means to not parseProg FunkKW
             //TODO free memory inside tmpF
         }else{
-            //parse member var
+            //parseProg member var
             //var * dummy = parseClassVar();//dont save vars here as pre scan call already does that
             //delete dummy;//TODO currently this parses and saves the starting value. This is iniffecent and cuasses a memory leak
             //Instead it should just skip it
@@ -507,7 +528,7 @@ void parseClass(object * obj){//TODO is it class or object?
                 nextSym();
         }
     }
-    if(lint)
+    if(lintProg)
         checkClassName(obj);
     pullScope();
     pullScope();
@@ -515,6 +536,11 @@ void parseClass(object * obj){//TODO is it class or object?
     debug("parseClass() done");
 }
 
+/**
+ * Accepts a function and tests if there is a return as the last line(TODO check if all valid paths through function give a return)
+ * If no return is found, and DEFAULT_RETURN is set, adds a return(TODO make it return last valid value?)
+ * @param F Function to check return of.
+ */
 void checkReturn(Funk * F){
     //TODO add automatic return of last defined var?
     /*
@@ -531,7 +557,8 @@ void checkReturn(Funk * F){
     }
 
     if(getFlag("DEFAULT_RETURN") && F->returnType.type != "void" && (F->funkBlock->Lines.size() == 0 || F->funkBlock->Lines.back()->type != "ret")){
-        //check las lines for implicet return?
+        //check last line for implicit return?
+
         parseNode * newReturn = new parseNode();
         expression3 * returnExp = new expression3();
         atom * returnAtom = new atom();
@@ -540,7 +567,7 @@ void checkReturn(Funk * F){
         if(F->returnType.type == "string"){
             returnAtom ->helper = var("string");
             returnAtom->literalValue = new string("\"\"");
-        }else{
+        }else{//default to return 0
             returnAtom->helper = var("num");
             returnAtom->literalValue = new string("0");
         }
@@ -551,7 +578,10 @@ void checkReturn(Funk * F){
     //debug("checkReturn() done");
 }
 
-
+/**
+ * Main parseProg loop. Taking
+ *
+ */
 void parseTop(){
     debug("parseTop()");
     //TODO have to do scopes
@@ -562,19 +592,19 @@ void parseTop(){
             parseFunkKW(&tmpF);//TODO params are doubled currently
             Funk * me = getFunk(tmpF.name, "");
             currentFunk = me;
-            parseFunk(me, false);//the false means to not parse FunkKW
+            parseFunk(me, false);//the false means to not parseProg FunkKW
             currentFunk = Prog->functions.front();//return to userMain function
             //delete tmpF.funkBlock;//delete ptr automotaically made in defualt constructor, TODO should be done in deconstructor
             pullScope();
         }else if(accept("object") || accept("class")){
             object tmp = object();
             parseClassDec(&tmp);//get name of class
-            parseClass(getClass(tmp.name));//get class and parse it
+            parseClass(getClass(tmp.name));//get class and parseProg it
         }else if(accept("branch")){
             branch B = branch();
             parseBranchDec(&B);//get name of class
-            parseBranch((branch *)getClass(B.name));//get class and parse it
-        }else{
+            parseBranch((branch *)getClass(B.name));//get class and parseProg it
+        }else{//TODO parseProg line?
             parseNode * me = new parseNode();
             currentFunk = Prog->functions.front();
             parseLine(me);
@@ -609,7 +639,7 @@ void parseFunk(Funk* F, bool doKW){
     }else{
 
     }
-    if(lint){
+    if(lintProg){
         checkFunkName(F);
         totalLines++;
     }
@@ -620,7 +650,7 @@ void parseFunk(Funk* F, bool doKW){
     parseBlock(F->funkBlock, true);
     checkReturn(F);//TODO only do if not constructor
 
-    if(lint){
+    if(lintProg){
         checkFunk(F, F->name != F->returnType.type);
         //TODO check trailing blanks
         newLineAfterFunk(*F);
@@ -630,7 +660,7 @@ void parseFunk(Funk* F, bool doKW){
     }
     debug("parseFunk() done");
 }
-void parseFunkKW(Funk* F){//TODO lint checks happen twice here
+void parseFunkKW(Funk* F){//TODO lintProg checks happen twice here
     debug("parseFunkKW()");
 
     //get function modifiers
@@ -664,7 +694,7 @@ void parseFunkKW(Funk* F){//TODO lint checks happen twice here
                 error("Missing name for function", false);
         }
     }
-    //parse parameters
+    //parseProg parameters
     expect("(");
     bool needComma = false;
     bool isVer = false;
@@ -689,7 +719,7 @@ void parseFunkKW(Funk* F){//TODO lint checks happen twice here
             if(currentLineOn){//add var to scope if not in pre-scan
                 //setVar(a.name,a.type, false, a.constant);
                 setVar(a);
-                if(lint) checkVarName(a.name);
+                if(lintProg) checkVarName(a.name);
             }
             if(accept("="))
                 a.startingValue = parseExpression(a.type);
@@ -786,7 +816,7 @@ void splitExp(expression3 * EXP, expression3 * left, expression3 * right, int po
 
 expression3 * parseExpression(const string targetType, const vector<unsigned long> arr, bool allowAssign){//TODO bool allowAssignment?
     debug("parseExpression(3)");
-    if(arr.size() != 0 && peek("{")){//parse list if expected
+    if(arr.size() != 0 && peek("{")){//parseProg list if expected
         expression3 * EXP = parseList(arr, targetType);
         debug("parseExpression(3) done");
         return EXP;
@@ -1070,7 +1100,7 @@ bool parseAtom(atom * a, string base, bool baseStatic){
         a->exp3 = new expression3();
         parseUncertainList(a->exp3);
     }else if(accept("super")){
-        baseIsStatic = true;//we say the base is static to format call correctly
+        baseIsStatic = true;//we say the base is static to formatProg call correctly
         //but call doesnt have to be static, so we dont set "a->baseIsStatic = true"
         if(currentClass == NULL)
             error("There is no 'super' when not in class");
@@ -1111,9 +1141,9 @@ void parseBlock(Block* b,bool pushBackVarScope){
     expectedIndents++;
     if(pushBackVarScope) pushScope();
     if(accept("{")){
-        if(lint) checkBlock((sym-1)->tokenText == "\n" || (sym-2)->tokenText == "\n");
+        if(lintProg) checkBlock((sym - 1)->tokenText == "\n" || (sym - 2)->tokenText == "\n");
         if(accept("}")){
-            if(lint) checkEmpty();
+            if(lintProg) checkEmpty();
         }else do{
                 /*parseNode * tmp = new parseNode();
                   parseLine(tmp);
@@ -1123,7 +1153,7 @@ void parseBlock(Block* b,bool pushBackVarScope){
                 b->Lines.push_back(tmp);
             }while(!accept("}"));
     }else{
-        if(lint) checkBlock((sym-1)->tokenText == "\n" || (sym-2)->tokenText == "\n");
+        if(lintProg) checkBlock((sym - 1)->tokenText == "\n" || (sym - 2)->tokenText == "\n");
         parseNode * tmp = new parseNode();
         parseLine(tmp);
         b->Lines.push_back(tmp);
@@ -1177,11 +1207,11 @@ void parseLine(parseNode* PN){
         PN->type = "IMPORT";
         PN->data = lastSym->tokenText;
     }else{
-        //try to parse exp
+        //try to parseProg exp
         PN->type = "exp3";
         PN->theThing = parseExpression();
     }
-    if(lint) checkLine(currentLine);
+    if(lintProg) checkLine(currentLine);
     debug("parseLine() done");
 }
 //Parsees lines that begin with reserved Key Word
@@ -1211,7 +1241,7 @@ void parseKW(parseNode* PN){
             if(!FORCE){
                 error("Return in void function", true);//TODO allow empty return
             }else{
-                delete parseExpression(currentFunk->returnType);//parse it, then throw it away
+                delete parseExpression(currentFunk->returnType);//parseProg it, then throw it away
                 PN->type = "SINGLE_COM"; PN->data = "FORCE-removed invalid return\n";
             }
         }else{
@@ -1431,7 +1461,7 @@ void parseIdent(parseNode * pn){//TODO add support for x++
             me->newVar = true;
             needToSetVar = true;
             tVar->type = "__ANY__";
-            if(lint){
+            if(lintProg){
                 checkTypeAllow(varName);
                 checkVarName(varName);
             }
@@ -1495,7 +1525,7 @@ var * parseClassVar(){
     a->name = lastSym->tokenText;
     if(isLocal(a->name))//TODO--this check doesnt currently work
       error("Redefinition of class var: "+a->name, true);//TODO
-    if(lint && currentLineOn){
+    if(lintProg && currentLineOn){
       checkVarName(a->name, a->constant);
       checkTypeAllow(a->name, !typeWasSet);
       }*/
@@ -1540,13 +1570,13 @@ void parseVarAssign(varAssign * va, bool constant, const string varType){
 
     va->OP = lastSym->tokenText;
 
-    if(getVARType(varName) != "DNE"){//check unique and lint
+    if(getVARType(varName) != "DNE"){//check unique and lintProg
         warn("Varriable '"+varName+"' with type '"+varType+"' overides higher-scoped var with same name and type '"+getVar(varName).toString()+"'");
-    }else if(lint){
+    }else if(lintProg){
         checkVarName(varName, constant);
     }
 
-    /*if(isList){//parse starting value
+    /*if(isList){//parseProg starting value
       va->exp3 = parseList(tVar->arr, varType);
     }else{
       va->exp3 = parseExpression(tVar->type);
@@ -1873,7 +1903,7 @@ void parseFunkCallParameters(funkCall * fc, Funk * F){
               fc->parameters.push_back(dynamicParams.at(dynamicParamPos));
             }
             }  */
-        }else{//parse regular parameter: value, value
+        }else{//parseProg regular parameter: value, value
             if(currentParam >= F->parameters.size()){//veradic function-TODO check
                 if(F->dynamicParamType != ""){
                     int dSize = 0;
@@ -1892,7 +1922,7 @@ void parseFunkCallParameters(funkCall * fc, Funk * F){
                 }else{
                     error("Too many parameters passed to function '"+F->name+"', ", + F->parameters.size()+" parameters in function");
                     parseExpression();
-                    exitLoop = true;//TODO just parse last of params so we can look at rest of file
+                    exitLoop = true;//TODO just parseProg last of params so we can look at rest of file
                 }
             }else{//normal param parsing
                 //replaces existing parameter
@@ -2082,7 +2112,7 @@ void nextSym(){
                 com->data = sym->tokenText;
                 currentFunk->funkBlock->Lines.push_back(com); concecutiveNewLines = 0;}
 
-        }else if(sym->tokenType == TokenData::LINE_END && lint){//check for lint criteria
+        }else if(sym->tokenType == TokenData::LINE_END && lintProg){//check for lintProg criteria
             concecutiveNewLines++;
             if(getLintFlag("EXCESS_NEW_LINE") && getLintFlag("EXCESS_NEW_LINE") < concecutiveNewLines && currentLineOn)
                 lintReport("Too many blank lines in a row ("+to_string((long long) concecutiveNewLines)+"/"+to_string((long long) getLintFlag("EXCESS_NEW_LINE"))+")", 1);
