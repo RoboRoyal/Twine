@@ -11,22 +11,23 @@
 #include <unwind.h>
 #endif //v_studio_MSVC
 
-//#include <stdio.h>
 
-#include <string>//String
-#include <iostream>//cin, cout, endl
-#include <fstream>//read, write file IO
-//#include <ctime>
-#include <vector>//lists
-//#include <stdexcept>
-#include <math.h>//pow, PI
 #include <algorithm>//sort
-#include <cstdarg>//Variadic functions
-
 #include <array>//std::array
+#include <cstdarg>//Variadic functions
+#include <fstream>//read, write file IO
+#include <iostream>//cin, cout, endl
+#include <math.h>//pow, PI
+#include <string>//String
+#include <vector>//lists
+
+//#include <ctime>
+//#include <stdexcept>
+//#include <stdio.h>
 //#include <cstdlib>
 //#include <initializer_list>
 //#include <typeinfo>
+
 #ifndef unix
 #undef TWINE_SEGFUALT_PROTECTION
 #endif

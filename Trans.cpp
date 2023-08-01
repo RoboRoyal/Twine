@@ -391,7 +391,7 @@ bool TransFunk(Funk *N, bool regFunk) {
         out += "__ANY__ " + N->dynamicParamVar + ";\n";
         out += "if(argLen){\n";
         out += "va_list ap;\nva_start(ap, argLen);\n";
-        out += N->dynamicParamVar + " = list(va_arg(ap, __ANY__));\nfor(int i = 2; i <= argLen; i++){\n" +
+        out += N->dynamicParamVar + " = __ANY__(va_arg(ap, __ANY__));\nfor(int i = 2; i <= argLen; i++){\n" +
                N->dynamicParamVar + " += va_arg(ap, __ANY__);}\nva_end(ap);}";
     }//add unum support
     if (!TransBlock(N->funkBlock)) {
