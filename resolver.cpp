@@ -11,7 +11,7 @@ int recused = 0;
 
 /*Used to tell if a var type is an object
   Object does not need ot be user created*/
-bool isObj(const string& name){
+bool isObj(const string& name){//vector?
     if(convertedType(name) == "num")
         return false;
     if(name == "string")
@@ -36,9 +36,10 @@ bool checkCast(const string& from, const string& targetType, bool output = true)
             if(output) error("Cast from string to number", true);
             return false;
         }
-    }else if(!builtInType(from) && from != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
+    }else if(!builtInType(from) && from != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS")){
         warn("Implicit cast from type '"+from+"' to type "+targetType);
-    //lintProg?
+    }
+    
     return true;
 }
 
@@ -70,18 +71,17 @@ void applyCast(expression2 * EXP, string targetType){
         return;
     }
 
-
     checkCast(EXP->helper, targetType);
     if(targetType == "string" && convertedType(EXP->helper) == "num"){//TODO bool should be different
-        //checkCast(EXP->helper,"string");
-        EXP->cast = "num to string";
+      //checkCast(EXP->helper,"string");
+      EXP->cast = "num to string";
     }else if(targetType == "string" && EXP->helper == "__ANY__"){
-        EXP->cast = "string";
-    }else if(targetType == "string" && isObj(EXP->helper)){
-        EXP->cast = "toString";
+      EXP->cast = "obj to string";//changed from "string"
+    }else if(targetType == "string" && !builtInType(EXP->helper)){
+      EXP->cast = "obj to string";
     }else if(convertedType(targetType) == "num" && EXP->helper == "string"){
-        EXP->cast = "string to num";
-
+      EXP->cast = "string to num";
+      
         //TODO cast warning/check allow
         /* if(getLintFlag("STRING_TO_NUM") == 1){
           warn("Cast from string to number");
@@ -92,6 +92,7 @@ void applyCast(expression2 * EXP, string targetType){
         //if(!builtInType(EXP->helper) && EXP->helper != "num" && targetType != "__ANY__" && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
         //  warn("Implicit cast from type '"+EXP->helper+"' to type "+targetType);
         EXP->cast = convertedType(targetType);
+	debug("Type fell through");
     }
     //cout<<"applyCast() set cast to: "<<EXP->cast<<endl;
     debug("applyCast(EXP) done");
@@ -104,14 +105,16 @@ void applyCast(atom * a, string targetType){
         return;
     }
     if(targetType == "string" && convertedType(a->helper.type) == "num"){//TODO bool should be different
-        a->cast = "num to string";
-        checkCast(a->helper.type, targetType);
+      a->cast = "num to string";
+      checkCast(a->helper.type, targetType);
     }else if(convertedType(targetType) == "num" && a->helper.type == "string"){
-        a->cast = "string to num";
+      a->cast = "string to num";
+    }else if(targetType == "string" && !builtInType(a->helper.type)){
+      a->cast = "obj to string";
     }else{
-        if(!builtInType(a->helper.type) && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
-            warn("Implicit cast from type '"+a->helper.type+"' to type "+targetType);
-        a->cast = convertedType(targetType);
+      if(!builtInType(a->helper.type) && getFlag("IMPLICIT_CASTS_ON_OBJECTS"))
+	warn("Implicit cast from type '"+a->helper.type+"' to type "+targetType);
+      a->cast = convertedType(targetType);
     }
     debug("applyCast(atom: "+targetType+") done");
 }
@@ -330,6 +333,7 @@ expression2 * resolveExpressions(expression2 * left, expression2 * right, string
             */
             //---------- </ONE> ---------
             //--------- <TWO> ----------//matches types baised on type
+	  //TODO: I think applyCast needs to be implimented when applyin casts but Im not sure
             if(left->helper == "__ANY__" || right->helper == "__ANY__"){//if one is an any, they both have to be
                 if(left->helper != "__ANY__")
                     left->cast = "__ANY__";
@@ -340,14 +344,14 @@ expression2 * resolveExpressions(expression2 * left, expression2 * right, string
                 if(convertedType(right->helper) == "num"){
                     right->cast = "num to string";
                 }else{
-                    right->cast = "string";
+		  right->cast = "string";debug("reg string here");
                 }
                 EXP->helper = "string";
             }else if(right->helper == "string"){
                 if(convertedType(left->helper) == "num"){
                     left->cast = "num to string";
                 }else{
-                    left->cast = "string";
+                    left->cast = "string";debug("reg string here");
                 }
                 EXP->helper = "string";
             }else{
@@ -412,7 +416,8 @@ expression2 * resolveAtoms(atom * left, atom * right, string OP){
                 if(convertedType(right->helper.type) == "num"){
                     right->cast = "num to string";
                 }else{
-                    right->cast = "string";
+		  //right->cast = "string";debug("basic string");
+		  applyCast(right, "string");
                 }
                 EXP->helper = "string";
             }else if(right->helper.type == "string"){
@@ -422,7 +427,7 @@ expression2 * resolveAtoms(atom * left, atom * right, string OP){
                     checkCast(left->helper.type, "string");
                     left->cast = "num to string";
                 }else{
-                    left->cast = "string";
+                    left->cast = "string";debug("basic string");
                 }
                 EXP->helper = "string";
             }else if(right->helper.type == "void"){

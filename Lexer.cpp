@@ -20,9 +20,9 @@ bool Lexer(const string * data, vector<TokenData>* tokens){
   if(data->size() == 0) return false;//error if there is nothing
   
   if(!tokens->capacity())
-    tokens->reserve((data->size()/6)+2);
+    tokens->reserve((data->size()/6)+2);//improve performance by reserving space in the tokens vector
   
-  if(lex(data, tokens)){  
+  if(lex(data, tokens)){//lex() actually tokenises data into the vector tokens
     return true;
   }
   
@@ -52,7 +52,7 @@ bool lex(const string* data, vector<TokenData>* tokens){//TODO add lexer parts(c
 
   report("Lexing file",0);
 
-  for(unsigned i=0; i<data->length(); ++i){ //loop through ever char in the input file
+  for(unsigned i=0; i<data->length(); ++i){ //loop through every char in the input file
     C = data->at(i);//get the next char
     charType = charClassy.get(C);//get char type (digit, letter, operator, etc..)
     charPos++;
@@ -441,6 +441,7 @@ void parseImport(const string& name, vector<TokenData>* tokens, unsigned lineNum
   if(isCpp){
     //TODO
     /*I think i need to make a rough C++ parser to find functions+parameters, would be done in 2Parse.cpp*/
+    /*New idea, find existing C++ parser and rip functions+parameters from that. Place in new file*/
     tokens->push_back(TokenData("import", lineNumber, 6, TokenData::IMPORT));
     tokens->push_back(TokenData(pathToFile, lineNumber, pathToFile.length(), TokenData::IMPORT));
     //exit(14);

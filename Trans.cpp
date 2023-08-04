@@ -17,6 +17,16 @@ bool Trans() {//, vector<Funk> * ProgPtr){
     return true;
 }
 
+bool vectorInsertValue(string vector_name, int index){
+  out += "insert(" + vector_name + "+" + to_string(index) + ", ";
+  return true;
+}
+bool vectorInsertArray(string base_vector, string vector_addition, int index, int addition_start=0, int addition_end=0){
+  out += "insert(" + base_vector + ".begin()+" + to_string(index) + ", " + vector_addition + ".begin()+" + to_string(addition_start)
+    + "," +  vector_addition + ".begin()+" + to_string(addition_end) + ", ";
+  return true;
+}
+
 bool TransRunner() {//TODO extends
     out += "\n\n\n//NEW TEST THING\n";//va_end?
     //out+= "template<typename... Types>\n";
@@ -581,7 +591,7 @@ bool TransExp(expression2 *N) {
         out += "(";
         TransExpHelp(N);
         out += ").toNum()";
-    } else if (N->cast == "string") {
+    } else if (N->cast == "obj to string") {
         out += "(";
         TransExpHelp(N);
         out += ").toString()";//?
@@ -653,6 +663,9 @@ void TransExp(expression3 *N) {
         out += "string(";
         TransExpHelp(N);
         out += ")";
+    }else if(N->cast == "obj to string"){
+      TransExpHelp(N);
+      out += ".toString()";
     } else if (N->cast == "int") {
         out += "(int)(";
         TransExpHelp(N);

@@ -167,6 +167,9 @@ __ANY__ TW_list() {
   ((vector<__ANY__> *)b.ptr)->reserve(4);
   return b;
 }
+__ANY__ list(){
+  return TW_list();
+}
 double pow(double exponent=1.0){//double pow(double, double) is defined in math.h
   return pow(2.71828182845904523536, exponent);
   //return pow(M_E, exponent);
