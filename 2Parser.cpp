@@ -1940,7 +1940,7 @@ void parseFunkCallParameters(funkCall * fc, Funk * F){
     for(int i = F->parameters.size()-1; i > -1; i--){
         if(fc->parameters.at(i) == NULL){
             if(F->parameters.at(i).startingValue == NULL && F->parameters.at(i).secondaryType != "..."){
-                error("Missing parameter '"+F->parameters.at(i).name+"' (" + F->parameters.at(i).type+") to function call: "+F->name);
+                error("Missing parameter '"+F->parameters.at(i).name+"' (" + F->parameters.at(i).type+") to function call: "+F->name);//TODO might be best to print out whole func def
             }else if(interpMode && F->parameters.at(i).secondaryType != "..."){//save all defualt paramas
                 fc->parameters.at(i) = F->parameters.at(i).startingValue;
             }else if(canRemove){//get rid of defualt params
